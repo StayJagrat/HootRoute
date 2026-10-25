@@ -42,6 +42,9 @@ class RemoteRuntime:
     async def audit(self, day: int, minute: int) -> dict:
         return await self._post("audit", {"day": day, "minute": minute}) or {"type": "audit.result", "ranking": [], "draft311": "DRAFT — not submitted. The audit agent did not answer."}
 
+    async def set_sharing(self, walk_id: str, active: bool, guardian_url: str | None):
+        await self._post("share", {"walkId": walk_id, "active": active, "guardianUrl": guardian_url})
+
     def status(self, walk_id: str): return None
     def restore(self, *a, **k): return None
     def start(self): pass

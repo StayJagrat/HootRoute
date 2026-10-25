@@ -90,7 +90,7 @@ def _stretch(engine: Engine, route: dict, on_route: bool, ident: str, day: int =
     evidence = f"{lamps} {lamp_label} on record nearby; {outages} open streetlight outage reports nearby."
     hours = "No listed open place within 50 m at the arrival minute."
     if unknown:
-        hours += f" {unknown} nearby place{'s have' if unknown != 1 else ' has'} no listed hours and count{'s' if unknown == 1 else ''} as closed."
+        hours += f" {unknown} nearby place{'s have' if unknown != 1 else ' has'} no listed hours (unknown, not closed; no credit in the score)."
     return {
         "id": ident,
         "name": _street_names(route, start, end),
@@ -118,10 +118,13 @@ def _kind(cat: str) -> str:
 
 
 def _close_time(spec: str | None, arrival: int, day: int = DAY) -> str:
+    """When a listed-open place closes after you pass it: "HH:MM", "24h", "closed" (listed hours say closed then) or "unknown" (no hours)."""
     if not spec:
-        return "closed"
+        return "unknown"
     if spec == "24/7":
         return "24h"
+    if not is_open(spec, (day + arrival // 1440) % 7, arrival % 1440):
+        return "closed"
     for minute in range(arrival + 1, arrival + 12 * 60 + 1):
         dd = (day + minute // 1440) % 7
         if not is_open(spec, dd, minute % 1440):
@@ -159,7 +162,7 @@ def _clock(minute: int) -> str:
 def _option(engine: Engine, route: dict, depart: int) -> dict:
     return {"id": route["id"], "label": route["label"], "coords": route["coords"], "steps": route["steps"],
             "stats": _stats(route), "km": route["km"], "placesOpen": route["places_open"], "lightPct": route["light_pct"],
-            "points": route["points"], "weights": route["weights"]}
+            "points": route["points"], "weights": route["weights"], "turnsPerKm": route["turns_per_km"], "mainPct": route["main_pct"], "avoidsReport": route.get("avoids", True)}
 
 
 def build_route_data(engine: Engine, lat: float, lon: float, name: str, origin: tuple[float, float] | None = None, origin_name: str | None = None,
@@ -175,7 +178,7 @@ def initials(name: str) -> str:
 
 def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[float, float] | None = None, origin_name: str | None = None,
                day: int = DAY, depart: int = DEPART, walker: str = "Arya", guardian: str = "Maya Chen", session: str = SESSION,
-               simulated_shops: bool = True) -> tuple[dict, dict]:
+               simulated_shops: bool = True, avoid: list | None = None) -> tuple[dict, dict]:
     """(DemoData for the PWA, the engine's own route dicts keyed 'best' and 'fast' for the agents)."""
     name = name.strip()[:100]
     if not name:
@@ -197,7 +200,7 @@ def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[
             raise ValueError("Start and destination are the same place. Pick a different destination.")
         engine.clear(session)
         try:
-            result = engine.route(session, origin, destination, day, depart)
+            result = engine.route(session, origin, destination, day, depart, avoid=avoid)
             fastest = next(r for r in result["routes"] if r["id"] == "fast")
             best = next((r for r in result["routes"] if r["id"] == "best"), fastest)
             suggested = engine.suggest_declarations(session, best, day, depart)
@@ -212,7 +215,7 @@ def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[
             what_if = None
             if shop:
                 closed = {"id": shop["id"], "name": shop["name"], "cat": shop["cat"], "ll": shop["ll"], "hours": shop["hours"], "d": shop["at"]}
-                places.append({**_place(engine, closed, day, depart, simulated_shops), "openUntil": "closed"})
+                places.append(_place(engine, closed, day, depart, simulated_shops))      # not open when you pass: closed, or unknown hours
                 engine.declare(session, shop["id"], depart + 150, day, depart)
                 ctx = engine.ctx(session, day, depart)
                 what_if = {
@@ -225,6 +228,7 @@ def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[
             cumulative = _cumulative(engine, best["coords"])
             stop = _point_at(best["coords"], cumulative, sum(best_gap) / 2)
             debt = engine.darkness_debt(day, depart, near=engine.center_of(best["coords"]), top=3)
+            balanced_r = next((r for r in result["routes"] if r["id"] == "balanced"), None)
             data = {
                 "scenario": {"label": f"{DAY_NAMES[day]} · {_clock(depart)}", "area": f"{origin_name} → {name}", "segmentsScored": engine.W.stats()["segments"], "departureMinute": depart, "day": day},
                 "walker": {"id": "walker", "name": walker},
@@ -236,14 +240,16 @@ def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[
                 "dimStretches": [_stretch(engine, best, True, "hootroute-gap", day, depart), _stretch(engine, fastest, False, "shortest-gap", day, depart)],
                 "stopAt": stop,
                 "places": places,
-                "stats": {"hootroute": _stats(best), "shortest": _stats(fastest)},
+                "stats": {"hootroute": _stats(best), "shortest": _stats(fastest), **({"balanced": _stats(balanced_r)} if balanced_r else {})},
                 "darknessDebt": [{"street": r["street"], "minutes": r["minutes"]} for r in debt["rows"]],
                 "routeSteps": {"hootroute": best["steps"], "shortest": fastest["steps"]},
                 "options": [_option(engine, r, depart) for r in result["routes"]],
                 "recommended": result["recommended"],
                 "whatIf": what_if,
-                "dataNote": f"Scores compare this walk with typical walks in the same neighbourhood at the same hour. Places without listed hours count as closed. The destination is snapped to the nearest mapped street, {destination_snap_m} m away. Darkness debt is modeled walker-minutes, not observed foot traffic.",
+                "dataNote": f"Scores compare this walk with typical walks in the same neighbourhood at the same hour. Places without listed hours earn no credit (unknown, not closed). The destination is snapped to the nearest mapped street, {destination_snap_m} m away. Darkness debt is modeled walker-minutes, not observed foot traffic.",
             }
-            return data, {"best": best, "fast": fastest}
+            routes = {"best": best, "fast": fastest}
+            if balanced_r: routes["balanced"] = balanced_r
+            return data, routes
         finally:
             engine.clear(session)

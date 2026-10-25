@@ -1,15 +1,15 @@
 import type { AgentName, Place } from './types';
+import { PERSONA } from './personas';
 
-export const AGENT_LABEL: Record<AgentName, string> = {
-  head: 'Head',
-  guide: 'Guide',
-  checker: 'Checker',
-  rescuer: 'Rescuer',
-};
+export const AGENT_LABEL: Record<AgentName, string> = PERSONA;
+
+/** Listed open when you pass. Unknown hours are not open and not closed. */
+export const isListedOpen = (u: string) => u !== 'closed' && u !== 'unknown';
 
 export function openLabel(p: Pick<Place, 'openUntil' | 'kind'>): string {
   const u = p.openUntil;
   if (u === 'closed') return 'Closed';
+  if (u === 'unknown') return 'Hours unknown';
   if (u === '24h') return 'Open 24h';
   if (u === 'lobby') return 'Lobby open';
   return `Open till ${clock(u)}`;
@@ -20,6 +20,7 @@ export function openSpoken(p: Pick<Place, 'openUntil'>): string {
   if (u === '24h') return 'open all night';
   if (u === 'lobby') return 'with the lobby open';
   if (u === 'closed') return 'closed';
+  if (u === 'unknown') return 'with unknown hours';
   return `open till ${clock(u)}`;
 }
 
@@ -49,4 +50,30 @@ export function meters(m: number): string {
 
 export function minutesText(min: number): string {
   return `${Math.max(1, Math.round(min))} min`;
+}
+
+/** Minute of the day (may exceed 1440) → "11:30 PM". */
+export function clockOfMinute(minute: number): string {
+  const m = ((Math.round(minute) % 1440) + 1440) % 1440;
+  const h = Math.floor(m / 60);
+  return `${h % 12 || 12}:${String(m % 60).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
+}
+
+/** ISO time → "Oct 24, 9:14 PM" (or the raw string if it doesn't parse). */
+export function whenText(iso: string | null | undefined): string {
+  if (!iso) return 'time unknown';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+/** Only http(s) links are ever rendered as links. */
+export function safeUrl(u: string | null | undefined): string | null {
+  if (!u) return null;
+  try {
+    const x = new URL(u);
+    return x.protocol === 'http:' || x.protocol === 'https:' ? x.href : null;
+  } catch {
+    return null;
+  }
 }

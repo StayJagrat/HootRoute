@@ -10,6 +10,7 @@ The walk logic is hootroute_agents (the same code the gateway runs in-process), 
 from __future__ import annotations
 
 import asyncio
+import hmac
 import json
 import logging
 import os
@@ -106,7 +107,7 @@ class Outbox:
 
 
 def bridge_app(rt: UAgentsRuntime) -> web.Application:
-    def authorised(req: web.Request) -> bool: return not SECRET or req.headers.get("X-Bridge-Secret") == SECRET
+    def authorised(req: web.Request) -> bool: return bool(SECRET) and hmac.compare_digest(req.headers.get("X-Bridge-Secret", ""), SECRET)
 
     async def handle(req: web.Request):
         if not authorised(req): return web.json_response({"error": "unauthorised"}, status=401)
@@ -117,6 +118,7 @@ def bridge_app(rt: UAgentsRuntime) -> web.Application:
         elif kind == "envelope": await rt.handle(body["envelope"])
         elif kind == "place": asyncio.create_task(rt.place_update(body["placeId"], body["declaration"], body["walks"]))
         elif kind == "declarations": rt.engine.set_declarations({int(d): v for d, v in body["declared"].items()})
+        elif kind == "share": await rt.set_sharing(body["walkId"], bool(body["active"]), body.get("guardianUrl"))
         elif kind == "audit": return web.json_response(await rt.audit(body["day"], body["minute"]))
         else: return web.json_response({"error": "unknown"}, status=404)
         return web.json_response({"ok": True})
@@ -128,6 +130,7 @@ def bridge_app(rt: UAgentsRuntime) -> web.Application:
 
 async def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    if len(SECRET) < 16: raise SystemExit("BRIDGE_SECRET (16+ characters) must be set: without it anyone could drive the walk agents.")
     engine = await asyncio.to_thread(Engine); outbox = Outbox()
     rt = UAgentsRuntime(EnginePort(engine), outbox.send, Notifier(os.environ.get("TWILIO_ACCOUNT_SID", ""), os.environ.get("TWILIO_AUTH_TOKEN", ""), os.environ.get("TWILIO_FROM_NUMBER", "")))
     agents = build_all()                                   # the four core agents (Head also serves the ASI:One chat)

@@ -83,14 +83,15 @@ async def _full_walk(base):
                                                 "walker": "Arya", "guardian": "Maya Chen", "guardianPhone": "415 555 0123", "replay": True, "timeScale": 60})
         assert r.status_code == 201, r.text
         walk = r.json(); wid, token = walk["walkId"], walk["walkerToken"]
-        assert walk["guardianUrl"].endswith(f"/guardian/{wid}")
+        assert f"/guardian/{wid}?g=" in walk["guardianUrl"]
+        gtoken = walk["guardianUrl"].split("?g=")[1]
 
         # a guardian link cannot act as the walker
         with pytest.raises(Exception):
             bad_ws = await websockets.connect(f"{base.replace('http', 'ws')}/ws?walk={wid}&role=walker&token=wrong"); await bad_ws.recv()
 
         walker = await Client.open(base, wid, "walker", token)
-        guardian = await Client.open(base, wid, "guardian")
+        guardian = await Client.open(base, wid, "guardian", gtoken)
         p = await walker.wait("walk.plan")
         data = p["plan"]["data"]; assert p["plan"]["guardian"] == "Maya Chen" and data["walker"]["name"] == "Arya"
         assert data["route"] == plan["route"], "the walk must run on the reviewed route"
@@ -142,10 +143,11 @@ async def _full_walk(base):
             await asyncio.sleep(0.02)
         end = await guardian.wait("walk.end", 10)
         assert end["outcome"] == "arrived" and end["summary"] and end["reportBy"].startswith(("template", "Claude"))
-        rec = (await http.get(f"/api/walks/{wid}")).json(); assert rec["status"] == "ended" and rec["outcome"] == "arrived"
+        assert (await http.get(f"/api/walks/{wid}")).status_code == 404            # the walk id alone reveals nothing
+        rec = (await http.get(f"/api/walks/{wid}", headers={"X-Walker-Token": token})).json(); assert rec["status"] == "ended" and rec["outcome"] == "arrived"
 
         # late joiner after the end sees no location trace
-        late = await Client.open(base, wid, "guardian")
+        late = await Client.open(base, wid, "guardian", gtoken)
         assert "walk.position" not in late.types() and "walk.end" in late.types()
 
         # control room runs the overnight audit
@@ -163,16 +165,18 @@ def test_head_and_checker(server):
         tools = [t["tool"] for t in r["trace"]]
         assert r["by"].startswith("fixed pipeline") and r["planId"] and "plan_routes" in tools and "find_route_unknowns" in tools, r
         assert {t["agent"] for t in r["trace"]} <= {"guide", "checker"}
-        if "check_listed_hours" in tools: assert r["check"]["mock"] and "after" in r
+        assert "check_listed_hours" not in tools, "a paid check must wait for approval"
+        if "propose_hours_check" in tools: assert r["pendingApproval"]["provider"] == "mock"
         ins = http.post("/api/check/route", json={"planId": r["planId"]}).json()
         assert ins["verdict"].startswith(("Good to go", "Heads up")) and ins["items"] and all(i["level"] in ("ok", "note", "warn") for i in ins["items"])
         assert "inspect_route" in tools
         u = http.post("/api/check/unknowns", json={"planId": r["planId"]}).json()
         assert all(p["id"] and p["name"] for p in u["places"])
-        c = http.post("/api/check/hours", json={"planId": r["planId"]}).json()
+        assert http.post("/api/check/hours", json={"planId": r["planId"]}).status_code == 428      # no silent paid runs
+        c = http.post("/api/check/hours", json={"planId": r["planId"], "confirm": True}).json()
         assert c["ok"] and c["before"] and c["after"] and c["plan"]["planId"] == c["planId"]
         assert all(x["status"] in ("hours found", "no hours", "closed", "not found") for x in c["results"])
-        assert http.post("/api/check/hours", json={"planId": "nope"}).status_code == 404
+        assert http.post("/api/check/hours", json={"planId": "nope", "confirm": True}).status_code == 404
 
 
 def test_rescue_ladder(server):
@@ -244,7 +248,7 @@ def test_full_walk_under_uagents(tmp_path):
     agents_py = ROOT / ".venv-agents" / "bin" / "python"
     if not agents_py.exists(): pytest.skip("no .venv-agents")
     port, bridge, bureau = free_port(), free_port(), free_port(); base = f"http://127.0.0.1:{port}"
-    common = {**os.environ, "BRIDGE_SECRET": "test-secret", "TWILIO_ACCOUNT_SID": "", "CARTESIA_API_KEY": ""}
+    common = {**os.environ, "BRIDGE_SECRET": "test-secret-0123456789", "TWILIO_ACCOUNT_SID": "", "CARTESIA_API_KEY": ""}
     b = subprocess.Popen([str(agents_py), "live_bureau.py"], cwd=ROOT / "services" / "agents",
                          env={**common, "HOOTROUTE_MODE": "local", "HOOTROUTE_ALLOW_DEV_SEEDS": "1", "GATEWAY_URL": base, "BRIDGE_PORT": str(bridge), "BUREAU_PORT": str(bureau)})
     g = subprocess.Popen([sys.executable, "-m", "uvicorn", "main:app", "--port", str(port), "--log-level", "warning"], cwd=ROOT / "services" / "api",

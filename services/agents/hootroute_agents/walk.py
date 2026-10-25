@@ -37,6 +37,12 @@ class Walk:
     thresholds: dict = field(default_factory=lambda: dict(DEFAULT_THRESHOLDS))
     backup_name: str | None = None   # optional second trusted contact (ladder step 3)
     backup_phone: str | None = None
+    notify_consent: bool = False     # walker opted in to SMS / calls to their contacts
+    sharing: bool = True             # live link active; off = guardian link revoked, no SMS or calls
+    notifications: int = 0           # SMS + calls sent on this walk (capped)
+    recovery: dict | None = None     # pending Mission Recovery options awaiting the walker's choice
+    chosen_recovery: dict | None = None
+    last_report: float = 0.0
     status: str = "planning"        # planning | planned | walking | checkin | escalated | ended
     data: dict | None = None        # DemoData sent in walk.plan
     routes: dict | None = None      # engine route dicts {'best', 'fast'}
@@ -67,25 +73,36 @@ class Walk:
     _cum: list | None = None
 
     # ---------- the line the walker chose ----------
+    @property
+    def key(self) -> str:
+        k = {"usual": "fast", "balanced": "balanced"}.get(self.choice, "best")
+        return k if self.routes and k in self.routes else "best"
+
     def route(self) -> dict:
-        return self.routes["fast" if self.choice == "usual" else "best"]
+        return self.routes[self.key]
+
+    def stats(self) -> dict:
+        """Engine stats of the route being walked."""
+        if self.key == "fast": return self.data["stats"]["shortest"]
+        if self.key == "balanced": return next((o["stats"] for o in self.data.get("options") or [] if o["id"] == "balanced"), self.data["stats"]["hootroute"])
+        return self.data["stats"]["hootroute"]
 
     def line(self) -> list:
         if self._line is None:
-            self._line = self.data["shortest"] if self.choice == "usual" else self.data["route"]; self._cum = geo.cumulative(self._line)
+            self._line = self.route()["coords"]; self._cum = geo.cumulative(self._line)
         return self._line
 
     def cum(self) -> list: self.line(); return self._cum
 
     def total(self) -> float: return self.cum()[-1]
 
-    def steps(self) -> list: return self.data["routeSteps"]["shortest" if self.choice == "usual" else "hootroute"]
+    def steps(self) -> list: return self.route()["steps"]
 
     def set_plan(self, data: dict, routes: dict):
         self.data, self.routes, self._line, self._cum = data, routes, None, None
 
     def set_choice(self, choice: str):
-        self.choice = "usual" if choice == "usual" else "hootroute"; self._line = self._cum = None
+        self.choice = choice if choice in ("usual", "balanced") else "hootroute"; self._line = self._cum = None
 
     @property
     def active(self) -> bool: return self.status in ("walking", "checkin", "escalated")

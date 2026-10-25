@@ -10,16 +10,18 @@ ROLES = ("walker", "guardian", "shop", "room")
 # (walk.plan, voice.say, checkin.ask, escalate, guardian.alert, agent.log, audit.result) is rejected from clients,
 # so nobody holding a walk link can forge an alert or a plan.
 CLIENT_TYPES: dict[str, set[str]] = {
-    "walker": {"walk.accept", "walk.start", "walk.position", "checkin.reply", "walk.end"},
+    "walker": {"walk.accept", "walk.start", "walk.position", "checkin.reply", "walk.end", "obstacle.report", "recovery.choose"},
     "guardian": {"guardian.join", "guardian.ack"},
     "room": {"audit.run", "walk.position"},      # walk.position from the control room only for replay walks (checked in rooms.py)
     "shop": set(),                               # shops declare hours over REST (POST /api/places/{id}/declaration)
 }
 
-AGENT_TYPES = {"rescue.ladder", "walk.plan", "voice.say", "checkin.ask", "escalate", "guardian.alert", "agent.log", "walk.end", "audit.result", "place.update", "walk.reset"}
+AGENT_TYPES = {"rescue.ladder", "walk.plan", "voice.say", "checkin.ask", "escalate", "guardian.alert", "agent.log", "walk.end", "audit.result", "place.update", "walk.reset",
+               "recovery.options", "recovery.closed", "share.update"}
+OBSTACLE_KINDS = ("blocked", "construction", "place_closed", "want_detour", "other")
 
 # Room history kept for late joiners: only the newest of these types matters.
-LATEST_ONLY = {"walk.position", "walk.plan", "audit.result", "guardian.join"}
+LATEST_ONLY = {"walk.position", "walk.plan", "audit.result", "guardian.join", "recovery.options", "share.update"}
 
 
 def envelope(walk_id: str, msg: dict, sender: str = "engine") -> dict:
@@ -46,7 +48,15 @@ def clean_client_msg(role: str, msg: dict) -> dict | None:
         if msg.get("reply") not in ("fine", "help"): return None
         return {"type": kind, "reply": msg["reply"], "via": "voice" if msg.get("via") == "voice" else "tap"}
     if kind == "walk.accept":
-        return {"type": kind, "choice": "usual" if msg.get("choice") == "usual" else "hootroute"}
+        return {"type": kind, "choice": msg["choice"] if msg.get("choice") in ("usual", "balanced") else "hootroute"}
+    if kind == "obstacle.report":
+        out = {"type": kind, "kind": msg["kind"] if msg.get("kind") in OBSTACLE_KINDS else "other", "note": str(msg.get("note") or "")[:140]}
+        if valid_lnglat(msg.get("lngLat")): out["lngLat"] = [float(msg["lngLat"][0]), float(msg["lngLat"][1])]
+        return out
+    if kind == "recovery.choose":
+        rid, oid = msg.get("recoveryId"), msg.get("optionId")
+        if not (isinstance(rid, str) and isinstance(oid, str) and 0 < len(rid) <= 40 and 0 < len(oid) <= 40): return None
+        return {"type": kind, "recoveryId": rid, "optionId": oid}
     if kind == "walk.start":
         return {"type": kind, "replay": bool(msg.get("replay"))}
     if kind == "walk.end":       # a walker may end their own walk early; arrival is decided by the agents

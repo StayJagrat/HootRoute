@@ -198,3 +198,6 @@
 .ladder__rung--now .ladder__n { border-color: var(--alert); background: var(--alert); color: var(--on-accent); }
 .ladder__rung--done .ladder__n { border-color: var(--open); background: var(--open); color: var(--on-accent); }
 .call911 { text-decoration: none; text-align: center; }
+.walk__toast--ok {
+  border-color: var(--open);
+}

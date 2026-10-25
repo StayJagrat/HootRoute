@@ -1,0 +1,128 @@
+.lj__p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.lj__kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.lj__note {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lj__note textarea {
+  font: inherit;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  resize: vertical;
+  width: 100%;
+  box-sizing: border-box;
+}
+.lj__say {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+.lj__say .t-caption {
+  font-size: 11px;
+}
+.lj__opts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lj__opt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid var(--route);
+  background: color-mix(in srgb, var(--route) 8%, var(--surface));
+}
+.lj__opt--current {
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+.lj__opt-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.lj__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.lj__stats div {
+  display: flex;
+  flex-direction: column;
+}
+.lj__stats .t-mono {
+  font-size: 16px;
+}
+.lj__stats small {
+  font-size: 11px;
+  color: var(--text-2);
+}
+.lj__opt .btn {
+  min-height: 48px;
+  font-size: 15px;
+}
+.lj__share {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+}
+.lj__share-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  line-height: 1.3;
+}
+.lj__share-text .t-caption {
+  font-size: 12px;
+}
+.lj__err {
+  font-size: 12px;
+  color: var(--checkin);
+}
+.lj__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.lj__report {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 22px;
+  background: var(--surface-2);
+  font-size: 14px;
+  font-weight: 600;
+}
+.lj__warn {
+  color: var(--checkin);
+}

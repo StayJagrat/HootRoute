@@ -1,7 +1,8 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { isLive, lastWalkId } from './api';
 import { Room, type LinkStatus, type Role } from './transport';
-import type { AgentName, DemoData, Envelope, LngLat, Msg, Place, Thresholds } from './types';
+import { isListedOpen } from './format';
+import type { AgentName, DemoData, Envelope, LngLat, Msg, ObstacleKind, Place, Thresholds } from './types';
 
 // Every screen rebuilds the same WalkState from the message stream,
 // so the walker, guardian, shop and control room always agree.
@@ -19,7 +20,7 @@ export interface LogEntry {
 
 export interface TimelineEvent {
   ts: number;
-  kind: 'start' | 'place' | 'stop' | 'checkin' | 'fine' | 'alert' | 'ack' | 'arrive';
+  kind: 'start' | 'place' | 'stop' | 'checkin' | 'fine' | 'alert' | 'ack' | 'arrive' | 'report';
   label: string;
 }
 
@@ -45,7 +46,16 @@ export interface WalkState {
   reportBy?: string;
   ladder?: { step: number; label: string; status: string; steps: string[]; ts: number };
   engineFrom?: Role;
+  /** Mission Recovery offer from Wingman Wally. The route never changes until the walker chooses. */
+  recovery?: Extract<Msg, { type: 'recovery.options' }> & { ts: number; chosen?: string };
+  lastReport?: { kind: ObstacleKind; note?: string; ts: number };
+  /** Guardian sharing state from share.update (undefined = no update seen yet). */
+  sharing?: boolean;
+  sharingTs?: number;
+  switchedAt?: number;
 }
+
+export const SWITCHED_PREFIX = 'Switched after your report';
 
 export const initialState = (): WalkState => ({
   phase: 'preview',
@@ -70,11 +80,15 @@ export function reduce(s: WalkState, e: Envelope): WalkState {
     case 'walk.reset':
       return { ...initialState(), places: s.places, brightened: s.brightened, log: s.log, guardianJoined: s.guardianJoined };
     case 'walk.plan':
+      if (m.plan.reason?.startsWith(SWITCHED_PREFIX)) {
+        // the walker chose a recovery option: the new plan's main route is the one to follow
+        return { ...s, plan: m.plan, recovery: undefined, switchedAt: ts, choice: s.choice === 'usual' ? 'hootroute' : s.choice };
+      }
       return { ...s, plan: m.plan };
     case 'walk.accept':
       return { ...s, choice: m.choice };
     case 'walk.start':
-      return { ...initialState(), plan: s.plan, choice: s.choice ?? 'hootroute', places: s.places, brightened: s.brightened, log: s.log, guardianJoined: s.guardianJoined, phase: 'walking', replay: m.replay, startedAt: ts, engineFrom: e.from, events: [{ ts, kind: 'start', label: 'Walk started' }] };
+      return { ...initialState(), sharing: s.sharing, sharingTs: s.sharingTs, plan: s.plan, choice: s.choice ?? 'hootroute', places: s.places, brightened: s.brightened, log: s.log, guardianJoined: s.guardianJoined, phase: 'walking', replay: m.replay, startedAt: ts, engineFrom: e.from, events: [{ ts, kind: 'start', label: 'Walk started' }] };
     case 'walk.position': {
       const last = s.trail[s.trail.length - 1];
       const moved = !last || Math.abs(last[0] - m.lngLat[0]) + Math.abs(last[1] - m.lngLat[1]) > 0.00003;
@@ -104,7 +118,7 @@ export function reduce(s: WalkState, e: Envelope): WalkState {
     case 'guardian.join':
       return { ...s, guardianJoined: m.name };
     case 'place.update': {
-      const open = m.place.openUntil !== 'closed';
+      const open = isListedOpen(m.place.openUntil);
       return {
         ...s,
         places: { ...s.places, [m.place.id]: { ...s.places[m.place.id], ...m.place } },
@@ -120,6 +134,17 @@ export function reduce(s: WalkState, e: Envelope): WalkState {
       return { ...s, ladder: { step: m.step, label: m.label, status: m.status, steps: m.steps, ts } };
     case 'audit.result':
       return { ...s, audit: { ranking: m.ranking, draft311: m.draft311, ts } };
+    case 'obstacle.report':
+      return { ...s, lastReport: { kind: m.kind, note: m.note, ts }, events: push(s.events, { ts, kind: 'report', label: 'Report' }) };
+    case 'recovery.options':
+      return { ...s, recovery: { ...m, ts }, lastReport: undefined };
+    case 'recovery.choose':
+      if (!s.recovery || s.recovery.recoveryId !== m.recoveryId) return s;
+      return m.optionId === 'keep' ? { ...s, recovery: undefined, lastReport: undefined } : { ...s, recovery: { ...s.recovery, chosen: m.optionId }, lastReport: undefined };
+    case 'recovery.closed':      // the offer expired or the choice was rejected: the current route stays
+      return s.recovery && s.recovery.recoveryId === m.recoveryId ? { ...s, recovery: undefined } : s;
+    case 'share.update':
+      return { ...s, sharing: m.active, sharingTs: ts };
     default:
       return s;
   }
@@ -160,7 +185,7 @@ export function useWalk(walkId: string, role: Role) {
   };
   const state = useSyncExternalStore(subscribe, () => store.state);
   const status = useSyncExternalStore(subscribe, () => store.status);
-  return { state, status, room: store.room, send: (m: Msg) => store.room.send(m) };
+  return { state, status, refused: store.room.refused, room: store.room, send: (m: Msg) => store.room.send(m) };
 }
 
 // ---------------------------------------------------------------- demo data
@@ -230,7 +255,7 @@ export function useDemoData(enabled = true): { data: DemoData | null; error: str
   return result;
 }
 
-/** The route every screen draws. Live: whatever Scout last planned for this walk (same on every device). Demo: cached data. */
+/** The route every screen draws. Live: whatever the Guide last planned for this walk (same on every device). Demo: cached data. */
 export function useWalkData(state: WalkState): { data: DemoData | null; error: string | null; waiting: boolean } {
   const live = isLive();
   const demo = useDemoData(!live);
@@ -254,6 +279,8 @@ export interface Settings {
   timeScale: number; // demo replay speed (1 = real time)
   walkerName: string;
   destination?: { name: string; lngLat: [number, number] };
+  /** Opt-in: the Rescuer may text or call contacts when a check-in goes unanswered. Off by default. */
+  notifyConsent?: boolean;
   origin?: { name: string; lngLat: [number, number] };
   depart?: { day: number; minute: number; label: string };
 }

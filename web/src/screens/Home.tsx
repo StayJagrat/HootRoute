@@ -4,6 +4,7 @@ import { introSeen } from './Intro';
 import { Mascot } from '../components/ui';
 import { walkIdFromUrl } from '../lib/store';
 import type { AgentName } from '../lib/types';
+import { PERSONA } from '../lib/personas';
 
 // Hub for the demo crew: one walk id, four screens.
 export default function Home() {
@@ -11,8 +12,8 @@ export default function Home() {
   if (!introSeen() && !new URLSearchParams(location.search).has('hub')) return <Navigate to="/welcome" replace />;
   const q = w ? `?walk=${encodeURIComponent(w)}` : '';
   const links: [string, string, string, AgentName][] = [
-    [`/welcome`, 'How it works', 'The four agents, step by step', 'head'],
-    [`/plan`, 'Plan a walk', 'Ask the Head, or pick any start and destination in San Francisco', 'head'],
+    [`/welcome`, 'How it works', `${PERSONA.guide}, ${PERSONA.checker}, ${PERSONA.rescuer} and ${PERSONA.head}`, 'head'],
+    [`/plan`, 'Plan a walk', `Ask ${PERSONA.head}, or pick any start and destination in San Francisco`, 'head'],
     [`/setup`, 'Setup', 'Guardian, backup contact and standing orders', 'guide'],
     [`/walk${q}`, 'Walker', 'The demo phone with earbuds', 'checker'],
     ...(w ? [[`/guardian/${w}`, 'Guardian', "Opened from the QR on a judge's phone", 'rescuer'] as [string, string, string, AgentName]] : []),

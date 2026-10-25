@@ -100,7 +100,7 @@ class World:
         for pl in self.places:
             e = ev.get(pl["id"])
             if pl["hours"] is None and e and e.get("opening_hours") and e.get("confidence", 0) >= min_conf:
-                pl["hours"] = e["opening_hours"]; pl["hours_source"] = e.get("source", "evidence"); pl["hours_conf"] = e.get("confidence"); self.hours_filled += 1
+                pl["hours"] = e["opening_hours"]; pl["hours_source"] = e.get("source", "evidence"); pl["hours_conf"] = e.get("confidence"); pl["hours_at"] = e.get("fetched_at"); self.hours_filled += 1
 
     # ---------- SF 311 ----------
     def _load_311(self):

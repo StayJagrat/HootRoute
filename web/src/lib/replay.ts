@@ -4,7 +4,7 @@ import type { LngLat, Msg } from './types';
 // GPS replay for indoor demos (?gps=replay). It only produces positions; the live agents on the gateway decide
 // everything else, exactly as they would for a real walk. Every screen shows the "DEMO · GPS REPLAY" tape.
 // It walks the route at timeScale× walking speed and stands still at `stopAt` until resume() (the walker answered)
-// or until maxHoldMs, so the Watcher's stop rule fires on the engine-chosen stretch.
+// or until maxHoldMs, so the Checker's stop rule fires on the engine-chosen stretch.
 
 const WALK_MS = 1.35;
 const TICK = 500;

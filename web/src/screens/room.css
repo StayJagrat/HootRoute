@@ -352,3 +352,72 @@
   font-family: var(--font-display);
   font-weight: 800;
 }
+
+/* ---- feed tabs and Mission Control ---- */
+.room__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.room__tab {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.room__tab.on {
+  color: var(--text);
+  background: var(--surface);
+}
+.room__mission {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 14px 16px 24px;
+}
+.room__mission section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.room__mission p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.room__mh {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+}
+.room__rec {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--checkin);
+}
+.room__rec-t {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.room__rec-t th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-2);
+  padding: 2px 4px;
+}
+.room__rec-t td {
+  padding: 4px;
+  border-top: 1px solid var(--border);
+}
+.room__rec-t tr.on td {
+  color: var(--open);
+}

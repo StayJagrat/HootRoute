@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { PERSONA } from '../lib/personas';
 import { useParams } from 'react-router-dom';
 import { Mascot, Toggle } from '../components/ui';
 import { clock } from '../lib/format';
@@ -128,7 +129,7 @@ export default function Shop() {
             <Mascot agent="guide" state="done" size={48} />
             <div>
               <div className="t-headline" style={{ fontSize: 15 }}>Your hours update is visible to nearby walkers.</div>
-              <div className="shop__toast-sub">{live ? (notified ? `The Guide told ${notified} walk${notified === 1 ? '' : 's'} passing your door · just now` : 'The Guide will offer it to the next walker · just now') : walking ? `Scout kept ${settings.walkerName}'s walk past your door · just now` : 'The Guide will offer it to the next walker · just now'}</div>
+              <div className="shop__toast-sub">{live ? (notified ? `${PERSONA.guide} told ${notified} walk${notified === 1 ? '' : 's'} passing your door · just now` : `${PERSONA.guide} will offer it to the next walker · just now`) : walking ? `Simulated · ${PERSONA.guide} kept ${settings.walkerName}'s walk past your door · just now` : `${PERSONA.guide} will offer it to the next walker · just now`}</div>
             </div>
           </div>
         )}

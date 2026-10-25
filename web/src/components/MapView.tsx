@@ -5,7 +5,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { Protocol } from 'pmtiles';
 import { buildStyle, UI_COLORS, type Theme } from '../lib/mapStyle';
 import { along, bounds, cumulative, lineLength, offsetPoint, project, sliceFrom, sliceTo } from '../lib/geo';
-import { openLabel } from '../lib/format';
+import { isListedOpen, openLabel } from '../lib/format';
 import type { DemoData, LngLat, Place } from '../lib/types';
 import { ICONS } from './icons';
 
@@ -39,6 +39,9 @@ export function ensurePmtiles() {
   maplibregl.addProtocol('pmtiles', new Protocol().tile);
   pmtilesReady = true;
 }
+
+/** Place and street names come from map data and user-chosen destinations; never let them become markup. */
+const esc = (t: string) => t.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
 
 export default function MapView(p: MapViewProps) {
   return <MapBoundary className={p.className}><MapViewInner {...p} /></MapBoundary>;
@@ -162,7 +165,7 @@ function MapViewInner(p: MapViewProps) {
   // ---------------------------------------------------------------- data layers
   useEffect(() => {
     const m = map.current;
-    if (!m || !ready) return;
+    if (!m || !ready || !m.getSource('route-ahead')) return;   // style reloading (theme switch, hot reload): sources come back with 'load'
     const walked = (p.progress ?? 0) * total;
     (m.getSource('route-ahead') as GeoJSONSource).setData(fc([ls(walked > 1 ? sliceFrom(line, walked, cum) : line)]));
     (m.getSource('route-done') as GeoJSONSource).setData(fc(walked > 1 ? [ls(sliceTo(line, walked, cum))] : []));
@@ -214,13 +217,13 @@ function MapViewInner(p: MapViewProps) {
       if (node.innerHTML !== html) node.innerHTML = html;
       mk.setLngLat(lngLat);
     };
-    put('start', p.data.start.lngLat, `<div class="end-pin"><span style="width:18px;height:18px;display:inline-flex">${ICONS.train}</span>${p.data.start.name}</div>`, 'bottom-left', [-14, -6]);
-    put('end', p.data.end.lngLat, `<div class="end-pin"><span style="width:18px;height:18px;display:inline-flex">${ICONS.star}</span>${p.data.end.name}</div>`, 'top-left', [-14, 6]);
+    put('start', p.data.start.lngLat, `<div class="end-pin"><span style="width:18px;height:18px;display:inline-flex">${ICONS.train}</span>${esc(p.data.start.name)}</div>`, 'bottom-left', [-14, -6]);
+    put('end', p.data.end.lngLat, `<div class="end-pin"><span style="width:18px;height:18px;display:inline-flex">${ICONS.star}</span>${esc(p.data.end.name)}</div>`, 'top-left', [-14, 6]);
     for (const pl of p.places) {
-      const closed = pl.openUntil === 'closed';
+      const closed = !isListedOpen(pl.openUntil);
       const cls = `place-marker${closed ? ' place-marker--closed' : ''}${p.bouncePlace === pl.id ? ' place-marker--bounce' : ''}`;
       put(`place:${pl.id}`, pl.lngLat,
-        `<div class="${cls}" title="${pl.name}${pl.simulated ? ' (simulated)' : ''}"><div class="place-marker__pin" style="color:#0B0E14">${ICONS[pl.kind]}</div><div class="place-marker__tag">${pl.simulated ? '' : `${pl.name} · `}${openLabel(pl)}${pl.safeHaven && !closed ? `<span style="width:12px;height:12px;display:inline-flex">${ICONS.star}</span>` : ''}</div></div>`);
+        `<div class="${cls}" title="${esc(pl.name)}${pl.simulated ? ' (simulated)' : ''}"><div class="place-marker__pin" style="color:#0B0E14">${ICONS[pl.kind]}</div><div class="place-marker__tag">${pl.simulated ? '' : `${esc(pl.name)} · `}${openLabel(pl)}${pl.safeHaven && !closed ? `<span style="width:12px;height:12px;display:inline-flex">${ICONS.star}</span>` : ''}</div></div>`);
     }
     for (const k of Object.keys(markers.current)) if (!want.has(k)) {
       markers.current[k].remove();

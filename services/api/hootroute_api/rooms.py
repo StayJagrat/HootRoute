@@ -81,4 +81,15 @@ class Hub:
                 try: await fn(env)
                 except Exception: log.exception("observer failed on %s", env["msg"].get("type"))
 
+    async def kick(self, walk_id: str, role: str, code: int = 4401):
+        """Disconnect every client of one role (sharing stopped: guardians lose the live view immediately)."""
+        r = self.rooms.get(walk_id)
+        if not r: return
+        async with r.lock:
+            out = [s for s, rl in r.clients.items() if rl == role]
+            for s in out: r.clients.pop(s, None)
+        for s in out:
+            try: await s.close(code=code)
+            except Exception: pass
+
     def active_room_ids(self) -> list[str]: return [k for k, r in self.rooms.items() if r.persistent]

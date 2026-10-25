@@ -264,3 +264,40 @@
 .inspect__item--warn .inspect__dot { background: var(--checkin); }
 .inspect__src { font-size: 10.5px; color: var(--text-2); opacity: .75; margin-top: 2px; }
 .inspect__missing { margin: 0; color: var(--checkin); }
+
+/* ---- preferences, demo label, crew ---- */
+.plan__sim {
+  font-weight: 600;
+  color: var(--checkin);
+}
+.plan__prefs-toggle {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.plan__choice {
+  margin: 0;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-2);
+}
+.plan__crew summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--route);
+}
+.plan__cards > .plan__card {
+  min-width: 0;
+}

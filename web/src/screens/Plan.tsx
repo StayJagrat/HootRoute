@@ -5,14 +5,29 @@ import PickerMap from '../components/PickerMap';
 import { Button, Icon, Mascot } from '../components/ui';
 import { inCity, LOCAL_DESTINATIONS, nameForPin, searchPlaces, type DestinationResult } from '../lib/search';
 import { loadSettings, primeDemoData, saveSettings } from '../lib/store';
-import { askHead, createPlan, createWalk, gpsMode, isLive, withFlags, type HeadAnswer, type Plan as LivePlan } from '../lib/api';
-import { CheckerCard, HeadAnswerCard, HeadAsk, Steps } from '../components/AgentPanels';
+import { createPlan, createWalk, gpsMode, health as getHealth, isLive, withFlags, type HeadAnswer, type Health, type Plan as LivePlan, type Preferences, type RouteKey, type WalkChoice } from '../lib/api';
+import { CheckerCard, Steps } from '../components/AgentPanels';
+import { HootPanel } from '../components/HootPanel';
+import { Drawer } from '../components/Drawer';
+import { CrewStatus, TraceTimeline } from '../components/MissionControl';
+import { EvidenceExplorer } from '../components/EvidenceExplorer';
+import { RoutePrefs } from '../components/RoutePrefs';
+import { anyPrefs, loadPrefs, savePrefs } from '../lib/prefs';
+import { PERSONA, SHORT } from '../lib/personas';
 import type { DemoData, LngLat } from '../lib/types';
 import { minutesText } from '../lib/format';
 import './walk.css';
 import './plan.css';
 
 type Field = 'from' | 'to';
+type Pick3 = 'fast' | 'balanced' | 'best';
+const CHOICE: Record<Pick3, WalkChoice> = { fast: 'usual', balanced: 'balanced', best: 'hootroute' };
+function recommendedPick(p: DemoData | LivePlan): Pick3 {
+  const want = ('preferenceChoice' in p && p.preferenceChoice?.optionId) || p.recommended;
+  if (want === 'fast') return 'fast';
+  if (want === 'balanced' && p.options?.some((o) => o.id === 'balanced')) return 'balanced';
+  return 'best';
+}
 interface Spot { name: string; lngLat: LngLat }
 interface When { day: number; minute: number; label: string }
 
@@ -60,12 +75,15 @@ export default function Plan() {
   const [starting, setStarting] = useState(false);
   const [planning, setPlanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pick, setPick] = useState<'fast' | 'best'>('best');
+  const [pick, setPick] = useState<Pick3>('best');
   const [sheetH, setSheetH] = useState(360);
   const sheet = useRef<HTMLElement>(null);
-  const [headBusy, setHeadBusy] = useState(false);
-  const [headAns, setHeadAns] = useState<HeadAnswer | null>(null);
-  const headSession = useRef<string | null>(null);
+  const [hp, setHealth] = useState<Health | null>(null);
+  const [prefs, setPrefsState] = useState<Preferences>(loadPrefs);
+  const [prefsOpen, setPrefsOpen] = useState(false);
+  const [mission, setMission] = useState<HeadAnswer | null>(null);
+  const [evidenceOpen, setEvidenceOpen] = useState(false);
+  const setPrefs = (p: Preferences) => { setPrefsState(p); savePrefs(p); };
   const preset = useRef<LivePlan | null>(null);   // a plan the Head already made: show it instead of planning again
 
   // keep the map clear of the sheet
@@ -75,6 +93,8 @@ export default function Plan() {
     ro.observe(sheet.current);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => { if (isLive()) getHealth().then(setHealth, () => setHealth(null)); }, []);
 
   // search: our own API first (works offline), Photon adds addresses
   useEffect(() => {
@@ -108,34 +128,31 @@ export default function Plan() {
   // score the route whenever the start, destination or time changes
   useEffect(() => {
     if (!from || !to) { setPlan(null); return; }
-    if (preset.current) { const p = preset.current; preset.current = null; setPlan(p); setPick(p.recommended === 'fast' ? 'fast' : 'best'); setPlanning(false); return; }
+    if (preset.current) { const p = preset.current; preset.current = null; setPlan(p); setPick(recommendedPick(p)); setPlanning(false); return; }
     const c = new AbortController();
     setPlanning(true);
     setError(null);
     const t = window.setTimeout(() => {
-      createPlan(from, to, { day: when.day, minute: when.minute }, c.signal)
-        .then((d) => { setPlan(d); setPick(d.recommended === 'fast' ? 'fast' : 'best'); })
+      createPlan(from, to, { day: when.day, minute: when.minute }, c.signal, anyPrefs(prefs) ? prefs : undefined)
+        .then((d) => { setPlan(d); setPick(recommendedPick(d)); })
         .catch((e: Error) => { if (!c.signal.aborted) { setPlan(null); setError(e.message); } })
         .finally(() => { if (!c.signal.aborted) setPlanning(false); });
     }, 250);
     return () => { window.clearTimeout(t); c.abort(); };
-  }, [from, to, when]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [from, to, when, prefs]);
 
-  const ask = async (text: string) => {
-    setHeadBusy(true); setError(null);
-    try {
-      const a = await askHead(text, headSession.current);
-      headSession.current = a.session; setHeadAns(a);
-      if (a.plan && a.planId && a.req) {
-        preset.current = { ...a.plan, planId: a.planId };
-        const { origin: o, destination: d, day, minute } = a.req;
-        setQuery(''); setResults([]);
-        setFrom({ name: o.name, lngLat: [o.lon, o.lat] }); setTo({ name: d.name, lngLat: [d.lon, d.lat] });
-        setWhen(whens.find((w) => w.day === day && w.minute === minute) ?? { day, minute, label: `${DAY3[day]} ${clock(minute)}` });
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'The Head could not answer.');
-    } finally { setHeadBusy(false); }
+  /** Professor Hoot answered: show the plan he made instead of planning again. */
+  const onAnswer = (a: HeadAnswer) => {
+    setError(null);
+    if (!a.plan || !a.planId) return;
+    const p: LivePlan = { ...a.plan, planId: a.planId, preferenceChoice: a.preferenceChoice ?? a.plan.preferenceChoice ?? null };
+    if (!a.req) { setPlan(p); setPick(recommendedPick(p)); return; }
+    preset.current = p;
+    const { origin: o, destination: d, day, minute } = a.req;
+    setQuery(''); setResults([]);
+    setFrom({ name: o.name, lngLat: [o.lon, o.lat] }); setTo({ name: d.name, lngLat: [d.lon, d.lat] });
+    setWhen(whens.find((w) => w.day === day && w.minute === minute) ?? { day, minute, label: `${DAY3[day]} ${clock(minute)}` });
   };
 
   const useMyLocation = () => {
@@ -153,6 +170,11 @@ export default function Plan() {
 
   const swap = () => { setFrom(to); setTo(from); setPlan(null); };
   const stats = plan?.stats;
+  const balanced = plan?.options?.find((o) => o.id === 'balanced') ?? null;
+  const livePlanId = plan && 'planId' in plan ? plan.planId : null;
+  const choiceReason = plan && 'preferenceChoice' in plan ? plan.preferenceChoice?.reason : null;
+  const prefCount = [prefs.fewerTurns, prefs.preferOpenPlaces, prefs.preferMainRoads, prefs.fastest, prefs.lowDistraction].filter(Boolean).length;
+  const checkRoute: RouteKey = pick === 'fast' ? 'fast' : pick === 'balanced' ? 'balanced' : 'best';
   const gain = stats ? stats.hootroute.score - stats.shortest.score : 0;
   const extra = stats ? stats.hootroute.minutes - stats.shortest.minutes : 0;
   const same = !!plan && plan.options?.length === 1;
@@ -170,7 +192,7 @@ export default function Plan() {
     try {
       const replay = gpsMode() === 'replay';
       const w = await createWalk({
-        planId: 'planId' in plan ? plan.planId : undefined, from, to, when: { day: when.day, minute: when.minute }, choice: pick === 'fast' ? 'usual' : 'hootroute',
+        planId: 'planId' in plan ? plan.planId : undefined, from, to, when: { day: when.day, minute: when.minute }, choice: CHOICE[pick], notifyConsent: !!saved.notifyConsent,
         walker: saved.walkerName, guardian: saved.guardianName, guardianPhone: saved.guardianPhone, backupName: saved.backupName, backupPhone: saved.backupPhone, thresholds: saved.thresholds, replay, timeScale: replay ? saved.timeScale : 1,
       });
       nav(withFlags(w.walkPath));
@@ -200,11 +222,12 @@ export default function Plan() {
 
   return (
     <div className="screen plan" data-theme="night">
-      <PickerMap from={from?.lngLat ?? null} to={to?.lngLat ?? null} fast={plan?.shortest} best={plan?.route} highlight={pick} bottomPad={sheetH + 24} onTap={onTap} />
+      <PickerMap from={from?.lngLat ?? null} to={to?.lngLat ?? null} fast={plan?.shortest} best={pick === 'balanced' && balanced ? balanced.coords : plan?.route} highlight={checkRoute === 'fast' ? 'fast' : 'best'} bottomPad={sheetH + 24} onTap={onTap} />
 
       <div className="plan__top">
         <Link to="/" className="round-btn" aria-label="Home"><Icon name="back" size={20} /></Link>
         <div className="chip"><span className="dot dot--live" />San Francisco · {when.label}</div>
+        {!isLive() && <span className="chip plan__sim">Simulated demo</span>}
       </div>
 
       <section className="sheet plan__sheet" ref={sheet} aria-label="Plan a walk">
@@ -212,11 +235,10 @@ export default function Plan() {
  <Steps at={plan ? 2 : 1} />
         <div className="plan__head">
           <Mascot agent="guide" state={planning ? 'thinking' : plan ? 'done' : 'idle'} size={34} />
-          <div className="t-headline" style={{ fontSize: 16 }}>{plan ? 'The Guide found your routes' : planning ? 'The Guide is scoring every block…' : 'Where are you walking?'}</div>
+          <div className="t-headline" style={{ fontSize: 16 }}>{plan ? `${PERSONA.guide} found your routes` : planning ? `${SHORT.guide} is scoring every block…` : 'Where are you walking?'}</div>
         </div>
 
-        {isLive() && <HeadAsk busy={headBusy} onAsk={(t) => void ask(t)} />}
-        {headAns && !query && <HeadAnswerCard a={headAns} />}
+        {isLive() && <div hidden={!!query}><HootPanel health={hp} onAnswer={onAnswer} onOpenMission={setMission} onOpenEvidence={livePlanId ? () => setEvidenceOpen(true) : undefined} /></div>}
 
         <div className="plan__fields">
           {row('from', from, 'Start')}
@@ -243,6 +265,11 @@ export default function Plan() {
           ))}
         </div>
 
+        <button type="button" className="plan__prefs-toggle" onClick={() => setPrefsOpen(!prefsOpen)} aria-expanded={prefsOpen}>
+          Route preferences{prefCount ? ` · ${prefCount} on` : ''}<Icon name="chevronDown" size={14} />
+        </button>
+        {prefsOpen && <RoutePrefs value={prefs} onChange={setPrefs} />}
+
         {error && <div className="plan__error" role="alert">{error}</div>}
 
         {plan && stats && !query && (
@@ -253,6 +280,13 @@ export default function Plan() {
                 <div className="plan__score">{stats.shortest.score}<small>/100</small></div>
                 <div className="plan__meta">{minutesText(stats.shortest.minutes)}<br />{stats.shortest.longestEmptyM} m empty</div>
               </button>
+              {!same && balanced && (
+                <button type="button" className={`plan__card plan__card--best${pick === 'balanced' ? ' on' : ''}`} onClick={() => setPick('balanced')} aria-pressed={pick === 'balanced'}>
+                  <div className="t-caption">{balanced.label || 'Balanced'}</div>
+                  <div className="plan__score">{balanced.stats.score}<small>/100</small></div>
+                  <div className="plan__meta">{minutesText(balanced.stats.minutes)}<br />{balanced.stats.longestEmptyM} m empty</div>
+                </button>
+              )}
               {!same && (
                 <button type="button" className={`plan__card plan__card--best${pick === 'best' ? ' on' : ''}`} onClick={() => setPick('best')} aria-pressed={pick === 'best'}>
                   <div className="t-caption">{BRAND}</div>
@@ -266,13 +300,30 @@ export default function Plan() {
                 ? 'The fastest route is already the best one I found at this hour.'
                 : `${BRAND} scores ${gain >= 0 ? '+' : ''}${gain} points higher for ${extra >= 0 ? '+' : ''}${extra.toFixed(1)} min. The longest stretch with nothing open drops from ${stats.shortest.longestEmptyM} m to ${stats.hootroute.longestEmptyM} m.`}
             </p>
+            {choiceReason && <p className="plan__choice"><Mascot agent="guide" size={18} alt="" /> {choiceReason}</p>}
             <div className="t-caption" style={{ fontSize: 11 }}>Compared with typical walks nearby at this hour. Conditions, not a safety rating.</div>
-            <CheckerCard plan={plan} route={pick} onPlan={(p) => setPlan(p)} />
-            <Button kind="primary" block disabled={starting} onClick={() => void review()}>{starting ? 'Starting your walk…' : 'Start walk · Rescuer on standby'}</Button>
+            <CheckerCard plan={plan} route={checkRoute} onOpenEvidence={livePlanId ? () => setEvidenceOpen(true) : undefined} />
+            <Button kind="primary" block disabled={starting} onClick={() => void review()}>{starting ? 'Starting your walk…' : `Start walk · ${SHORT.rescuer} on standby`}</Button>
           </>
         )}
         {!plan && !planning && !error && from && to && <div className="t-caption">Scoring starts as soon as both pins are set.</div>}
       </section>
+
+      <Drawer open={!!mission} onClose={() => setMission(null)} label="Mission Control" title={<><Mascot agent="head" size={28} alt="" /> Mission Control</>}>
+        {mission && (
+          <>
+            <p className="t-caption" style={{ margin: 0 }}>Every tool call behind this answer, in order. {mission.by} · {(mission.ms / 1000).toFixed(1)} s total.</p>
+            <TraceTimeline trace={mission.trace ?? []} />
+            <details className="plan__crew">
+              <summary>The crew on this server</summary>
+              <CrewStatus />
+            </details>
+          </>
+        )}
+      </Drawer>
+      <Drawer open={evidenceOpen && !!livePlanId} onClose={() => setEvidenceOpen(false)} label="Evidence Explorer" title={<><Mascot agent="checker" size={28} alt="" /> Evidence · {checkRoute === 'fast' ? 'fastest route' : `${BRAND} route`}</>}>
+        {livePlanId && <EvidenceExplorer planId={livePlanId} route={checkRoute} apify={hp?.apify} onPlan={(p) => setPlan(p)} />}
+      </Drawer>
     </div>
   );
 }

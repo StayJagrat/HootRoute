@@ -26,6 +26,8 @@ export class Room {
   private seen = new Set<string>();
   private listeners = new Set<Listener>();
   private statusListeners = new Set<(s: LinkStatus) => void>();
+  /** Close code when the gateway refused this socket (4401 = no valid token, e.g. sharing stopped). */
+  refused: number | null = null;
   private retry = 0;
   private closed = false;
   private outbox: string[] = [];
@@ -44,8 +46,12 @@ export class Room {
     const env = import.meta.env.VITE_GATEWAY_URL as string | undefined;
     const base = env && env.length > 0 ? env : `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`;
     const sep = base.includes('?') ? '&' : '?';
-    // walker: the token issued when the walk was created on this phone; room: the control-room token, if the server requires one
-    const token = this.role === 'walker' ? walkCreds(this.walkId)?.token ?? '' : this.role === 'room' ? adminToken() : '';
+    // walker: the token issued when the walk was created on this phone; room: the control-room token, if the server requires one;
+    // guardian: the token in the shared link (/guardian/:walk?g=<token>)
+    const token = this.role === 'walker' ? walkCreds(this.walkId)?.token ?? ''
+      : this.role === 'room' ? adminToken()
+      : this.role === 'guardian' ? new URLSearchParams(location.search).get('g') ?? ''
+      : '';
     return `${base}${sep}walk=${encodeURIComponent(this.walkId)}&role=${this.role}${token ? `&token=${encodeURIComponent(token)}` : ''}`;
   }
 
@@ -89,6 +95,7 @@ export class Room {
       if (this.closed) return;
       if (ev.code === 4401 || ev.code === 4404 || ev.code === 1008) {
         // refused: wrong token or unknown walk. Retrying won't help.
+        this.refused = ev.code;
         this.setStatus('local');
         return;
       }

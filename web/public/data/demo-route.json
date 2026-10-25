@@ -833,7 +833,7 @@
       ],
       "lampEvidence": "8 lamp locations on record nearby; 0 open streetlight outage reports nearby.",
       "lampSource": "OSM street lamps and SF 311 streetlight reports",
-      "openPlaces": "No listed open place within 50 m at the arrival minute. 2 nearby places have no listed hours and count as closed.",
+      "openPlaces": "No listed open place within 50 m at the arrival minute. 2 nearby places have no listed hours (unknown, not closed; no credit in the score).",
       "openSource": "OSM listed hours and matched hours evidence",
       "why": "This 390 m stretch has no listed open place or reachable help point on the route. Conditions, not a safety rating."
     },
@@ -1711,7 +1711,10 @@
         "main": 10,
         "transit": 10,
         "turns": 10
-      }
+      },
+      "turnsPerKm": 3.1,
+      "mainPct": 85,
+      "avoidsReport": true
     },
     {
       "id": "best",
@@ -2161,7 +2164,10 @@
         "main": 10,
         "transit": 10,
         "turns": 10
-      }
+      },
+      "turnsPerKm": 2.4,
+      "mainPct": 86,
+      "avoidsReport": true
     }
   ],
   "recommended": "best",
@@ -2181,5 +2187,5 @@
       }
     }
   },
-  "dataNote": "Scores compare this walk with typical walks in the same neighbourhood at the same hour. Places without listed hours count as closed. The destination is snapped to the nearest mapped street, 77 m away. Darkness debt is modeled walker-minutes, not observed foot traffic."
+  "dataNote": "Scores compare this walk with typical walks in the same neighbourhood at the same hour. Places without listed hours earn no credit (unknown, not closed). The destination is snapped to the nearest mapped street, 77 m away. Darkness debt is modeled walker-minutes, not observed foot traffic."
 }

@@ -32,18 +32,26 @@ def _flag(name: str, default: bool) -> bool:
     return v in ("1", "true", "yes", "on")
 
 
+def _production() -> bool: return env("HOOTROUTE_ENV").lower() == "production"
+
+
 @dataclass(frozen=True)
 class Settings:
+    production: bool = field(default_factory=_production)                                # HOOTROUTE_ENV=production: refuse open defaults
     public_url: str = field(default_factory=lambda: env("PUBLIC_URL").rstrip("/"))       # e.g. https://hootroute.example.com; used in guardian links and SMS
     db_path: Path = field(default_factory=lambda: Path(env("DB_PATH", str(ROOT / "data" / "hootroute.db"))))
     admin_token: str = field(default_factory=lambda: env("ADMIN_TOKEN"))                 # empty = control room open (local development only)
-    demo_rooms: bool = field(default_factory=lambda: _flag("ALLOW_DEMO_ROOMS", True))    # relay unregistered rooms for the offline DemoEngine
+    demo_rooms: bool = field(default_factory=lambda: _flag("ALLOW_DEMO_ROOMS", not _production()))    # relay unregistered rooms for the offline DemoEngine
+    rate_limits: bool = field(default_factory=lambda: _flag("RATE_LIMITS", True))        # per-IP limits on planning and paid endpoints
+    apify_daily_runs: int = field(default_factory=lambda: int(env("APIFY_DAILY_RUNS", "25")))   # paid hours checks per day, whole gateway
+    sms_allowlist: tuple[str, ...] = field(default_factory=lambda: tuple(n.strip() for n in env("SMS_ALLOWLIST").split(",") if n.strip()))
+    max_notifications: int = field(default_factory=lambda: int(env("MAX_NOTIFICATIONS_PER_WALK", "6")))      # SMS + calls per walk
     agent_runtime: str = field(default_factory=lambda: env("AGENT_RUNTIME", "inprocess"))  # inprocess | uagents
     uagents_bridge_url: str = field(default_factory=lambda: env("UAGENTS_BRIDGE_URL", "http://127.0.0.1:8110").rstrip("/"))
     bridge_secret: str = field(default_factory=lambda: env("BRIDGE_SECRET"))
     position_retention_h: float = field(default_factory=lambda: float(env("POSITION_RETENTION_HOURS", "24")))
     plan_ttl_s: int = field(default_factory=lambda: int(env("PLAN_TTL_SECONDS", "1800")))
-    cors_origins: tuple[str, ...] = field(default_factory=lambda: tuple(o.strip() for o in env("CORS_ORIGINS", "*").split(",") if o.strip()))
+    cors_origins: tuple[str, ...] = field(default_factory=lambda: tuple(o.strip() for o in env("CORS_ORIGINS", env("PUBLIC_URL").rstrip("/") if _production() else "*").split(",") if o.strip()))
     # optional providers: each feature reports "not configured" instead of failing
     twilio_sid: str = field(default_factory=lambda: env("TWILIO_ACCOUNT_SID"))
     twilio_token: str = field(default_factory=lambda: env("TWILIO_AUTH_TOKEN"))
@@ -58,6 +66,17 @@ class Settings:
 
     @property
     def tts_enabled(self) -> bool: return bool(self.cartesia_key and self.cartesia_voice)
+
+    def problems(self) -> list[str]:
+        """Configuration that must not reach a public deployment. In production the gateway refuses to start with any of these."""
+        out = []
+        if self.agent_runtime == "uagents" and len(self.bridge_secret) < 16: out.append("BRIDGE_SECRET (16+ characters) is required when AGENT_RUNTIME=uagents")
+        if self.production:
+            if len(self.admin_token) < 16: out.append("ADMIN_TOKEN (16+ characters) is required in production")
+            if not self.public_url.startswith("https://"): out.append("PUBLIC_URL must be an https:// origin in production")
+            if "*" in self.cors_origins: out.append("CORS_ORIGINS must list the app's origins in production, not *")
+            if self.sms_enabled and not self.sms_allowlist: out.append("SMS_ALLOWLIST is required in production when Twilio is configured")
+        return out
 
 
 settings = Settings()

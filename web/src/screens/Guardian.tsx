@@ -36,7 +36,7 @@ function beep() {
 export default function Guardian() {
   const { walk = 'demo' } = useParams();
   const settings = useMemo(loadSettings, []);
-  const { state, send, status } = useWalk(walk, 'guardian');
+  const { state, send, status, refused } = useWalk(walk, 'guardian');
   const { data, error, waiting } = useWalkData(state);
   const [sound, setSound] = useState(false);
   const [details, setDetails] = useState(false);
@@ -68,6 +68,18 @@ export default function Guardian() {
     }
   }, [state.alert]);
 
+  if (refused === 4401 || state.sharing === false) {
+    return (
+      <div className="screen guardian" data-theme="day">
+        <main className="g-stopped" role="status">
+          <Logo size={22} />
+          <h1 className="t-display">Sharing was stopped by the walker</h1>
+          <p className="muted">This link no longer shows {state.plan?.walker ?? 'their'}{state.plan?.walker ? "'s" : ''} location. If sharing is turned back on, the walker gets a new link to send you; this one stays off.</p>
+          {refused === 4401 && state.sharing !== false && <p className="t-caption">If you only just opened this link, it may be an old or incomplete one.</p>}
+        </main>
+      </div>
+    );
+  }
   if (!data) return <div className="screen" data-theme="day" role={error ? 'alert' : undefined} style={{ padding: 24 }}>{error ?? (waiting ? 'Waiting for the walk to be planned…' : 'Loading route…')}</div>;
   const places = mergedPlaces(data, state);
   const active = state.phase !== 'preview' && state.phase !== 'arrived';
@@ -93,7 +105,7 @@ export default function Guardian() {
       <header className="g-top">
         <div>
           <Logo size={20} />
-          <div className="t-caption" style={{ fontSize: 12 }}>Shared by {walker} · ends when the walk ends</div>
+          <div className="t-caption" style={{ fontSize: 12 }}>Shared by {walker} · ends when the walk ends or sharing stops</div>
         </div>
         {active ? (
           <span className="live-pill"><span className="dot dot--live" /> LIVE</span>
@@ -102,8 +114,8 @@ export default function Guardian() {
         )}
       </header>
 
-      {(state.replay || state.plan?.replay) && active && (
-        <div className="g-tape"><DemoTape label={`DEMO · GPS REPLAY${state.plan?.timeScale ? ` · ×${state.plan.timeScale}` : ''}`} /></div>
+      {(((state.replay || state.plan?.replay) && active) || !isLive()) && (
+        <div className="g-tape"><DemoTape label={`${isLive() ? '' : 'SIMULATED DEMO · '}${(state.replay || state.plan?.replay) && active ? `DEMO · GPS REPLAY${state.plan?.timeScale ? ` · ×${state.plan.timeScale}` : ''}` : ''}`.replace(/ · $/, '')} /></div>
       )}
 
       {!sound && (

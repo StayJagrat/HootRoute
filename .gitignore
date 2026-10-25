@@ -1,4 +1,4 @@
-.venv/
+.venv
 node_modules/
 __pycache__/
 *.pyc
@@ -10,7 +10,7 @@ legacy/web/dist/
 data/cache/osm_*_t*.json
 data/out*/
 .venv-hours/
-.venv-agents/
+.venv-agents
 data/cache/hours_raw_*.json
 data/cache/hours_evidence.mock.json
 services/**/.env
@@ -26,3 +26,7 @@ data/raw/
 # runtime database (walks, GPS traces, alerts)
 data/*.db
 data/*.db-*
+
+# written at runtime: live listing checks and per-cell score norms computed on demand (the committed norms stay tracked)
+data/cache/hours_live.json
+data/cache/norms/

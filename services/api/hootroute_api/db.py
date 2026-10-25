@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS routes (walk_id TEXT PRIMARY KEY, body TEXT NOT NULL,
 """
 
 WALK_COLUMNS = ("id", "created_at", "status", "walker_token", "walker_name", "guardian_name", "guardian_phone", "origin", "destination", "depart_day",
-                "depart_minute", "choice", "thresholds", "replay", "time_scale", "started_at", "ended_at", "outcome", "summary", "backup_name", "backup_phone")
+                "depart_minute", "choice", "thresholds", "replay", "time_scale", "started_at", "ended_at", "outcome", "summary", "backup_name", "backup_phone", "guardian_token", "notify_consent", "sharing")
 JSON_COLUMNS = {"origin", "destination", "thresholds"}
 
 
@@ -45,8 +45,9 @@ class DB:
         with self.lock:
             self.conn.execute("PRAGMA journal_mode=WAL"); self.conn.execute("PRAGMA synchronous=NORMAL"); self.conn.executescript(SCHEMA)
             cols = {r[1] for r in self.conn.execute("PRAGMA table_info(walks)")}
-            for c in ("backup_name", "backup_phone"):          # added for the rescue ladder; older databases get the columns here
-                if c not in cols: self.conn.execute(f"ALTER TABLE walks ADD COLUMN {c} TEXT")
+            for c, kind in (("backup_name", "TEXT"), ("backup_phone", "TEXT"),          # older databases get newer columns here
+                            ("guardian_token", "TEXT"), ("notify_consent", "INTEGER NOT NULL DEFAULT 0"), ("sharing", "INTEGER NOT NULL DEFAULT 1")):
+                if c not in cols: self.conn.execute(f"ALTER TABLE walks ADD COLUMN {c} {kind}")
 
     def _exec(self, sql: str, args=()):
         with self.lock: return self.conn.execute(sql, args)
@@ -64,7 +65,8 @@ class DB:
         if row is None: return None
         d = dict(row)
         for k in JSON_COLUMNS: d[k] = json.loads(d[k])
-        d["replay"] = bool(d["replay"]); return d
+        for k in ("replay", "notify_consent", "sharing"): d[k] = bool(d.get(k))
+        return d
 
     def walk(self, walk_id: str) -> dict | None:
         rows = self._all("SELECT * FROM walks WHERE id = ?", (walk_id,)); return self._walk(rows[0] if rows else None)

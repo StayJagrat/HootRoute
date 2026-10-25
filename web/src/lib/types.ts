@@ -12,7 +12,7 @@ export interface Place {
   name: string;
   kind: 'cafe' | 'market' | 'pharmacy' | 'hotel';
   lngLat: LngLat;
-  openUntil: string; // "01:00", "24h", "lobby", or "closed"
+  openUntil: string; // "01:00", "24h", "lobby", "closed" (listed hours say closed when you pass) or "unknown" (no hours)
   safeHaven: boolean;
   frontLight?: boolean;
   simulated: boolean;
@@ -73,7 +73,7 @@ export interface DemoData {
   dimStretches: DimStretch[];
   stopAt: LngLat;
   places: Place[];
-  stats: { hootroute: RouteStats; shortest: RouteStats };
+  stats: { hootroute: RouteStats; shortest: RouteStats; balanced?: RouteStats };
   darknessDebt: { street: string; minutes: number }[];
   routeSteps: { hootroute: RouteStep[]; shortest: RouteStep[] };
   options?: RouteOption[];
@@ -107,7 +107,26 @@ export type Msg =
   | { type: 'walk.end'; outcome: 'arrived' | 'ended' | 'incident'; summary: string; draft311?: string; reportBy?: string }
   | { type: 'rescue.ladder'; step: number; label: string; status: string; steps: string[] }
   | { type: 'audit.run' }
-  | { type: 'audit.result'; ranking: { street: string; minutes: number }[]; draft311: string; cases?: { id: string; opened: string; details: string }[] };
+  | { type: 'audit.result'; ranking: { street: string; minutes: number }[]; draft311: string; cases?: { id: string; opened: string; details: string }[] }
+  | { type: 'obstacle.report'; kind: ObstacleKind; note?: string; lngLat?: LngLat }
+  | { type: 'recovery.choose'; recoveryId: string; optionId: string }
+  | { type: 'recovery.options'; recoveryId: string; kind: string; reason: string; at: LngLat; current: RecoveryOption; options: RecoveryOption[]; explanation: string; explainedBy: string; expiresAt: number }
+  | { type: 'recovery.closed'; recoveryId: string; reason: string }
+  | { type: 'share.update'; active: boolean };
+
+export type ObstacleKind = 'blocked' | 'construction' | 'place_closed' | 'want_detour' | 'other';
+
+/** One route the Wingman offers after an obstacle report. Numbers come from the engine. */
+export interface RecoveryOption {
+  id: string;
+  label: string;
+  coords: LngLat[];
+  stats: RouteStats;
+  km: number;
+  turnsPerKm: number;
+  avoidsReport: boolean;
+  liveEvidence: number;
+}
 
 /** The Guide's plan. In live mode `data` carries the whole route, so every screen on every device draws the same walk. */
 export interface WalkPlan {

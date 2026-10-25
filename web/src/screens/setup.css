@@ -128,3 +128,24 @@
   font-size: 14px;
   margin-top: 6px;
 }
+
+.setup__consent {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px;
+  border: 0;
+  cursor: pointer;
+}
+.setup__consent input {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 2px 0 0;
+  accent-color: var(--open);
+}
+.setup__crew-name {
+  max-width: 76px;
+  text-align: center;
+  line-height: 1.2;
+}

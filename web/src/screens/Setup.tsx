@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Icon, Initials, Mascot } from '../components/ui';
 import { loadSettings, saveSettings } from '../lib/store';
 import type { AgentName } from '../lib/types';
+import { PERSONA } from '../lib/personas';
 import './setup.css';
 
 const CREW: [AgentName, string, string][] = [
-  ['head', 'Head', 'understands your request, coordinates the others and writes your walk report'],
-  ['guide', 'Guide', 'plans and scores the route at the minute you pass each block'],
-  ['checker', 'Checker', 'checks the route before you leave and checks in when you stop'],
-  ['rescuer', 'Rescuer', 'alerts your people step by step if you go quiet'],
+  ['head', PERSONA.head, 'reads your request, picks the tools, asks before any paid check and explains every choice'],
+  ['guide', PERSONA.guide, 'plans and scores the route at the minute you pass each block, and re-plans around obstacles'],
+  ['checker', PERSONA.checker, 'finds unknown hours on the route and checks published listings after you approve'],
+  ['rescuer', PERSONA.rescuer, 'handles the live walk: obstacle reports, route recovery, sharing on and off, and check-ins'],
 ];
 
 export default function Setup() {
@@ -31,7 +32,7 @@ export default function Setup() {
             {CREW.map(([a, name]) => (
               <button type="button" key={a} className={`setup__crew-item${picked === a ? ' on' : ''}`} onClick={() => setPicked(a)} aria-pressed={picked === a}>
                 <Mascot agent={a} state={picked === a ? 'talking' : 'idle'} size={54} />
-                <span>{name}</span>
+                <span className="setup__crew-name">{name}</span>
               </button>
             ))}
           </div>
@@ -45,7 +46,7 @@ export default function Setup() {
             <input className="setup__input" value={s.guardianName} onChange={(e) => set({ guardianName: e.target.value })} aria-label="Guardian name" />
             <input className="setup__input setup__input--phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="Phone for text and call (optional)"
               value={s.guardianPhone ?? ''} onChange={(e) => set({ guardianPhone: e.target.value })} aria-label="Guardian phone" />
-            <div className="t-caption" style={{ fontSize: 12 }}>Gets a live link only during a walk · a text, then a call, only if you go quiet</div>
+            <div className="t-caption" style={{ fontSize: 12 }}>Gets a live link only during a walk · a text or call only if you opt in below</div>
           </div>
         </section>
 
@@ -56,9 +57,17 @@ export default function Setup() {
             <input className="setup__input" value={s.backupName ?? ''} placeholder="Name" onChange={(e) => set({ backupName: e.target.value })} aria-label="Backup contact name" />
             <input className="setup__input setup__input--phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="Phone for text and call"
               value={s.backupPhone ?? ''} onChange={(e) => set({ backupPhone: e.target.value })} aria-label="Backup contact phone" />
-            <div className="t-caption" style={{ fontSize: 12 }}>Only if your guardian doesn't answer: step 3 of the rescue ladder</div>
+            <div className="t-caption" style={{ fontSize: 12 }}>Only if your guardian doesn't answer and you opt in below: step 3 of the rescue ladder</div>
           </div>
         </section>
+
+        <label className="card setup__consent">
+          <input type="checkbox" checked={!!s.notifyConsent} onChange={(e) => set({ notifyConsent: e.target.checked })} />
+          <span>
+            <span className="t-headline" style={{ fontSize: 15 }}>Text or call my contacts if I don't answer a check-in</span>
+            <span className="t-caption" style={{ fontSize: 12, display: 'block' }}>Off by default. Without it, {BRAND} only uses the live link you share; no text or call is ever sent.</span>
+          </span>
+        </label>
 
         <section className="card setup__orders">
           <div className="t-number muted" style={{ fontSize: 13, letterSpacing: 1.2 }}>STANDING ORDERS</div>
@@ -66,7 +75,7 @@ export default function Setup() {
             If I stop on a dim stretch for{' '}
             <Pick value={s.thresholds.stopSeconds} options={[60, 90, 120]} suffix=" s" tone="checkin" onChange={(v) => setT('stopSeconds', v)} /> and don't answer in{' '}
             <Pick value={s.thresholds.replySeconds} options={[30, 45, 60]} suffix=" s" tone="checkin" onChange={(v) => setT('replySeconds', v)} />, send{' '}
-            <span className="pick pick--route">{s.guardianName.split(' ')[0] || 'my guardian'}</span> my live location.
+            <span className="pick pick--route">{s.guardianName.split(' ')[0] || 'my guardian'}</span> my live location{s.notifyConsent ? ', then text and call' : ' on the live link'}.
           </p>
         </section>
 

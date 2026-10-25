@@ -20,6 +20,7 @@ from pathlib import Path
 import httpx
 import numpy as np
 
+from . import evidence
 from .config import env
 
 log = logging.getLogger("hootroute.hours")
@@ -83,21 +84,45 @@ def _match(place: dict, items: list[dict]) -> dict | None:
     return best if best_s >= 0.6 else None
 
 
-def run_actor(places: list[dict], timeout_s: int = 100, max_usd: float = 0.5) -> tuple[list[dict], dict]:
-    """One synchronous Apify run that searches every place name inside a box around them. Returns (items, run info)."""
+TERMINAL = {"SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"}
+
+
+def run_actor(places: list[dict], timeout_s: int = 100, max_usd: float = 0.5, client: httpx.Client | None = None) -> tuple[list[dict], dict]:
+    """One Apify actor run that searches every place name inside a box around them. Returns (items, run info with the run id).
+
+    Starts the run, waits for it (up to `timeout_s`), aborts it if it is still running, then reads its dataset. The charge cap
+    is enforced by Apify (`maxTotalChargeUsd`)."""
     token = env("APIFY_TOKEN")
     if not token: raise RuntimeError("APIFY_TOKEN is not configured")
     names = list(dict.fromkeys(p["name"] for p in places))[:8]
     run_input = {"searchStringsArray": names, "customGeolocation": _polygon(places), "maxCrawledPlacesPerSearch": 3,
                  "language": "en", "skipClosedPlaces": False}
-    t0 = time.time()
-    with httpx.Client(timeout=timeout_s + 20) as c:
-        r = c.post(f"https://api.apify.com/v2/acts/{ACTOR}/run-sync-get-dataset-items", params={"timeout": timeout_s, "maxTotalChargeUsd": max_usd},
-                   headers={"Authorization": f"Bearer {token}"}, json=run_input)
-    if r.status_code == 408: raise TimeoutError(f"Apify run did not finish within {timeout_s} s")
-    r.raise_for_status()
-    items = r.json()
-    return (items if isinstance(items, list) else []), {"actor": ACTOR.replace("~", "/"), "input": run_input, "seconds": round(time.time() - t0, 1), "items": len(items) if isinstance(items, list) else 0}
+    t0 = time.time(); api = "https://api.apify.com/v2"; own = client is None
+    c = client or httpx.Client(timeout=75, headers={"Authorization": f"Bearer {token}"})
+    try:
+        r = c.post(f"{api}/acts/{ACTOR}/runs", params={"timeout": timeout_s, "maxTotalChargeUsd": max_usd, "waitForFinish": 60}, json=run_input)
+        r.raise_for_status(); run = r.json().get("data") or {}
+        rid = run.get("id")
+        if not rid: raise RuntimeError("Apify did not return a run id")
+        while run.get("status") not in TERMINAL and time.time() - t0 < timeout_s + 15:
+            r = c.get(f"{api}/actor-runs/{rid}", params={"waitForFinish": 30}); r.raise_for_status(); run = r.json().get("data") or run
+        info = {"actor": ACTOR.replace("~", "/"), "runId": rid, "consoleUrl": f"https://console.apify.com/actors/runs/{rid}", "status": run.get("status"),
+                "input": run_input, "seconds": round(time.time() - t0, 1), "items": 0, "usageUsd": run.get("usageTotalUsd")}
+        if run.get("status") not in TERMINAL:
+            try: c.post(f"{api}/actor-runs/{rid}/abort")
+            except httpx.HTTPError: pass
+            raise TimeoutError(f"Apify run {rid} did not finish within {timeout_s} s and was aborted")
+        if run.get("status") != "SUCCEEDED": raise RuntimeError(f"Apify run {rid} ended {run.get('status')}")
+        r = c.get(f"{api}/datasets/{run['defaultDatasetId']}/items", params={"clean": "true", "format": "json", "limit": 100}); r.raise_for_status()
+        items = r.json(); items = items if isinstance(items, list) else []
+        info["items"] = len(items)
+        log.info("apify run %s %s: %d items in %.1fs", rid, run.get("status"), len(items), info["seconds"])
+        return items, info
+    finally:
+        if own: c.close()
+
+
+def mock_mode() -> bool: return env("HOURS_CHECK_MOCK") == "1"
 
 
 def _mock_items(places: list[dict]) -> list[dict]:
@@ -113,13 +138,13 @@ def _mock_items(places: list[dict]) -> list[dict]:
 def check(places: list[dict]) -> dict:
     """Check each place's published listing. Never raises: failures come back as an honest status the UI can show."""
     if not places: return {"ok": True, "results": [], "run": None, "note": "No place with unknown hours on this route."}
-    mock = env("HOURS_CHECK_MOCK") == "1"
+    mock = mock_mode()
     try:
-        items, run = (_mock_items(places), {"actor": "MOCK (tests only)", "seconds": 0.0, "items": len(places)}) if mock else run_actor(places)
-    except Exception as e:      # timeout, no token, network, HTTP error
+        items, run = (_mock_items(places), {"actor": "MOCK (tests only)", "runId": None, "consoleUrl": None, "seconds": 0.0, "items": len(places), "status": "MOCK"}) if mock else run_actor(places)
+    except Exception as e:      # timeout, no token, network, HTTP error, unexpected response
         log.warning("hours check failed: %s", e)
-        return {"ok": False, "results": [dict(id=p["id"], name=p["name"], status="check failed", hours=None) for p in places], "run": None,
-                "note": f"The live check did not finish ({type(e).__name__}: {str(e)[:120]}). Hours stay unknown; the route is unchanged."}
+        return {"ok": False, "results": [dict(id=p["id"], name=p["name"], status="check failed", hours=None, checkedAt=time.strftime("%Y-%m-%dT%H:%M:%S%z")) for p in places], "run": None,
+                "mock": mock, "note": f"The live check did not finish ({type(e).__name__}: {str(e)[:120]}). Hours stay unknown; the route is unchanged."}
     from match_osm import source_text
     from parse_hours import parse_rules
     now = time.strftime("%Y-%m-%dT%H:%M:%S%z"); results = []
@@ -137,22 +162,36 @@ def check(places: list[dict]) -> dict:
 
 
 # ---------------------------------------------------------------------------------------------------- evidence
-def apply(engine, results: list[dict]) -> int:
+def apply(engine, results: list[dict], run: dict | None = None) -> int:
     """Write found hours into the engine (and data/cache/hours_live.json so a restart keeps them). Returns how many changed."""
     W = engine.W; changed = 0
-    store = json.loads(LIVE_FILE.read_text()) if LIVE_FILE.exists() else {}
     with engine.lock:
         for r in results:
             if r["status"] not in ("hours found", "closed") or not r.get("hours"): continue
             i = W.place_index.get(r["id"])
             if i is None or W.places[i]["hours"] is not None: continue
-            W.places[i]["hours"] = r["hours"]; W.places[i]["hours_source"] = "apify-live"; changed += 1
-            store[r["id"]] = {"opening_hours": r["hours"], "source": "apify-live", "url": r.get("source"), "checked_at": r.get("checkedAt"), "confidence": r.get("confidence")}
+            W.places[i]["hours"] = r["hours"]; changed += 1
+            W.places[i]["hours_source"] = "mock" if str(r.get("source") or "").startswith("mock://") else "apify-live"
         if changed: engine._quick.clear()
-    if changed:
-        try: LIVE_FILE.write_text(json.dumps(store, indent=1))
-        except OSError: log.warning("could not persist live hours")
+    record(results, run)
     return changed
+
+
+def record(results: list[dict], run: dict | None = None) -> bool:
+    """Remember every completed check (found, no hours, not found, closed) with its source, time and run id, so a repeat
+    within EVIDENCE_TTL_HOURS reuses it instead of paying again. Failed checks are not remembered."""
+    store = json.loads(LIVE_FILE.read_text()) if LIVE_FILE.exists() else {}; n = 0
+    for r in results:
+        kind = evidence.KIND_OF_STATUS.get(r.get("status"))
+        if kind in (None, "check_failed") or str(r.get("source") or "").startswith("mock://"): continue     # test stand-ins are never kept
+        store[r["id"]] = {"opening_hours": r.get("hours") if kind in ("published_hours", "listed_closed") else None, "kind": kind, "name": r.get("name"),
+                          "source": "apify-live", "url": r.get("source"), "checked_at": r.get("checkedAt"), "confidence": r.get("confidence"),
+                          "listing_name": r.get("listingName"), "run_id": (run or {}).get("runId")}
+        n += 1
+    if n:
+        try: LIVE_FILE.parent.mkdir(parents=True, exist_ok=True); LIVE_FILE.write_text(json.dumps(store, indent=1))
+        except OSError: log.warning("could not persist live hours"); return False
+    return bool(n)
 
 
 def load_live(engine) -> int:
@@ -164,3 +203,26 @@ def load_live(engine) -> int:
         if i is not None and W.places[i]["hours"] is None and e.get("opening_hours"):
             W.places[i]["hours"] = e["opening_hours"]; W.places[i]["hours_source"] = "apify-live"; n += 1
     return n
+
+
+# ---------------------------------------------------------------------------------------------------- the investigation
+async def investigate(engine, places: list[dict], budget=None) -> dict:
+    """Sherlock's bounded investigation: reuse recent checks, spend at most one paid run on the rest (if the daily budget
+    allows), apply what was found, and return every result as Evidence with its source and time."""
+    import asyncio
+    store = evidence.live_store(LIVE_FILE); mock = mock_mode()
+    reused = [evidence.result_from_store(p["id"], store[p["id"]]) for p in places if not mock and evidence.reusable(store.get(p["id"]))]
+    fresh = [p for p in places if p["id"] not in {r["id"] for r in reused}]
+    run = None; results: list[dict] = []; ok = True; note = ""
+    if fresh:
+        if not mock and budget is not None and not budget.spend():
+            ok = False; note = "Today's budget for paid listing checks is used up. Hours stay unknown; nothing was changed."
+            results = [dict(id=p["id"], name=p["name"], status="check failed", hours=None) for p in fresh]
+        else:
+            res = await asyncio.to_thread(check, fresh); results, run, ok, note = res["results"], res["run"], res["ok"], res["note"]
+    if reused: note = (note + " " if note else "") + f"Reused {len(reused)} check{'s' if len(reused) != 1 else ''} from the last {evidence.TTL_HOURS:g} h (no new charge)."
+    allr = reused + results
+    changed = await asyncio.to_thread(apply, engine, results, run) if ok and results else 0       # reused evidence is already in the engine
+    ev = [evidence.from_result(r, run, mock, reused=r in reused) for r in allr]
+    return {"ok": ok or bool(reused), "results": allr, "run": run, "mock": mock, "note": note or "Nothing to check.", "changed": changed, "evidence": ev,
+            "reused": len(reused), "checked": len(results)}

@@ -1,11 +1,12 @@
 import { along, cumulative, lineLength, project, turnsFromSteps, type Turn } from './geo';
-import { AGENT_LABEL, clock, openSpoken } from './format';
+import { AGENT_LABEL, clock, isListedOpen, openSpoken } from './format';
 import type { Room } from './transport';
 import type { AgentName, DemoData, Envelope, LngLat, Msg, Place } from './types';
 import type { Settings } from './store';
+import { PERSONA } from './personas';
 
-// Deterministic demo engine: plays the five agents from cached data when the
-// gateway isn't driving the walk (Demo Mode / Deterministic mode in the build doc).
+// Deterministic demo engine: plays the four agents from cached data when the
+// gateway isn't driving the walk (?agents=demo). It is scripted: every screen it drives is labelled "Simulated demo".
 // It speaks the same message types the real agents send, so every screen behaves
 // identically in both modes. It replays the route as GPS (badged "Demo · GPS replay")
 // and injects one stop on the engine-selected stretch.
@@ -79,9 +80,9 @@ export class DemoEngine {
     const d = this.data;
     const overnight = new Date();
     overnight.setHours(2, 0, 4, 0);
-    this.log('head', `Cached conditions cover ${d.scenario.segmentsScored.toLocaleString()} street segments.`, 'OSM streets, listed place hours, and SF 311 streetlight records.', 'Scout', overnight.getTime());
-    this.log('guide', `Which places are listed open along ${d.start.name} → ${d.end.name}?`, 'Checking the cached hours at each arrival minute.', 'Checker');
-    const open = this.places.filter((p) => p.openUntil !== 'closed');
+    this.log('head', `Cached conditions cover ${d.scenario.segmentsScored.toLocaleString()} street segments.`, 'Simulated demo from cached OSM streets, listed place hours, and SF 311 streetlight records.', PERSONA.guide, overnight.getTime());
+    this.log('guide', `Which places are listed open along ${d.start.name} → ${d.end.name}?`, 'Checking the cached hours at each arrival minute.', PERSONA.checker);
+    const open = this.places.filter((p) => isListedOpen(p.openUntil));
     this.later(500, () => {
       for (const p of open) this.log('guide', `Listed hours · ${p.name}: ${p.openUntil === '24h' ? 'open 24h' : p.openUntil === 'lobby' ? 'lobby open' : `open until ${clock(p.openUntil)}`}.`, 'Cached place hours; shopkeeper interaction is simulated.');
       this.sendPlan(`The route scores ${d.stats.hootroute.score} versus ${d.stats.shortest.score}. Its longest stretch without a listed open place or help point is ${d.stats.hootroute.longestEmptyM} m versus ${d.stats.shortest.longestEmptyM} m. Conditions, not a safety rating.`);
@@ -89,7 +90,7 @@ export class DemoEngine {
   }
 
   private sendPlan(reason: string) {
-    this.send({ type: 'walk.plan', plan: { routeId: 'route-1', stats: structuredClone(this.stats), reason, thresholds: this.settings.thresholds, guardian: this.settings.guardianName } });
+    this.send({ type: 'walk.plan', plan: { routeId: 'route-1', stats: structuredClone(this.stats), reason: `Simulated demo. ${reason}`, thresholds: this.settings.thresholds, guardian: this.settings.guardianName } });
   }
 
   start(choice: 'hootroute' | 'usual') {
@@ -107,7 +108,7 @@ export class DemoEngine {
     this.state = 'walking';
     this.send({ type: 'walk.accept', choice });
     this.send({ type: 'walk.start', replay: true });
-    this.log('guide', `WalkPlan sent: ${choice === 'hootroute' ? 'HootRoute route' : 'shortest route'}. Score ${this.stats.hootroute.score} vs ${this.stats.shortest.score}.`, `${this.settings.walkerName} chose this route.`, 'Watcher');
+    this.log('guide', `WalkPlan sent: ${choice === 'hootroute' ? 'HootRoute route' : 'shortest route'}. Score ${this.stats.hootroute.score} vs ${this.stats.shortest.score}.`, `${this.settings.walkerName} chose this route.`, PERSONA.checker);
     const first = this.turnsList[0];
     const firstStreet = this.data.routeSteps[choice === 'usual' ? 'shortest' : 'hootroute'].find((s) => s.street !== 'the path')?.street ?? 'the walking path';
     this.say('guide', `Okay, I'm walking with you. Head toward ${firstStreet}${first && first.direction !== 'arrive' ? `, then ${first.direction} on ${first.street}` : ''}.`);
@@ -147,12 +148,12 @@ export class DemoEngine {
     // open places just ahead
     for (const p of this.places) {
       const key = `place:${p.id}`;
-      if (this.said.has(key) || p.openUntil === 'closed') continue;
+      if (this.said.has(key) || !isListedOpen(p.openUntil)) continue;
       const pr = project(this.line, p.lngLat, this.cum);
       if (pr.offset < 45 && pr.meters - m < 70 && pr.meters - m > 0) {
         this.said.add(key);
         this.say('checker', `${p.name} is just ahead, ${openSpoken(p)}.`);
-        if (!p.simulated) this.log('checker', `Passing ${p.name} (${openSpoken(p)}).`, 'Live place agent confirmed hours.');
+        if (!p.simulated) this.log('checker', `Passing ${p.name} (${openSpoken(p)}).`, 'Cached listed hours: published hours, not confirmation the place is staffed.');
         return;
       }
     }
@@ -163,7 +164,7 @@ export class DemoEngine {
       const pr = project(this.line, d.line[0], this.cum);
       if (pr.offset < 25 && pr.meters - m < 60 && pr.meters - m > -10) {
         this.said.add(key);
-        this.say('checker', `The next ${d.meters} metres have fewer working lights. I'm with you.`);
+        this.say('checker', `The next ${d.meters} metres have fewer mapped streetlights. I'm with you.`);
         return;
       }
     }
@@ -190,13 +191,13 @@ export class DemoEngine {
     this.state = 'escalated';
     const p = along(this.line, this.progress, this.cum);
     const where = this.data.dimStretches.find((d) => d.onRoute)?.name ?? this.data.end.name;
-    this.log('checker', 'Escalating with last position and trace.', `${reason}. Standing order: guardian first.`, 'Rescuer');
+    this.log('checker', 'Escalating with last position and trace.', `${reason}. Standing order: guardian first.`, PERSONA.rescuer);
     this.send({ type: 'escalate', reason, lngLat: p.lngLat });
     this.send({ type: 'guardian.alert', reason, lngLat: p.lngLat, where });
-    this.log('rescuer', `Alert sent to ${this.settings.guardianName.split(' ')[0]}'s live link. Handoff packet written. 911 not contacted.`, 'Hackathon build never calls emergency services.', 'Guardian');
+    this.log('rescuer', `Alert sent to ${this.settings.guardianName.split(' ')[0]}'s live link. Handoff packet written. 911 not contacted.`, 'Simulated demo. HootRoute never calls emergency services.', 'Guardian');
     this.say('rescuer', `I've sent ${this.settings.guardianName.split(' ')[0]} your live location. Say "I'm fine" or tap the button if you're okay.`);
     this.later(this.scaled(this.settings.thresholds.escalateSeconds), () => {
-      if (this.state === 'escalated') this.log('rescuer', 'Guardian has not cleared the alert. Handoff packet ready: position, route, time, reason.', 'Production would hand off to a licensed dispatch partner here; this build stops.');
+      if (this.state === 'escalated') this.log('rescuer', 'Guardian has not cleared the alert. Handoff packet ready: position, route, time, reason.', 'Simulated demo: nobody else is contacted and 911 is never called. A person can tap Call 911.');
     });
   }
 
@@ -212,7 +213,7 @@ export class DemoEngine {
     window.clearInterval(this.timer);
     this.say('head', `You've arrived at ${this.data.end.name}, ${this.settings.walkerName}.`);
     this.send({ type: 'walk.end', outcome: 'arrived', summary: `Arrived near ${this.data.end.name}. Route conditions recorded; nothing was submitted to the city.` });
-    this.log('head', 'Walk ended. Route conditions recorded; any 311 report remains a draft.', 'No report was submitted.', 'Head');
+    this.log('head', 'Walk ended. Route conditions recorded; any 311 report remains a draft.', 'No report was submitted.');
   }
 
   private onMessage(e: Envelope) {
@@ -254,7 +255,7 @@ export class DemoEngine {
     const p = this.places.find((x) => x.id === u.id);
     if (!p) return;
     Object.assign(p, u);
-    const open = u.openUntil !== 'closed';
+    const open = isListedOpen(u.openUntil);
     this.log('guide', `Place update · ${p.name}: ${open ? `staying open until ${clock(u.openUntil)}` : 'closed for the night'}${u.frontLight ? ', front light on' : ''}.`, p.simulated ? 'Simulated shopkeeper declaration.' : 'Shopkeeper declaration.');
     const scenario = this.data.whatIf;
     if (scenario && p.id === scenario.placeId) {
@@ -277,7 +278,7 @@ export class DemoEngine {
       const ranking = this.data.darknessDebt;
       const top = ranking[0];
       this.send({ type: 'audit.result', ranking, draft311: `DRAFT — not submitted. Review streetlight conditions on ${top.street}. The model estimates ${top.minutes} walker-minutes on lower-light segments in a simulated overnight sample. Confirm conditions and report identifiers before filing.` });
-      this.log('head', `Ranked modeled walker-minutes on lower-light streets. Top: ${top.street} (${top.minutes} min). Draft 311 text prepared.`, 'Modeled trips, not observed foot traffic. Report remains a draft.', 'Reporter');
+      this.log('head', `Ranked modeled walker-minutes on lower-light streets. Top: ${top.street} (${top.minutes} min). Draft 311 text prepared.`, 'Modeled trips, not observed foot traffic. Report remains a draft.');
     });
   }
 

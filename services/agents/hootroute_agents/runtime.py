@@ -8,6 +8,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+
+from .config import env
 from collections.abc import Awaitable, Callable
 
 from .agents import Checker, Guide, Head, Rescuer
@@ -20,18 +22,23 @@ Send = Callable[[str, dict], Awaitable[None]]       # (walk id, msg) -> publish 
 
 # Which agent owns each client message type.
 ROUTE = {"walk.accept": "guide", "walk.start": "checker", "walk.position": "checker", "checkin.reply": "checker",
-         "guardian.ack": "rescuer", "walk.end": "head", "audit.run": "head"}
+         "guardian.ack": "rescuer", "walk.end": "head", "audit.run": "head", "obstacle.report": "rescuer", "recovery.choose": "rescuer"}
+EMERGENCY = {"911", "1911", "112", "999"}
 
 TELL_LABEL = {("checker", "rescuer", "no_reply"): "No reply to the check-in. Escalating with last position and trace.",
               ("checker", "rescuer", "help"): "Walker held Help. Escalating now.",
               ("checker", "rescuer", "fine"): "Walker answered after escalation.",
               ("checker", "head", "arrived"): "Walker reached the destination. Head, please write the report.",
-              ("checker", "guide", "replan"): "Walker left the route."}
+              ("checker", "guide", "replan"): "Walker left the route.",
+              ("rescuer", "head", "obstacle"): "Walker reported a problem ahead. Professor Hoot, please coordinate a recovery.",
+              ("rescuer", "guide", "switch"): "Walker chose a recovery option. Scoot, switch the active route."}
 
 
 class Runtime:
     def __init__(self, engine: EnginePort, send: Send, notifier: Notifier | None = None):
         self.engine = engine; self._send = send; self.notifier = notifier or Notifier()
+        self.sms_allowlist = {n.strip() for n in env("SMS_ALLOWLIST").split(",") if n.strip()}
+        self.max_notifications = int(env("MAX_NOTIFICATIONS_PER_WALK", "6"))
         self.walks: dict[str, Walk] = {}
         self.agents = {a.name: a for a in (Head(self), Guide(self), Checker(self), Rescuer(self))}
         self.locks: dict[str, asyncio.Lock] = {}
@@ -39,6 +46,25 @@ class Runtime:
 
     # ---------- plumbing ----------
     async def send(self, w: Walk, msg: dict): await self._send(w.id, msg)
+
+    async def contact(self, w: Walk, channel: str, to: str | None, text: str) -> str:
+        """Every SMS and call goes through here: opt-in, sharing on, number allowed, per-walk cap. Returns a status for the log."""
+        if not self.notifier.enabled: return "not configured"
+        if not to: return "no number"
+        if to.lstrip("+") in EMERGENCY: return "refused (emergency number)"
+        if not w.notify_consent: return "off (walker did not opt in to texts or calls)"
+        if not w.sharing: return "off (walker stopped sharing)"
+        if self.sms_allowlist and to not in self.sms_allowlist: return "blocked (number not on SMS_ALLOWLIST)"
+        if w.notifications >= self.max_notifications: return f"skipped (cap of {self.max_notifications} per walk reached)"
+        w.notifications += 1
+        return await (self.notifier.sms(to, text) if channel == "sms" else self.notifier.call(to, text))
+
+    async def set_sharing(self, walk_id: str, active: bool, guardian_url: str | None):
+        w = self.walks.get(walk_id)
+        if not w: return
+        async with self.lock(w.id):
+            w.sharing = active; w.guardian_url = guardian_url or ""
+            await self.agents["rescuer"].sharing(w, active)
 
     async def tell(self, frm: str, to: str, w: Walk, event: str, **data):
         label = TELL_LABEL.get((frm, to, event))
@@ -55,7 +81,9 @@ class Runtime:
             if event in ("no_reply", "help"): await a.escalate(w, data.get("reason") or "Walker asked for help")
             elif event == "fine": await a.fine(w, data.get("via", "tap"))
         elif to == "head" and event == "arrived": await a.arrived(w)
+        elif to == "head" and event == "obstacle": await a.recover(w, data["report"], data["at"], data["here"])
         elif to == "guide" and event == "replan": await a.replan(w, data["at"])
+        elif to == "guide" and event == "switch": await a.switch(w, data["option"])
 
     def lock(self, walk_id: str) -> asyncio.Lock: return self.locks.setdefault(walk_id, asyncio.Lock())
 
@@ -82,9 +110,10 @@ class Runtime:
     @staticmethod
     def make_walk(record: dict, guardian_url: str) -> Walk:
         return Walk(id=record["id"], walker=record["walker_name"], guardian=record["guardian_name"], guardian_phone=record.get("guardian_phone"),
-                    guardian_url=guardian_url, origin=record["origin"], dest=record["destination"], day=record["depart_day"], minute=record["depart_minute"],
+                    guardian_url=guardian_url or "", origin=record["origin"], dest=record["destination"], day=record["depart_day"], minute=record["depart_minute"],
                     choice=record["choice"], replay=record["replay"], time_scale=record["time_scale"],
                     backup_name=record.get("backup_name"), backup_phone=record.get("backup_phone"),
+                    notify_consent=bool(record.get("notify_consent")), sharing=bool(record.get("sharing", True)),
                     thresholds=effective_thresholds(record["thresholds"], record["replay"], record["time_scale"]))
 
     async def request(self, record: dict, guardian_url: str, cached: tuple[dict, dict] | None = None):
@@ -100,6 +129,8 @@ class Runtime:
         for e in history:
             t = e["msg"].get("type")
             if t == "walk.accept": w.set_choice(e["msg"].get("choice", "hootroute"))
+            elif t == "walk.plan" and str(e["msg"]["plan"].get("reason", "")).startswith("Switched after your report"): w.set_choice("hootroute")   # chosen option was promoted to best
+            elif t == "rescue.ladder" and "SMS sent" in str(e["msg"].get("status", "")): w.sms_sent = True; w.notifications += 1
             elif t == "walk.start": w.status, w.started, w.moved_ts = "walking", e["ts"] / 1000, time.time()
             elif t == "checkin.ask": w.status, w.reply_deadline, w.checkins = "checkin", e["msg"]["deadline"] / 1000, w.checkins + 1
             elif t == "checkin.reply" and e["msg"].get("reply") == "fine" and w.status in ("checkin", "escalated"): w.status = "walking"
@@ -132,6 +163,8 @@ class Runtime:
             elif kind == "checkin.reply": await self.agents["checker"].reply(w, msg["reply"], msg["via"])
             elif kind == "guardian.ack": await self.agents["rescuer"].ack(w, msg["by"])
             elif kind == "walk.end" and env.get("from") == "walker": await self.agents["head"].ended(w)
+            elif kind == "obstacle.report": await self.agents["rescuer"].obstacle(w, msg)
+            elif kind == "recovery.choose": await self.agents["rescuer"].choose(w, msg["recoveryId"], msg["optionId"])
 
     async def place_update(self, place_id: str, decl: dict, near_walks: list[str]):
         for wid in near_walks:

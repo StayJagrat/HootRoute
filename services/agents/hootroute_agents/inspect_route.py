@@ -89,7 +89,7 @@ def inspect(engine, data: dict, routes: dict, key: str, day: int, minute: int) -
     # 2. the longest stretch with nothing listed open
     gap = stats["longestEmptyM"]; stretch = next((d for d in data.get("dimStretches", []) if d["onRoute"] == (key == "best")), None)
     name = stretch["name"] if stretch else "one stretch"
-    if gap >= 300: add("warn", f"{gap} m with nothing listed open", f"On {name}. The Checker will check in if you stop there.", "OSM listed hours + matched hours evidence, at your arrival minute")
+    if gap >= 300: add("warn", f"{gap} m with nothing listed open", f"On {name}. HootRoute checks in if you stop there.", "OSM listed hours + matched hours evidence, at your arrival minute")
     elif gap >= 150: add("note", f"Longest gap between open places: {gap} m", f"On {name}.", "OSM listed hours + matched hours evidence")
     else: add("ok", "Open places all along the way", f"Never more than {gap} m from a listed-open place or help point.", "OSM listed hours + matched hours evidence")
 
@@ -115,7 +115,7 @@ def inspect(engine, data: dict, routes: dict, key: str, day: int, minute: int) -
 
     # 5. unknown hours
     unk = route.get("unknown_hours_nearby") or 0
-    if unk: add("note", f"{unk} places on the route publish no hours", "They count as closed in the score. Ask the Checker to check their listings.", "OSM places without opening_hours")
+    if unk: add("note", f"{unk} places on the route publish no hours", "Their hours are unknown, so they earn no credit in the score (unknown, not closed). Ask Sherlock to check their listings.", "OSM places without opening_hours")
 
     # 6. transit at the destination
     end = W.proj.xy(route["coords"][-1][1], route["coords"][-1][0])

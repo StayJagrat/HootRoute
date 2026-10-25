@@ -8,6 +8,9 @@ import { DemoEngine } from '../lib/engine';
 import { timeOf } from '../lib/format';
 import { getRoomStore, isGatewayMode, loadSettings, mergedPlaces, useWalk, useWalkData, walkIdFromUrl, type LogEntry } from '../lib/store';
 import { createWalk, gpsMode, listWalks, walkCreds } from '../lib/api';
+import { TraceTimeline, useLastMission } from '../components/MissionControl';
+import { PERSONA, SHORT } from '../lib/personas';
+import { minutesText } from '../lib/format';
 import { GpsReplay } from '../lib/replay';
 import type { DemoData } from '../lib/types';
 import type { MascotState } from '../lib/types';
@@ -58,9 +61,16 @@ export default function Room() {
       guardianParams.set('destinationName', settings.destination.name);
     }
   }
-  const guardianUrl = walkCreds(walkId)?.guardianUrl ?? `${location.origin}/guardian/${walkId}${guardianParams.size ? `?${guardianParams}` : ''}`;
+  // live: only the link the gateway returned works (it carries the guardian token); demo: a local link
+  const creds = walkCreds(walkId);
+  const guardianUrl = isGatewayMode()
+    ? (state.sharing === false ? null : creds?.guardianUrl ?? null)
+    : `${location.origin}/guardian/${walkId}${guardianParams.size ? `?${guardianParams}` : ''}`;
+  const [tab, setTab] = useState<'feed' | 'mission'>('feed');
+  const lastMission = useLastMission();
 
   useEffect(() => {
+    if (!guardianUrl) { setQr(''); return; }
     QRCode.toDataURL(guardianUrl, { margin: 1, width: 360, color: { dark: '#10141C', light: '#ECE7DC' } }).then(setQr).catch(() => setQr(''));
   }, [guardianUrl]);
   useEffect(() => {
@@ -94,19 +104,19 @@ export default function Room() {
 
   // live: a real walk on the stage corridor, positions replayed (badged) so it runs indoors; the agents are the real ones
   async function startLiveDemo() {
-    setStarting('Asking the Guide for the stage route…');
+    setStarting(`Asking ${SHORT.guide} for the stage route…`);
     try {
       const corridor = (await fetch('/data/demo-route.json').then((r) => r.json())) as DemoData;
       const w = await createWalk({
         from: corridor.start, to: corridor.end, when: { day: corridor.scenario.day ?? 4, minute: corridor.scenario.departureMinute }, choice: 'hootroute',
-        walker: settings.walkerName, guardian: settings.guardianName, guardianPhone: settings.guardianPhone, thresholds: settings.thresholds, replay: true, timeScale: settings.timeScale,
+        walker: settings.walkerName, guardian: settings.guardianName, guardianPhone: settings.guardianPhone, notifyConsent: !!settings.notifyConsent, thresholds: settings.thresholds, replay: true, timeScale: settings.timeScale,
       });
       follow(w.walkId);
       const walker = getRoomStore(w.walkId, 'walker');
       const t0 = Date.now();
       while (!walker.state.plan?.data && Date.now() - t0 < 30000) await new Promise((r) => setTimeout(r, 200));
       const planned = walker.state.plan?.data;
-      if (!planned) throw new Error('The Guide did not answer in time.');
+      if (!planned) throw new Error(`${SHORT.guide} did not answer in time.`);
       walker.room.send({ type: 'walk.accept', choice: 'hootroute' });
       walker.room.send({ type: 'walk.start', replay: true });
       const t = walker.state.plan!.thresholds;
@@ -127,7 +137,7 @@ export default function Room() {
     return (
       <div className="screen" data-theme="night" role={error ? 'alert' : undefined} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 520 }}>
         <Logo size={24} />
-        <p className="t-spoken">{error ?? starting ?? (walkId ? 'Waiting for the Guide\'s plan…' : 'No active walk yet. Start one on a phone from /plan, or run the stage walk here.')}</p>
+        <p className="t-spoken">{error ?? starting ?? (walkId ? `Waiting for ${SHORT.guide}'s plan…` : 'No active walk yet. Start one on a phone from /plan, or run the stage walk here.')}</p>
         {isGatewayMode() && !walkId && <button type="button" className="room__action" onClick={() => void startLiveDemo()}><Icon name="play" size={16} /> Start demo walk here</button>}
       </div>
     );
@@ -175,11 +185,20 @@ export default function Room() {
           <span className="room__nav-item">Overnight audit</span>
         </nav>
         <div className="room__qr card">
-          {qr ? <img src={qr} alt={`QR code for ${guardianUrl}`} /> : <div style={{ height: 160 }} />}
-          <div>
-            <div className="t-headline" style={{ fontSize: 14 }}>Scan to be the guardian</div>
-            <div className="t-mono" style={{ wordBreak: 'break-all' }}>{guardianUrl.replace(/^https?:\/\//, '')}</div>
-          </div>
+          {guardianUrl ? (
+            <>
+              {qr ? <img src={qr} alt="QR code for the guardian link" /> : <div style={{ height: 160 }} />}
+              <div>
+                <div className="t-headline" style={{ fontSize: 14 }}>Scan to be the guardian</div>
+                <div className="t-mono" style={{ wordBreak: 'break-all' }}>{guardianUrl.replace(/^https?:\/\//, '')}</div>
+              </div>
+            </>
+          ) : (
+            <div>
+              <div className="t-headline" style={{ fontSize: 14 }}>{state.sharing === false ? 'Sharing stopped by the walker' : 'Guardian link not on this device'}</div>
+              <div className="t-caption" style={{ fontSize: 12 }}>{state.sharing === false ? 'The old guardian link is revoked.' : 'The walker\'s phone holds the guardian link for this walk.'}</div>
+            </div>
+          )}
         </div>
         <div style={{ flex: 1 }} />
         <button type="button" className="room__action" onClick={startDemo} disabled={!!starting}>
@@ -195,7 +214,7 @@ export default function Room() {
           </div>
           <LinkBadge status={status} />
         </div>
-          <DemoTape label={isGatewayMode() ? (walkRunning ? state.replay ? `DEMO · GPS REPLAY · ×${state.plan?.timeScale ?? settings.timeScale} · LIVE AGENTS` : 'LIVE · WALKER GPS' : `LIVE AGENTS · GPS ${gpsMode() === 'replay' ? 'REPLAY' : 'REAL'}`) : 'DEMO · GPS REPLAY'} />
+          <DemoTape label={isGatewayMode() ? (walkRunning ? state.replay ? `DEMO · GPS REPLAY · ×${state.plan?.timeScale ?? settings.timeScale} · LIVE AGENTS` : 'LIVE · WALKER GPS' : `LIVE AGENTS · GPS ${gpsMode() === 'replay' ? 'REPLAY' : 'REAL'}`) : 'SIMULATED DEMO · GPS REPLAY'} />
         <div className="t-mono" style={{ fontSize: 10 }}>OSM · SF 311 · missing hours count closed</div>
       </aside>
 
@@ -222,7 +241,7 @@ export default function Room() {
           <div className="room__pills">
             <span className="chip t-mono"><span className="dot" /> OSM + SF 311</span>
             <span className="chip t-mono"><span className="dot" /> {data.places.length} listed places</span>
-            <span className="chip t-mono"><span className="dot" style={{ background: 'var(--route)' }} /> 4 agents · Head, Guide, Checker, Rescuer</span>
+            <span className="chip t-mono"><span className="dot" style={{ background: 'var(--route)' }} /> 4 agents · {PERSONA.head}, {PERSONA.guide}, {PERSONA.checker}, {PERSONA.rescuer}</span>
           </div>
         </header>
 
@@ -283,11 +302,52 @@ export default function Room() {
       {/* ---------- feed ---------- */}
       <aside className="room__feed">
         <header className="room__feed-head">
-          <h2 className="t-title" style={{ fontSize: 20 }}>Agent feed</h2>
-          <span className="dot dot--live" />
-          <span className="t-mono" style={{ marginLeft: 'auto' }}>{isGatewayMode() ? (walkRunning && !state.replay ? 'Gateway · live walk' : 'Gateway · demo replay') : 'Local demo replay'}</span>
+          <div className="room__tabs" role="tablist" aria-label="Agent views">
+            <button type="button" role="tab" aria-selected={tab === 'feed'} className={`room__tab${tab === 'feed' ? ' on' : ''}`} onClick={() => setTab('feed')}>Agent feed</button>
+            <button type="button" role="tab" aria-selected={tab === 'mission'} className={`room__tab${tab === 'mission' ? ' on' : ''}`} onClick={() => setTab('mission')}>Mission Control{state.recovery ? ' ·1' : ''}</button>
+          </div>
+          <span className="t-mono" style={{ marginLeft: 'auto' }}>{isGatewayMode() ? (walkRunning && !state.replay ? 'Gateway · live walk' : 'Gateway · demo replay') : 'Simulated demo'}</span>
         </header>
-        <div className="room__feed-list">
+        {tab === 'mission' && (
+          <div className="room__feed-list room__mission">
+            <section>
+              <h3 className="room__mh">Live journey · {PERSONA.rescuer}</h3>
+              {state.lastReport && <p className="t-caption">Walker reported: {state.lastReport.kind.replace('_', ' ')}{state.lastReport.note ? ` · “${state.lastReport.note}”` : ''} · {timeOf(state.lastReport.ts)}</p>}
+              {state.recovery ? (
+                <div className="room__rec">
+                  <p><strong>{state.recovery.reason}</strong></p>
+                  {state.recovery.explanation && <p>{state.recovery.explanation} <span className="t-caption">· {state.recovery.explainedBy}</span></p>}
+                  <table className="room__rec-t">
+                    <thead><tr><th>Route</th><th>Min</th><th>Score</th><th>Empty</th><th>Avoids</th></tr></thead>
+                    <tbody>
+                      {[state.recovery.current, ...state.recovery.options].map((o, i) => (
+                        <tr key={o.id} className={state.recovery?.chosen === o.id ? 'on' : ''}>
+                          <td>{i === 0 ? `Current · ${o.label}` : o.label}</td><td className="t-mono">{minutesText(o.stats.minutes)}</td><td className="t-mono">{o.stats.score}</td><td className="t-mono">{o.stats.longestEmptyM} m</td><td>{o.avoidsReport ? 'yes' : 'no'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <p className="t-caption">{state.recovery.chosen ? `Walker chose ${state.recovery.chosen}.` : 'Waiting for the walker to choose. Nothing switches automatically.'}</p>
+                </div>
+              ) : (
+                <p className="t-caption">No recovery in progress.{state.switchedAt ? ` Last switch at ${timeOf(state.switchedAt)}.` : ''}</p>
+              )}
+              {state.sharing === false && <p className="t-caption">Guardian sharing is stopped.</p>}
+            </section>
+            <section>
+              <h3 className="room__mh">Last request to {PERSONA.head} on this device</h3>
+              {lastMission ? (
+                <>
+                  <p className="t-caption">“{lastMission.question}” · {lastMission.by} · {(lastMission.ms / 1000).toFixed(1)} s · {timeOf(lastMission.at)}</p>
+                  <TraceTimeline trace={lastMission.trace} />
+                </>
+              ) : (
+                <p className="t-caption">Nothing yet. Ask {PERSONA.head} on /plan in this browser and the tool calls show up here.</p>
+              )}
+            </section>
+          </div>
+        )}
+        <div className="room__feed-list" hidden={tab !== 'feed'}>
           {state.log.length === 0 && (
             <div className="room__empty">
               <Mascot agent="checker" state="idle" size={72} />

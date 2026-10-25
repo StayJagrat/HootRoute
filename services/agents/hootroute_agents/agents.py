@@ -12,12 +12,13 @@ from __future__ import annotations
 
 import logging
 import time
+import uuid
 from typing import TYPE_CHECKING
 
 from hootroute_engine import geo
 
 from .brand import BRAND
-from .head_brain import write_report
+from .head_brain import explain_recovery, write_report
 from .walk import Walk
 
 if TYPE_CHECKING:
@@ -56,6 +57,15 @@ def secs(w: Walk, v: float) -> str:
 
 def wall_clock(ts: float) -> str:
     return time.strftime("%-I:%M %p", time.localtime(ts))
+
+
+def promote(data: dict, routes: dict, key: str) -> tuple[dict, dict]:
+    """Make candidate `key` the walk's active route: every screen draws data.route, and the agents follow routes['best']."""
+    if key == "best" or key not in routes: return data, routes
+    r = routes[key]; opt = next((o for o in data.get("options") or [] if o["id"] == key), None)
+    stats = opt["stats"] if opt else {"score": r["score"], "longestEmptyM": r["gap"]["m"], "minutes": r["minutes"]}
+    data = {**data, "route": r["coords"], "stats": {**data["stats"], "hootroute": stats}, "routeSteps": {**data["routeSteps"], "hootroute": r["steps"]}, "activeOption": key}
+    return data, {**routes, "best": r}
 
 
 class Agent:
@@ -98,10 +108,12 @@ class Guide(Agent):
         except ValueError as e:
             await self.log(w, f"Could not plan this walk: {e}", "The start or destination is outside the mapped part of San Francisco.")
             await self.rt.send(w, {"type": "walk.end", "outcome": "ended", "summary": f"Guide could not plan this walk: {e}"}); w.status = "ended"; return
+        if w.choice == "balanced":                       # the walker picked the balanced option in the planner
+            data, routes = promote(data, routes, "balanced"); w.choice = "hootroute"
         w.set_plan(data, routes); w.status = "planned"
-        opened = [p for p in data["places"] if p["openUntil"] != "closed"]
+        opened = [p for p in data["places"] if p["openUntil"] not in ("closed", "unknown")]
         await self.log(w, f"{len(routes['best']['shops'])} places listed open along the HootRoute route at the time you pass them.",
-                       "OSM opening hours plus matched hours evidence; places with no listed hours count as closed.", "Checker")
+                       "OSM opening hours plus matched hours evidence; places with no listed hours earn no credit (unknown, not closed).", "Checker")
         await self.rt.send(w, self.plan_msg(w, self.explain(data["stats"])))
         await self.say(w, f"The HootRoute route scores {data['stats']['hootroute']['score']} versus {data['stats']['shortest']['score']} for the shortest route. "
                           + (f"{opened[0]['name']} is open along the way. " if opened else "") + "I'm ready when you are.")
@@ -109,8 +121,8 @@ class Guide(Agent):
     async def accept(self, w: Walk, choice: str):
         if not w.data: return
         w.set_choice(choice)
-        label = "shortest route" if w.choice == "usual" else "HootRoute route"
-        await self.log(w, f"WalkPlan sent to Checker: {label}, score {w.data['stats']['shortest' if w.choice == 'usual' else 'hootroute']['score']}.",
+        label = {"usual": "shortest route", "balanced": "balanced route"}.get(w.choice, "HootRoute route")
+        await self.log(w, f"WalkPlan sent to Checker: {label}, score {w.stats()['score']}.",
                        f"{w.walker} chose the {label}.", "Checker")
 
     async def first_instruction(self, w: Walk):
@@ -142,6 +154,24 @@ class Guide(Agent):
         w.set_plan(data, routes); w.set_choice("hootroute"); w.meters = 0.0; w.said = {k for k in w.said if not k.startswith(("turn:", "place:", "dim:"))}
         await self.rt.send(w, self.plan_msg(w, f"Rerouted from {where}. " + self.explain(data["stats"])))
         await self.say(w, f"You're off the planned route. I found a new way from here, about {round(data['stats']['hootroute']['minutes'])} minutes.")
+
+    async def alternatives(self, w: Walk, at: list[float], avoid: list[tuple[float, float, float]], minute: int) -> tuple[dict, dict, str]:
+        """Mission Recovery: candidate routes from where the walker is, around the reported spot, at the current minute."""
+        where = await self.eng.where(at)
+        data, routes = await self.eng.plan({"lat": at[1], "lon": at[0], "name": where}, w.dest, w.day, minute, w.walker, w.guardian, avoid=avoid)
+        return data, routes, where
+
+    async def switch(self, w: Walk, option_id: str):
+        """Apply the recovery option the walker chose (Wally stored it on the walk; only the option id travels between agents)."""
+        rec = w.chosen_recovery; w.chosen_recovery = None
+        if not rec or option_id not in rec["routes"]: return
+        data, routes = promote(rec["data"], rec["routes"], option_id)
+        w.set_plan(data, routes); w.set_choice("hootroute")
+        w.meters = 0.0; w.offroute = 0; w.said = {k for k in w.said if not k.startswith(("turn:", "place:", "dim:"))}
+        st = w.stats()
+        await self.rt.send(w, self.plan_msg(w, f"Switched after your report ({rec['label']}). {st['minutes']} min from here, score {st['score']}, longest stretch with nothing listed open {st['longestEmptyM']} m. Conditions, not a safety rating."))
+        await self.say(w, f"New route set. About {round(st['minutes'])} minutes from here.")
+        await self.log(w, f"Switched to the {option_id} option from {rec['where']}.", f"{w.walker} chose it on the recovery card.", "Checker")
 
     async def place_update(self, w: Walk, place_id: str, decl: dict):
         """A shopkeeper changed their hours. Before the walk: plan again. During it: re-score the fixed routes and tell the walker if it is ahead."""
@@ -282,11 +312,12 @@ class Rescuer(Agent):
         at = w.fix or w.line()[0]; where = await self.eng.where(at); w.last_where = where
         await self.rt.send(w, {"type": "escalate", "reason": reason, "lngLat": at})
         await self.rt.send(w, {"type": "guardian.alert", "reason": reason, "lngLat": at, "where": where})
-        sms = await self.rt.notifier.sms(w.guardian_phone, f"{BRAND}: {w.walker} isn't answering ({reason.lower()}). Last seen on {where} at {wall_clock(time.time())}. "
+        sms = await self.rt.contact(w, "sms", w.guardian_phone, f"{BRAND}: {w.walker} isn't answering ({reason.lower()}). Last seen on {where} at {wall_clock(time.time())}. "
                                                             f"Live map: {w.guardian_url} . {BRAND} does not call 911; if you think {w.walker} needs emergency help, call 911 yourself.")
         w.sms_sent = sms == "sent"
-        await self.rung(w, 0, f"live link sent; SMS {sms}")
-        await self.log(w, f"Step 1: alert on {w.first_name(w.guardian)}'s live link. SMS: {sms}. 911 not contacted.",
+        link = "live link alert sent" if w.sharing else "sharing is off: nobody sees the alert"
+        await self.rung(w, 0, f"{link}; SMS {sms}")
+        await self.log(w, f"Step 1: {'alert on ' + w.first_name(w.guardian) + chr(39) + 's live link' if w.sharing else 'sharing is off, so no guardian sees this alert'}. SMS: {sms}. 911 not contacted.",
                        "Standing order: trusted contact first. This service never calls emergency services.", "Guardian")
         await self.log(w, f"Handoff packet ready · position {at[1]:.5f}, {at[0]:.5f} · {where} · {w.origin.get('name')} → {w.dest.get('name')} · {wall_clock(time.time())} · {reason}.",
                        "Everything a guardian or a dispatcher needs in one place.")
@@ -296,7 +327,7 @@ class Rescuer(Agent):
         if w.status != "escalated": return
         w.status = "walking"; w.moved_ts = time.time(); w.asked_here = True
         await self.say(w, "Okay. I've told your guardian you're fine. Walking with you.")
-        sms = await self.rt.notifier.sms(w.guardian_phone, f"{BRAND} update: {w.walker} says they're fine and is walking again.") if w.sms_sent else "not needed"
+        sms = await self.rt.contact(w, "sms", w.guardian_phone, f"{BRAND} update: {w.walker} says they're fine and is walking again.") if w.sms_sent else "not needed"
         await self.rung(w, w.ladder, "cleared: walker is fine")
         await self.log(w, f"Walker said they are fine. Guardian alert cleared. SMS update: {sms}.", "Check-in answered after escalation.", "Guardian")
 
@@ -312,15 +343,15 @@ class Rescuer(Agent):
         w.ladder += 1; w.escalate_deadline = now + w.thresholds["escalateSeconds"]; wait = secs(w, w.thresholds['escalateSeconds'])
         where = getattr(w, "last_where", None) or "the last known position"
         if w.ladder == 1:
-            call = await self.rt.notifier.call(w.guardian_phone, f"This is {BRAND}. {w.walker} is not answering check-ins. Last seen on {where}. "
+            call = await self.rt.contact(w, "call", w.guardian_phone, f"This is {BRAND}. {w.walker} is not answering check-ins. Last seen on {where}. "
                                                                   f"Open the live map link we texted you. {BRAND} does not call 911. If you think {w.walker} needs emergency help, call 911 yourself.")
             await self.rung(w, 1, f"call {call}")
             await self.log(w, f"Step 2: no answer after {wait}. Calling {w.first_name(w.guardian)}: {call}.", "Nobody cleared the alert, so the Rescuer moves one rung up.", "Guardian")
         elif w.ladder == 2:
             if w.backup_phone:
-                sms = await self.rt.notifier.sms(w.backup_phone, f"{BRAND}: {w.walker} isn't answering and {w.first_name(w.guardian)} hasn't responded. Last seen on {where}. Live map: {w.guardian_url} . "
+                sms = await self.rt.contact(w, "sms", w.backup_phone, f"{BRAND}: {w.walker} isn't answering and {w.first_name(w.guardian)} hasn't responded. Last seen on {where}. Live map: {w.guardian_url} . "
                                                                   f"{BRAND} does not call 911; call 911 yourself if you think it's an emergency.")
-                call = await self.rt.notifier.call(w.backup_phone, f"This is {BRAND}. {w.walker} is not answering, and their first contact has not responded. Last seen on {where}. Check the link we texted you.")
+                call = await self.rt.contact(w, "call", w.backup_phone, f"This is {BRAND}. {w.walker} is not answering, and their first contact has not responded. Last seen on {where}. Check the link we texted you.")
                 status = f"SMS {sms}, call {call}"
             else:
                 status = "no backup contact set"
@@ -331,6 +362,48 @@ class Rescuer(Agent):
             await self.log(w, "Step 4: nobody has answered. Showing a Call 911 button to the walker and the guardian. HootRoute does not dial 911 itself.",
                            "Only a person can confirm an emergency; an automatic call risks false alarms.")
             await self.say(w, "If you need emergency help, tap Call 911.")
+
+
+    # ---------- Wingman Wally: the live journey ----------
+    async def sharing(self, w: Walk, active: bool):
+        if active: await self.log(w, "Sharing is on again with a new guardian link. Old links stay revoked.", f"{w.walker} turned sharing on.")
+        else: await self.log(w, "Sharing stopped. The guardian link is revoked and no texts or calls will be sent on this walk.", f"{w.walker} turned sharing off.")
+
+    async def obstacle(self, w: Walk, report: dict):
+        """The walker reported a problem. Wally works out where, then asks Professor Hoot to coordinate a recovery."""
+        if not w.data or w.status == "ended": return
+        if w.recovery and time.time() < w.recovery["expires"] and w.recovery.get("busy"): return
+        if time.time() - w.last_report < RECOVERY_COOLDOWN_S:
+            await self.log(w, "Report noted. Options from your last report are still the newest; wait a moment before reporting again.", "One recovery every 30 s keeps the planner responsive."); return
+        w.last_report = time.time()
+        at = report.get("lngLat") or geo.point_at(w.line(), min(w.total(), w.meters + RECOVERY_AHEAD_M), w.cum())      # the block just ahead on the route
+        here = w.fix or w.line()[0]
+        label = OBSTACLE_LABEL.get(report.get("kind"), "a problem")
+        await self.log(w, f"Report received: {label}" + (f" ({report['note']})" if report.get("note") else "") + ". Asking Professor Hoot for a way around it.",
+                       f"{w.walker} reported it. Walker reports are not verified; the current route stays active until {w.walker} chooses.", "Head")
+        await self.rt.tell(self.name, "head", w, "obstacle", report=report, at=at, here=here)
+
+    async def choose(self, w: Walk, recovery_id: str, option_id: str):
+        rec = w.recovery
+        if not rec or rec["id"] != recovery_id or time.time() > rec["expires"] or rec.get("busy"):
+            await self.rt.send(w, {"type": "recovery.closed", "recoveryId": recovery_id, "reason": "expired"})
+            await self.log(w, "That recovery choice expired. Report the problem again for fresh options.", "Options are only valid for a few minutes."); return
+        w.recovery = None
+        if option_id == "keep":
+            await self.say(w, "Okay, staying on your route.")
+            await self.log(w, "Walker kept the current route.", "Nothing changes without the walker's choice."); return
+        if option_id not in rec["routes"]:
+            await self.rt.send(w, {"type": "recovery.closed", "recoveryId": recovery_id, "reason": "unknown option"})
+            await self.log(w, f"Unknown option {option_id}; route unchanged.", "Choice did not match an offered option."); return
+        w.chosen_recovery = rec
+        await self.rt.tell(self.name, "guide", w, "switch", option=option_id)
+
+
+OBSTACLE_LABEL = {"blocked": "path blocked", "construction": "construction", "place_closed": "a place reported closed", "want_detour": "wants a different way", "other": "a problem"}
+RECOVERY_AHEAD_M = 35
+RECOVERY_RADIUS_M = 35
+RECOVERY_TTL_S = 300
+RECOVERY_COOLDOWN_S = 30
 
 
 # ------------------------------------------------------------------------------------------------------------- Head
@@ -344,8 +417,8 @@ class Head(Agent):
         w.status = "ended"
         minutes = (time.time() - (w.started or time.time())) / 60 * (w.time_scale if w.replay else 1)
         cases = await self.eng.cases_near(w.line(), 40.0, 5)
-        stats = w.data["stats"]["shortest" if w.choice == "usual" else "hootroute"]
-        facts = {"walker": w.walker, "from": w.origin.get("name"), "to": w.dest.get("name"), "minutes": round(minutes), "route": "fastest" if w.choice == "usual" else "HootRoute",
+        stats = w.stats()
+        facts = {"walker": w.walker, "from": w.origin.get("name"), "to": w.dest.get("name"), "minutes": round(minutes), "route": {"usual": "fastest", "balanced": "balanced"}.get(w.choice, "HootRoute"),
                  "score": stats["score"], "longest_empty_m": stats["longestEmptyM"], "checkins": w.checkins, "alerts": 1 if w.escalated_reason else 0,
                  "alert_reason": w.escalated_reason or None, "rescue_rung_reached": w.ladder if w.escalated_reason else None, "acked_by": w.acked_by,
                  "open_311_streetlight_cases": [{"id": c["id"], "details": c["details"], "opened": c["opened"]} for c in cases[:3]], "replay": w.replay}
@@ -360,7 +433,38 @@ class Head(Agent):
         await self.say(w, f"You've arrived at {w.dest.get('name')}, {w.walker}.")
         await self.log(w, f"Walk report written ({by}). " + (f"Draft 311 cites {len(cases)} real open case{'s' if len(cases) != 1 else ''}." if cases else "No open 311 streetlight case on the route."),
                        "Reports stay drafts for a person to review. Numbers in the report come from the engine and the walk log, not from the model.", w.walker)
-        if w.sms_sent: await self.rt.notifier.sms(w.guardian_phone, f"{BRAND}: {w.walker} has arrived. Location sharing has stopped.")
+        if w.sms_sent: await self.rt.contact(w, "sms", w.guardian_phone, f"{BRAND}: {w.walker} has arrived. Location sharing has stopped.")
+
+    async def recover(self, w: Walk, report: dict, at: list[float], here: list[float]):
+        """Professor Hoot coordinates Mission Recovery: Scoot re-plans around the report from where the walker is, using the
+        hours evidence already gathered; Hoot explains the trade-off; the walker chooses. Nothing switches automatically."""
+        w.recovery = {"busy": True, "expires": time.time() + 60, "id": ""}
+        elapsed = (time.time() - (w.started or time.time())) / 60 * (w.time_scale if w.replay else 1)
+        minute = int(w.minute + elapsed) % 1440
+        await self.log(w, f"Asking Scoot McRoute for routes from here that avoid {RECOVERY_RADIUS_M} m around the report.",
+                       "Recovery reuses the hours evidence already gathered; no paid check runs during a walk.", "Guide")
+        try:
+            data, routes, where = await self.rt.agents["guide"].alternatives(w, here, [(at[1], at[0], RECOVERY_RADIUS_M)], minute)
+        except ValueError as e:
+            w.recovery = None
+            await self.log(w, f"No alternative found: {e}", "Staying on the current route."); return
+        remaining = max(0.0, w.total() - w.meters)
+        cur = w.stats()
+        current = {"id": "keep", "label": "Keep current route", "coords": w.line(), "km": round(remaining / 1000, 2), "turnsPerKm": None, "avoidsReport": False, "liveEvidence": None,
+                   "stats": {"score": cur["score"], "minutes": round(remaining / 1.35 / 60, 1), "longestEmptyM": cur["longestEmptyM"]}, "remainingOnly": True}
+        live = lambda r: sum(1 for sh in r.get("shops", []) if (self.eng.place(sh["id"]) or {}).get("hours_source") == "apify-live")
+        options = [{"id": o["id"], "label": o["label"], "coords": o["coords"], "stats": o["stats"], "km": o["km"], "turnsPerKm": o.get("turnsPerKm"),
+                    "avoidsReport": bool(o.get("avoidsReport", True)), "liveEvidence": live(routes[o["id"]]) if o["id"] in routes else 0}
+                   for o in data.get("options") or [] if o["id"] in routes]
+        label = OBSTACLE_LABEL.get(report.get("kind"), "a problem")
+        explanation, by = await explain_recovery({"report": label, "note": report.get("note") or None, "from": where, "to": w.dest.get("name"),
+                                                  "current_remaining": current["stats"], "options": [{k: o[k] for k in ("id", "label", "stats", "km", "avoidsReport")} for o in options]})
+        rid = uuid.uuid4().hex[:10]
+        w.recovery = {"id": rid, "label": label, "where": where, "data": data, "routes": routes, "expires": time.time() + RECOVERY_TTL_S}
+        await self.rt.send(w, {"type": "recovery.options", "recoveryId": rid, "kind": report.get("kind", "other"), "reason": f"You reported {label} near {where}.",
+                               "at": at, "current": current, "options": options, "explanation": explanation, "explainedBy": by, "expiresAt": round(w.recovery["expires"] * 1000)})
+        await self.say(w, "I found other ways from here. Your route stays the same until you choose.")
+        await self.log(w, f"Recovery options ready: {len(options)} route{'s' if len(options) != 1 else ''} around the report ({by}).", "Waiting for the walker's choice.", w.walker)
 
     async def ended(self, w: Walk):
         if w.status == "ended": return

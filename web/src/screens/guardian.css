@@ -209,3 +209,20 @@
   z-index: 3;
 }
 .g-alert__911 { display: flex; align-items: center; justify-content: center; text-decoration: none; }
+
+.g-stopped {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: calc(48px + var(--safe-top)) 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.g-stopped h1 {
+  font-size: 28px;
+  line-height: 32px;
+  margin: 0;
+}
+.g-stopped p {
+  margin: 0;
+}

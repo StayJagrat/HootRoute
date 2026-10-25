@@ -9,6 +9,10 @@ import { cumulative, lineLength, project, turnsFromSteps } from '../lib/geo';
 import { AGENT_LABEL, meters, timeOf } from '../lib/format';
 import { getRoomStore, loadSettings, mergedPlaces, useWalk, useWalkData, walkIdFromUrl } from '../lib/store';
 import { gpsMode, isLive, walkCreds } from '../lib/api';
+import { loadPrefs } from '../lib/prefs';
+import { PERSONA, SHORT } from '../lib/personas';
+import { RecoverySheet, ReportSheet, SharingControl } from '../components/LiveJourney';
+import '../components/hoot.css';
 import { GpsReplay } from '../lib/replay';
 import { canListen, isMuted, listen, setMuted, speak, unlockAudio, type ListenerHandle } from '../lib/voice';
 import { keepAwake, vibrate, watchLocation } from '../lib/device';
@@ -32,6 +36,13 @@ export default function Walk() {
   const guardianFirst = guardianName.split(' ')[0];
   const timeScale = state.plan?.timeScale ?? settings.timeScale;
   const ownsWalk = !isLive() || !!walkCreds(walkId);
+  const lowDistraction = useMemo(() => loadPrefs().lowDistraction, []);
+  const [reportOpen, setReportOpen] = useState(false);
+  const recoveryId = state.recovery?.recoveryId;
+  useEffect(() => { if (recoveryId) setReportOpen(false); }, [recoveryId]);   // options arrived: the recovery card takes over
+  const [dismissed, setDismissed] = useState<string | null>(null);
+  const [shareLocal, setShareLocal] = useState<{ v: boolean; ts: number } | null>(null);
+  const live = isLive();
 
   // demo engine: plays the agents from cached data unless ?engine=off (gateway drives)
   useEffect(() => {
@@ -59,14 +70,15 @@ export default function Walk() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  // speak every new line
+  // speak every new line (low-distraction: only the Guide's turn prompts, check-ins and the Rescuer)
   const lastSaid = useRef(0);
   useEffect(() => {
     if (state.say && state.say.ts > lastSaid.current && state.phase !== 'preview') {
       lastSaid.current = state.say.ts;
-      void speak(state.say.text);
+      const quietable = state.phase === 'walking' && (state.say.agent === 'checker' || state.say.agent === 'head');
+      if (!(lowDistraction && quietable)) void speak(state.say.text);
     }
-  }, [state.say, state.phase]);
+  }, [state.say, state.phase, lowDistraction]);
 
   // buzz on check-in
   useEffect(() => {
@@ -120,6 +132,7 @@ export default function Walk() {
   }, []);
 
   const go = (choice: 'hootroute' | 'usual') => {
+    // walk.accept only knows hootroute | usual; a 'balanced' walk is already the plan's main route on the gateway
     if (!data) return;
     unlockAudio(); // the "Walk with me" tap doubles as the audio unlock
     void keepAwake(true);
@@ -159,12 +172,12 @@ export default function Walk() {
   if (isLive() && (!walkId || !ownsWalk)) {
     return (
       <div className="screen" data-theme="night" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <p className="t-spoken">{walkId ? 'This walk was started on another phone. Open the guardian link to follow it.' : 'Plan a walk first and the Guide will pick the route.'}</p>
+        <p className="t-spoken">{walkId ? 'This walk was started on another phone. Open the guardian link to follow it.' : `Plan a walk first and ${SHORT.guide} will pick the route.`}</p>
         <Link className="btn btn--primary btn--block" to={walkId ? `/guardian/${walkId}` : '/plan'} style={{ textDecoration: 'none' }}>{walkId ? 'Open guardian view' : 'Plan a walk'}</Link>
       </div>
     );
   }
-  if (!data) return <div className="screen" data-theme="night" role={error ? 'alert' : undefined} style={{ padding: 24 }}>{error ?? (waiting ? 'The Guide is planning your route…' : 'Loading route…')}</div>;
+  if (!data) return <div className="screen" data-theme="night" role={error ? 'alert' : undefined} style={{ padding: 24 }}>{error ?? (waiting ? `${SHORT.guide} is planning your route…` : 'Loading route…')}</div>;
 
   const places = mergedPlaces(data, state);
   const progress = state.position?.progress ?? 0;
@@ -182,6 +195,12 @@ export default function Walk() {
     ? demoClock.getTime() + (state.choice === 'usual' ? stats.shortest.minutes : stats.hootroute.minutes) * 60000
     : now + etaMin * 60000;
   const brightened = Object.keys(state.brightened);
+  const credsShare = walkCreds(walkId)?.sharing;
+  // whichever is newer: this phone's own toggle, or the room's share.update
+  const sharing = shareLocal && shareLocal.ts >= (state.sharingTs ?? 0) ? shareLocal.v : state.sharing ?? credsShare ?? true;
+  const recovery = state.recovery && state.recovery.recoveryId !== dismissed && (phase === 'walking' || phase === 'preview') ? state.recovery : null;
+  const justSwitched = state.switchedAt && now - state.switchedAt < 8000;
+  const demoLabel = live ? '' : 'SIMULATED DEMO · ';
 
   const puck = state.position && phase !== 'preview'
     ? { lngLat: state.position.lngLat, heading: state.position.heading, variant: (phase === 'escalated' ? 'alert' : phase === 'checkin' ? 'checkin' : 'normal') as 'alert' | 'checkin' | 'normal' }
@@ -227,20 +246,21 @@ export default function Walk() {
           )}
         </div>
       </div>
-      {state.replay && phase !== 'preview' && (
+      {((state.replay && phase !== 'preview') || !live) && (
         <div className="walk__tape">
-          <DemoTape label={`DEMO · GPS REPLAY · ×${timeScale}`} />
+          <DemoTape label={state.replay && phase !== 'preview' ? `${demoLabel}DEMO · GPS REPLAY · ×${timeScale}` : 'SIMULATED DEMO'} />
         </div>
       )}
       {gpsError && <div className="walk__toast">{gpsError}</div>}
+      {justSwitched && !gpsError && <div className="walk__toast walk__toast--ok" role="status">{plan?.reason ?? 'Switched to the new route.'}</div>}
 
       {/* ---------- sheets ---------- */}
       {phase === 'preview' && (
-        <Sheet label="Route offer from the Guide">
+        <Sheet label={`Route offer from ${PERSONA.guide}`}>
           <div className="speaker">
             <Mascot agent="guide" state={plan ? 'talking' : 'thinking'} />
             <div>
-              <div className="t-headline">Guide</div>
+              <div className="t-headline">{PERSONA.guide}</div>
               <div className="t-caption">{plan ? 'Planned before you left · just now' : 'Asking who is open nearby…'}</div>
             </div>
             <span style={{ marginLeft: 'auto' }}>
@@ -285,11 +305,12 @@ export default function Walk() {
             </div>
             <div className="guardian-chip">
               <Initials text={guardianName[0]} />
-              {guardianFirst} {state.guardianJoined ? 'is watching' : 'gets a live link if needed'}
+              {!sharing ? 'Sharing stopped' : `${guardianFirst} ${state.guardianJoined ? 'is watching' : 'gets a live link if needed'}`}
             </div>
           </div>
           <hr className="divider" />
-          {state.say && (
+          {lowDistraction && <p className="t-caption" style={{ margin: 0 }}>Low-distraction guidance: turn prompts and check-ins only.</p>}
+          {state.say && (!lowDistraction || state.say.agent === 'guide' || state.say.agent === 'rescuer') && (
             <>
               <div className="speaker">
                 <Mascot agent={state.say.agent} state={now - state.say.ts < 4000 ? 'talking' : 'idle'} />
@@ -309,7 +330,16 @@ export default function Walk() {
             <Button kind="fine" icon="check" onClick={() => reply('fine')}>I'm fine</Button>
             <HoldButton onConfirm={() => reply('help')}>Hold for help</HoldButton>
           </div>
-          {isLive() && <button type="button" className="walk__end t-caption" onClick={endWalk}>End walk · stop sharing location</button>}
+          {live && ownsWalk && (
+            <>
+              <div className="lj__actions">
+                <button type="button" className="lj__report" onClick={() => setReportOpen(true)}><Icon name="ring" size={16} /> Report a problem</button>
+                {state.lastReport && !state.recovery && now - state.lastReport.ts < 60000 && <span className="t-caption">{SHORT.guide} is looking for other ways…</span>}
+              </div>
+              <SharingControl walkId={walkId} active={sharing} onChange={(v) => setShareLocal({ v, ts: Date.now() })} />
+            </>
+          )}
+          {live && <button type="button" className="walk__end t-caption" onClick={endWalk}>End walk · stop sharing location</button>}
         </Sheet>
       )}
 
@@ -318,6 +348,7 @@ export default function Walk() {
           checkin={state.checkin}
           now={now}
           guardian={guardianFirst}
+          sharing={sharing}
           onFine={() => reply('fine')}
           onHelp={() => reply('help')}
         />
@@ -328,10 +359,12 @@ export default function Walk() {
           <div className="speaker">
             <Mascot agent="rescuer" state="talking" size={56} />
             <div>
-              <div className="t-caption">Rescuer</div>
-              <h2 className="t-display" style={{ fontSize: 26, lineHeight: '30px' }}>{guardianFirst} has your live location</h2>
+              <div className="t-caption">{PERSONA.rescuer}</div>
+              <h2 className="t-display" style={{ fontSize: 26, lineHeight: '30px' }}>{sharing ? `${guardianFirst} has your live location` : 'Sharing is stopped'}</h2>
             </div>
           </div>
+          {!sharing && <p className="t-caption" style={{ margin: 0 }}>Your guardian link is revoked, so {guardianFirst} can't see your position and no text or call goes out. Turn sharing back on to send a new link.</p>}
+          {live && ownsWalk && !sharing && <SharingControl walkId={walkId} active={sharing} onChange={(v) => setShareLocal({ v, ts: Date.now() })} />}
           <div className={`ack ${state.alert?.ackBy ? 'ack--on' : ''}`}>
             <Icon name={state.alert?.ackBy ? 'check' : 'ring'} size={18} />
             {state.alert?.ackBy ? `${guardianFirst} is on it` : `Waiting for ${guardianFirst} to respond…`}
@@ -349,23 +382,27 @@ export default function Walk() {
           <div className="speaker">
             <Mascot agent="head" state="done" size={56} />
             <div>
-              <div className="t-caption">Head</div>
+              <div className="t-caption">{PERSONA.head}</div>
               <h2 className="t-display" style={{ fontSize: 28 }}>You've arrived.</h2>
             </div>
           </div>
           <p className="t-caption" style={{ fontSize: 15, lineHeight: '21px' }}>{state.summary}</p>
           {state.reportBy && <p className="t-caption" style={{ fontSize: 11 }}>Walk report by {state.reportBy}. Numbers come from the engine and the walk log.</p>}
+          {!live && <p className="t-caption" style={{ fontSize: 11 }}>Simulated demo: the agents were played by the offline demo engine.</p>}
           <div className="btn-row">
             <Button kind="secondary" onClick={() => nav(`/room?walk=${walkId}`)}>Control room</Button>
             <Button kind="primary" onClick={() => { if (isLive()) { nav('/plan'); return; } send({ type: 'walk.reset' }); engine.current?.plan(); }}>New walk</Button>
           </div>
         </Sheet>
       )}
+
+      {live && ownsWalk && <ReportSheet open={reportOpen} onClose={() => setReportOpen(false)} send={send} at={state.position?.lngLat} />}
+      {recovery && <RecoverySheet r={recovery} now={now} send={send} onDismiss={() => setDismissed(recovery.recoveryId)} />}
     </div>
   );
 }
 
-function CheckIn({ checkin, now, guardian, onFine, onHelp }: { checkin: NonNullable<ReturnType<typeof useWalk>['state']['checkin']>; now: number; guardian: string; onFine: () => void; onHelp: () => void }) {
+function CheckIn({ checkin, now, guardian, sharing, onFine, onHelp }: { checkin: NonNullable<ReturnType<typeof useWalk>['state']['checkin']>; now: number; guardian: string; sharing: boolean; onFine: () => void; onHelp: () => void }) {
   const span = Math.max(1, checkin.deadline - checkin.ts);
   const left = Math.max(0, checkin.deadline - now);
   const frac = left / span;
@@ -384,14 +421,14 @@ function CheckIn({ checkin, now, guardian, onFine, onHelp }: { checkin: NonNulla
       <div className="speaker">
         <Mascot agent="checker" state="talking" size={64} />
         <div>
-          <div className="t-caption">Checker</div>
+          <div className="t-caption">{PERSONA.checker}</div>
           <h2 className="t-display">{checkin.text}</h2>
         </div>
       </div>
       <p className="muted" style={{ margin: 0, fontSize: 15 }}>Why I'm asking: {checkin.reason.charAt(0).toLowerCase() + checkin.reason.slice(1)}</p>
       <Button kind="fine" icon="check" tall block onClick={onFine}>I'm fine</Button>
       <HoldButton block onConfirm={onHelp}>Hold for help</HoldButton>
-      <p className="t-caption center">No answer in {secs} s → {guardian} gets your live location. {BRAND} never calls 911 for you.</p>
+      <p className="t-caption center">{sharing ? `No answer in ${secs} s → ${guardian} is alerted on the live link.` : 'Sharing is stopped, so nobody is alerted if you don’t answer.'} {BRAND} never calls 911 for you.</p>
     </Sheet>
   );
 }

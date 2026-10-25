@@ -4,18 +4,19 @@ import { LogoMark, Wordmark } from '../components/Logo';
 import { Button, Mascot } from '../components/ui';
 import { BRAND } from '../lib/brand';
 import type { AgentName } from '../lib/types';
+import { PERSONA } from '../lib/personas';
 import './intro.css';
 
 /** First-run walkthrough: the four agents in the order they work for you. */
 const STEPS: { agent: AgentName; n: string; name: string; title: string; body: string }[] = [
-  { agent: 'guide', n: '1', name: 'Guide', title: 'Picks the better street',
-    body: 'Scores the fastest route and a better one by what is listed open, lit and reachable at the minute you pass each block.' },
-  { agent: 'checker', n: '2', name: 'Checker', title: 'Walks it before you do',
-    body: 'Checks the route for closures and construction, long empty stretches, broken-lamp reports and transit, then says “Good to go” or what to know. While you walk, it checks in if you stop.' },
-  { agent: 'rescuer', n: '3', name: 'Rescuer', title: 'Brings in your people',
-    body: 'If you don’t answer, it climbs a ladder: live link and text to your guardian, a call, your backup contact, then a Call 911 button for a person to press.' },
-  { agent: 'head', n: '4', name: 'Head', title: 'Runs the crew and writes it up',
-    body: 'Understands what you ask in plain words, sends the others to work, explains every choice, and writes a short report when you arrive.' },
+  { agent: 'guide', n: '1', name: PERSONA.guide, title: 'Picks the better street',
+    body: 'Scores the fastest route and better ones by what is listed open, mapped as lit and reachable at the minute you pass each block. Re-plans around anything you report.' },
+  { agent: 'checker', n: '2', name: PERSONA.checker, title: 'Checks the evidence',
+    body: 'Finds places on the route whose hours are unknown or stale and, only after you approve, checks their published listings. Every hour shown says where it came from and when.' },
+  { agent: 'rescuer', n: '3', name: PERSONA.rescuer, title: 'Stays with you on the walk',
+    body: 'Takes obstacle reports and offers other routes for you to choose. Checks in if you stop. You can turn guardian sharing on or off; texts and calls go out only if you opt in.' },
+  { agent: 'head', n: '4', name: PERSONA.head, title: 'Runs the crew and explains it',
+    body: 'Reads what you ask in plain words, sends the others to work, asks before any paid check, and explains every choice with numbers from the tools.' },
 ];
 
 export function introSeen(): boolean {

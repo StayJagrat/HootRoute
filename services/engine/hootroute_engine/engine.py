@@ -72,20 +72,39 @@ class Engine:
         G = self.W.G; h = lambda u, v: float(np.hypot(*(G.nodes[u]["p"] - G.nodes[v]["p"])))
         return nx.astar_path(G, a, b, heuristic=h, weight=weight)
 
-    def route(self, session, origin, dest, day, minute, emit: Emit = None, max_extra=0.25):
+    def blocked_edges(self, avoid) -> set:
+        """Street segments passing within r metres of any (lat, lon, r) the walker reported as blocked."""
+        W = self.W
+        if not hasattr(self, "_seg"):
+            E = list(W.G.edges()); self._seg = (E, np.array([W.G.nodes[u]["p"] for u, _ in E]), np.array([W.G.nodes[v]["p"] for _, v in E]))
+        E, A, B = self._seg; AB = B - A; L2 = np.maximum((AB * AB).sum(1), 1e-9); out = set()
+        for lat, lon, r in avoid or ():
+            p = np.array(W.proj.xy(lat, lon)); t = np.clip(((p - A) * AB).sum(1) / L2, 0, 1)
+            d = np.hypot(*(A + AB * t[:, None] - p).T); out |= {frozenset(E[i]) for i in np.where(d <= r)[0]}
+        return out
+
+    def route(self, session, origin, dest, day, minute, emit: Emit = None, max_extra=0.25, avoid=None):
+        """Candidate routes scored at the minute each block is passed. `avoid` = [(lat, lon, radius_m)]: segments there cost
+        10,000x (a detour unless there is no other way). The score itself never sees `avoid`."""
         with self.lock:
             t0 = time.time(); W = self.W; ctx = self.ctx(session, day, minute); say = emit or (lambda *a, **k: None)
             a, da = W.nearest_node(*origin); b, db = W.nearest_node(*dest)
             say("guide", "start", f"Planning {DAYS[day]} {minute // 60 % 24}:{minute % 60:02d}. Snapped to the street graph ({da:.0f} m and {db:.0f} m from your points).", {})
             q = self.quick(ctx); eidx = W.e_index
-            paths = {}; paths["fast"] = self._astar(a, b, "length")
+            blocked = self.blocked_edges(avoid) if avoid else set()
+            pen = (lambda u, v: 1e4 if frozenset((u, v)) in blocked else 1.0) if blocked else (lambda u, v: 1.0)
+            paths = {}
+            if blocked:
+                nx.set_edge_attributes(W.G, {(u, v): d["length"] * pen(u, v) for u, v, d in W.G.edges(data=True)}, "len_av"); paths["fast"] = self._astar(a, b, "len_av")
+            else:
+                paths["fast"] = self._astar(a, b, "length")
             for lam in (1, 2, 4, 8):
-                w = {(u, v): d["length"] * (1 + lam * (1 - q[eidx[frozenset((u, v))]])) for u, v, d in W.G.edges(data=True)}
+                w = {(u, v): d["length"] * (1 + lam * (1 - q[eidx[frozenset((u, v))]])) * pen(u, v) for u, v, d in W.G.edges(data=True)}
                 nx.set_edge_attributes(W.G, w, f"w{lam}"); paths[f"l{lam}"] = self._astar(a, b, f"w{lam}")
             for seed in range(6):                      # seeded perturbations of the quality-weighted cost give genuinely different alternatives
                 rng = np.random.default_rng(seed)
                 jit = rng.uniform(0.7, 1.6, len(W.edges))
-                w = {(u, v): d["length"] * (1 + 3 * (1 - q[eidx[frozenset((u, v))]])) * jit[eidx[frozenset((u, v))]] for u, v, d in W.G.edges(data=True)}
+                w = {(u, v): d["length"] * (1 + 3 * (1 - q[eidx[frozenset((u, v))]])) * jit[eidx[frozenset((u, v))]] * pen(u, v) for u, v, d in W.G.edges(data=True)}
                 nx.set_edge_attributes(W.G, w, "wj"); paths[f"j{seed}"] = self._astar(a, b, "wj")
             uniq = {}; [uniq.setdefault(tuple(p), k) for k, p in paths.items()]
             say("guide", "step", f"Found {len(uniq)} distinct candidate routes. Scoring each at the minute you pass every block.", {"n": len(uniq), "why": "alternatives come from the quality-weighted search plus seeded perturbations"})
@@ -100,8 +119,11 @@ class Engine:
             options = [self._pack("fast", "Fastest", fast, ctx)]
             if balanced["path"] not in (fast["path"], best["path"]): options.append(self._pack("balanced", "Balanced", balanced, ctx))
             if best["path"] != fast["path"]: options.append(self._pack("best", "HootRoute", best, ctx))
+            for o in options:
+                path = {"fast": fast, "balanced": balanced, "best": best}[o["id"]]["path"]
+                o["avoids"] = not blocked or not any(frozenset((u, v)) in blocked for u, v in zip(path, path[1:]))
             out = dict(depart=dict(day=DAYS[day], minute=minute), recommended="best" if best is not fast else "fast", norm=dict(lo=N.lo, hi=N.hi),
-                       routes=options, candidates=len(uniq), ms=round((time.time() - t0) * 1000))
+                       routes=options, candidates=len(uniq), ms=round((time.time() - t0) * 1000), avoided=len(blocked))
             return out
 
     def _pack(self, rid, label, e, ctx):
@@ -218,7 +240,7 @@ class Engine:
             hh = f"{(minute // 60) % 24 % 12 or 12}:{minute % 60:02d} {'PM' if (minute // 60) % 24 >= 12 else 'AM'}"
             text = (f"{len(opened)} place{'s' if len(opened) != 1 else ''} open within reach at {hh}" if opened else f"No listed place open here at {hh}")
             text += f"; {lamps} lamp location{'s' if lamps != 1 else ''} on record" + (f", {outs} open outage report{'s' if outs != 1 else ''}" if outs else "")
-            if unknown: text += f". {len(unknown)} nearby place{'s have' if len(unknown) != 1 else ' has'} no listed hours and count as closed"
+            if unknown: text += f". {len(unknown)} nearby place{'s have' if len(unknown) != 1 else ' has'} no listed hours (unknown, not closed; no credit in the score)"
             return dict(street=ed["name"] or "Unnamed path", score=round(100 * float(q)), light_pct=round(100 * float(W.e_light[k])), open=[dict(name=pl["name"] or pl["cat"], hours=pl["hours"], src=pl.get("hours_source")) for pl in opened[:4]],
                         lamps=lamps, outages=outs, unknown_hours=len(unknown), ll=W.proj.ll(W.e_mid[k]), text=text)
 

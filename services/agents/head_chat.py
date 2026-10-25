@@ -1,8 +1,9 @@
 """hootroute-head: the HootRoute Head on Agentverse, usable entirely inside an ASI:One chat (Agent Chat Protocol).
 
-The whole primary workflow runs in the conversation: the walker describes the walk, the Head (Claude) has the Guide plan and
-score both routes and the Checker look for places with unknown hours; "check the hours" runs a live Apify listing check and
-re-scores, in the same chat. "Start my walk" creates a real walk and returns the walker and guardian links.
+The whole primary workflow runs in the conversation: the walker describes the walk, Professor Hoot (Claude) has Scoot McRoute
+plan and score the routes and Sherlock Hoots look for places with unknown hours. A paid listing check is only proposed;
+the walker answers "approve" (or "skip") in the chat, then the check runs and the walk is re-scored. "Start my walk" creates
+a real walk and returns the walker and guardian links.
 
     python head_chat.py        # alone (prints the Agentverse inspector link to connect the mailbox)
 """
@@ -19,10 +20,11 @@ from uagents_core.contrib.protocols.chat import ChatAcknowledgement, ChatMessage
 
 from common import CORE, ENGINE_URL, make_agent, mode
 
-HELP = ("Hi, I'm the Head of HootRoute, a walking companion for San Francisco late-shift workers.\n\n"
+HELP = ("Hi, I'm Professor Hoot from HootRoute, a journey companion for people walking in San Francisco after dark.\n\n"
         "Tell me your walk, for example: **My shift ends at 11:30 PM near Moscone Center, walk me to City Hall, I'd like more places open.**\n"
-        "I'll have my Guide score the fastest route and a better-lit, more-open one, and my Checker look for places whose hours are unknown. "
-        "Then you can say **check the hours** (a live listing check) or **start my walk** (you get a walker link and a link for the person watching over you).\n\n"
+        "Scoot McRoute scores the fastest route and alternatives, and Sherlock Hoots looks for places whose hours are unknown. "
+        "If a live listing check could help, I'll ask first (it costs a few cents): answer **approve** or **skip**. "
+        "Then say **start my walk** (you get a walker link and a link for the person watching over you).\n\n"
         "Scores describe route conditions, not a safety rating. HootRoute never calls 911.")
 
 
@@ -41,7 +43,7 @@ async def _post(path: str, body: dict, timeout: float = 240) -> dict:
 
 
 def _trace(res: dict) -> str:
-    lines = [f"- **{t['agent'].capitalize()}** · {t['tool'].replace('_', ' ')} · {t['summary']}" for t in res.get("trace", [])]
+    lines = [f"- **{t.get('persona') or t['agent'].capitalize()}** · {t['tool'].replace('_', ' ')} · {t['summary']}" for t in res.get("trace", [])]
     return ("\n\n_Agent activity:_\n" + "\n".join(lines)) if lines else ""
 
 
@@ -62,14 +64,32 @@ def build_head():
             return (f"Your walk has started. Open this on your phone to walk with me (keep it private, it lets you act as the walker): {base}{w['walkPath']}&t={w['walkerToken']}\n"
                     f"Send this to the person watching over you: {w['guardianUrl']}\n"
                     "If you stop on an empty stretch I'll check in; if you don't answer, my Rescuer alerts them step by step. HootRoute never calls 911.")
+        pending = ctx.storage.get(f"approval:{sender}")
         try:
-            res = await _post("/api/head/ask", {"text": text, "session": sid, "allowChecks": True})
+            if pending and sid and re.match(r"^(approve|approved|yes|ok|okay|go ahead|run it|check)\b", low):
+                ctx.storage.set(f"approval:{sender}", None)
+                res = await _post("/api/head/approve", {"session": sid, "approvalId": pending, "approve": True})
+            elif pending and sid and re.match(r"^(skip|no|not now|don'?t)\b", low):
+                ctx.storage.set(f"approval:{sender}", None)
+                res = await _post("/api/head/approve", {"session": sid, "approvalId": pending, "approve": False})
+            else:
+                res = await _post("/api/head/ask", {"text": text, "session": sid, "allowChecks": False})
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404: ctx.storage.set(f"approval:{sender}", None); return "That request expired. Tell me your walk again."
+            if e.response.status_code == 429: return "Too many requests right now. Please wait a moment and try again."
+            return f"The HootRoute planner answered {e.response.status_code}. Please try again in a moment."
         except httpx.HTTPError as e:
             return f"I couldn't reach the HootRoute planner right now ({type(e).__name__}). Please try again in a moment."
+        ap = res.get("pendingApproval")
+        if ap: ctx.storage.set(f"approval:{sender}", ap["id"])
         ctx.storage.set(f"session:{sender}", res["session"])
         if res.get("req") and res.get("planId"):
             q = res["req"]; ctx.storage.set(f"plan:{sender}", {"planId": res["planId"], "origin": q["origin"], "destination": q["destination"], "day": q["day"], "minute": q["minute"]})
-        tail = "\n\nSay **check the hours** to verify listings live, or **start my walk**." if res.get("planId") and not res.get("check") else "\n\nSay **start my walk** when you're ready." if res.get("planId") else ""
+        if ap and ap["provider"] != "unavailable":
+            names = ", ".join(p["name"] for p in ap["places"])
+            tail = f"\n\nI'd like Sherlock to check the published listings of {names} (up to ${ap['maxUsd']:.2f}). Reply **approve** or **skip**."
+        else:
+            tail = "\n\nSay **start my walk** when you're ready." if res.get("planId") else ""
         return res["answer"] + _trace(res) + tail
 
     @chat.on_message(ChatMessage)

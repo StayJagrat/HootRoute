@@ -19,10 +19,11 @@ class EnginePort:
 
     async def _run(self, fn, *args, **kw): return await asyncio.to_thread(fn, *args, **kw)
 
-    async def plan(self, origin: dict, dest: dict, day: int, minute: int, walker: str, guardian: str) -> tuple[dict, dict]:
-        """(DemoData, {'best', 'fast'} engine routes). Raises ValueError with a walker-readable message when the points cannot be routed."""
+    async def plan(self, origin: dict, dest: dict, day: int, minute: int, walker: str, guardian: str, avoid: list | None = None) -> tuple[dict, dict]:
+        """(DemoData, {'best', 'fast'[, 'balanced']} engine routes). Raises ValueError with a walker-readable message when the points cannot be routed.
+        `avoid` = [(lat, lon, radius_m)] for reported obstacles."""
         return await self._run(build_plan, self.engine, dest["lat"], dest["lon"], dest.get("name") or "Destination", (origin["lat"], origin["lon"]),
-                               origin.get("name") or "Start", day, minute, walker, guardian, f"plan:{uuid.uuid4().hex[:8]}", False)
+                               origin.get("name") or "Start", day, minute, walker, guardian, f"plan:{uuid.uuid4().hex[:8]}", False, avoid)
 
     async def rescore(self, routes: dict, day: int, minute: int) -> dict:
         def run():
