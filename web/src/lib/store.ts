@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 import { isLive, lastWalkId } from './api';
 import { Room, type LinkStatus, type Role } from './transport';
 import { isListedOpen } from './format';
@@ -188,83 +188,6 @@ export function useWalk(walkId: string, role: Role) {
   return { state, status, refused: store.room.refused, room: store.room, send: (m: Msg) => store.room.send(m) };
 }
 
-// ---------------------------------------------------------------- demo data
-const dataPromises = new Map<string, Promise<DemoData>>();
-function demoKey(settings: Settings, destination?: { lat: number; lon: number; name: string }, live = false) {
-  return destination
-    ? `${destination.lat},${destination.lon},${destination.name}|${settings.origin?.lngLat.join(',') ?? ''}|${settings.depart?.day ?? ''}:${settings.depart?.minute ?? ''}`
-    : live ? 'live-default' : 'offline-default';
-}
-/** The planner already fetched this plan; hand it to the walk screen so it doesn't score the route twice. */
-export function primeDemoData(settings: Settings, data: DemoData) {
-  const d = settings.destination;
-  if (!d) return;
-  dataPromises.set(demoKey(settings, { lat: d.lngLat[1], lon: d.lngLat[0], name: d.name }), Promise.resolve(data));
-}
-export function loadDemoData(): Promise<DemoData> {
-  const query = new URLSearchParams(location.search);
-  const live = isLive();
-  const settings = loadSettings();
-  const destinationParam = query.get('destination');
-  const requestedDestination = destinationParam ? (() => {
-    const [lat, lon] = destinationParam.split(',').map(Number);
-    const name = query.get('destinationName') ?? 'Destination';
-    return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon, name } : undefined;
-  })() : undefined;
-  const saved = settings.destination;
-  const destination = requestedDestination ?? (saved ? { lat: saved.lngLat[1], lon: saved.lngLat[0], name: saved.name } : undefined);
-  const key = demoKey(settings, destination ? { lat: destination.lat, lon: destination.lon, name: destination.name } : undefined, live);
-  if (!dataPromises.has(key)) {
-    const read = (url: string) => fetch(url).then((r) => {
-      if (!r.ok) throw new Error(`Demo data request failed: ${r.status}`);
-      return r.json() as Promise<DemoData>;
-    });
-    if (destination) {
-      const params = new URLSearchParams({ lat: String(destination.lat), lon: String(destination.lon), name: destination.name });
-      if (settings.origin) {
-        params.set('olat', String(settings.origin.lngLat[1]));
-        params.set('olon', String(settings.origin.lngLat[0]));
-        params.set('oname', settings.origin.name);
-      }
-      if (settings.depart) {
-        params.set('day', String(settings.depart.day));
-        params.set('minute', String(settings.depart.minute));
-      }
-      dataPromises.set(key, read(`/api/route-demo?${params}`));
-    } else {
-      dataPromises.set(key, live ? read('/api/demo').catch(() => read('/data/demo-route.json')) : read('/data/demo-route.json'));
-    }
-  }
-  const promise = dataPromises.get(key)!;
-  promise.catch(() => { if (dataPromises.get(key) === promise) dataPromises.delete(key); });
-  return promise;
-}
-export function useDemoData(enabled = true): { data: DemoData | null; error: string | null } {
-  const [result, setResult] = useState<{ data: DemoData | null; error: string | null }>({ data: null, error: null });
-  useEffect(() => {
-    if (!enabled) return;
-    let alive = true;
-    loadDemoData().then(
-      (data) => alive && setResult({ data, error: null }),
-      () => alive && setResult({ data: null, error: 'The selected destination route could not be loaded. Pick another start or destination inside San Francisco, or check that the API is running.' }),
-    );
-    return () => {
-      alive = false;
-    };
-  }, [enabled]);
-  return result;
-}
-
-/** The route every screen draws. Live: whatever the Guide last planned for this walk (same on every device). Demo: cached data. */
-export function useWalkData(state: WalkState): { data: DemoData | null; error: string | null; waiting: boolean } {
-  const live = isLive();
-  const demo = useDemoData(!live);
-  if (!live) return { ...demo, waiting: false };
-  const data = state.plan?.data ?? null;
-  const error = !data && state.phase === 'arrived' ? state.summary ?? 'This walk has ended.' : null;
-  return { data, error, waiting: !data && !error };
-}
-
 export function mergedPlaces(data: DemoData, s: WalkState): Place[] {
   return data.places.map((p) => ({ ...p, ...(s.places[p.id] ?? {}) }) as Place);
 }
@@ -305,7 +228,6 @@ export function saveSettings(s: Settings) {
   } catch {
     /* storage blocked */
   }
-  dataPromises.clear();
 }
 
 /** @deprecated use isLive() from ./api */

@@ -60,6 +60,9 @@ export interface RouteOption {
   lightPct: number;
   points: Record<string, number>;
   weights: Record<string, number>;
+  turnsPerKm?: number;
+  mainPct?: number;
+  avoidsReport?: boolean;
 }
 
 export interface DemoData {

@@ -1,20 +1,17 @@
 import type { AgentName, DemoData, LngLat, RouteStats, Thresholds } from './types';
 import { BRAND } from './brand';
 
-// Two independent switches (URL first, then build env, then the production default):
-//   ?agents=live|demo  live = the gateway's agents drive the walk; demo = the local DemoEngine plays them from cached data
-//   ?gps=real|replay   real = the phone's GPS; replay = positions replayed along the route (badged "DEMO · GPS REPLAY")
-// The stage demo indoors is ?gps=replay with live agents: real agents answering a replayed walk.
+// Every screen talks to the live gateway agents. One switch for indoor demos:
+//   ?gps=real|replay   real = the phone's GPS; replay = positions replayed along the route (labelled "GPS replay · demo")
 
 const query = () => new URLSearchParams(location.search);
 
 export type AgentsMode = 'live' | 'demo';
 export type GpsMode = 'real' | 'replay';
 
+/** The scripted offline demo engine was removed: agents are always the gateway's. */
 export function agentsMode(): AgentsMode {
-  const q = query();
-  const v = q.get('agents') ?? (q.get('engine') === 'off' ? 'live' : q.get('engine') === 'on' ? 'demo' : null) ?? (import.meta.env.VITE_AGENTS as string | undefined);
-  return v === 'demo' ? 'demo' : 'live';
+  return 'live';
 }
 
 export function gpsMode(): GpsMode {

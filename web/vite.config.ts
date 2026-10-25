@@ -6,17 +6,20 @@ import { VitePWA } from 'vite-plugin-pwa';
 // one HTTPS tunnel (Cloudflare / ngrok) serves both the app and the realtime room,
 // so a judge's phone that scans the QR code reaches both.
 export default defineConfig({
+  envDir: '..',            // one .env at the repo root; Vite only exposes VITE_* values to the browser
   plugins: [
     react(),
     VitePWA({
+      // The old service worker kept serving cached builds of the previous UI. This one removes itself and its caches.
+      selfDestroying: true,
       registerType: 'autoUpdate',
       includeAssets: ['mascots/*.svg', 'data/*.json', 'icons/*.png'],
       manifest: {
         name: 'HootRoute',
         short_name: 'HootRoute',
-        description: 'A walking companion for late-shift workers walking home after dark.',
-        theme_color: '#10141C',
-        background_color: '#10141C',
+        description: 'Agentic navigation for the journey after dark.',
+        theme_color: '#07090D',
+        background_color: '#07090D',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',

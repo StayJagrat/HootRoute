@@ -34,27 +34,26 @@ cd web && npx tsc --noEmit && npm run build
 ## Demo walkthrough (golden workflow, ~3 min)
 
 Stage corridor: Moscone Center → City Hall, Friday 11:30 PM (engine: HootRoute 77 vs fastest 57, longest stretch with
-nothing listed open 390 m vs 560 m, +1.1 min). Re-check after any hours-evidence change.
+nothing listed open 390 m vs 560 m). Re-check after any hours-evidence change.
 
-1. `/plan`: ask Professor Hoot "My shift ends at 11:30 PM Friday, Moscone Center to City Hall, fewer turns, check listed hours".
-2. Point at Mission Control: each tool call, which persona ran it, why, timing. Same-turn lookups ran side by side.
-3. Hoot's answer quotes engine numbers ("Numbers verified against tool results") and proposes a check: the approval card
-   lists the places, provider and the $0.50 cap. Nothing has run yet.
-4. Press **Run check**: Sherlock's Apify run (run id and console link in the Evidence panel), before → after scores, or
-   "nothing changed" with the reason. Open **Evidence**: every place, its source and time; unknown stays unknown.
-5. Pick the route (preference ranking explains the choice) → **Start walk**. Show sharing on, the guardian link on a second phone.
-6. **Report a problem → Construction**. Mission Recovery: current vs alternatives, Hoot's explanation, "your route stays
-   active until you choose". Press **Switch to this route**: new turn-by-turn guidance.
-7. Turn **Sharing off**: the guardian phone shows "Sharing was stopped by the walker"; the old link is dead.
+1. Open `/`. Type to Professor Hoot: "from Moscone Center to City Hall Friday at 11:30 pm, fewer turns, check listed hours".
+2. Hoot's answer quotes engine numbers ("Numbers match tool results"); routes appear on the map and in **Routes**.
+3. Sherlock's card asks for your OK with the places and the $0.50 cap. Nothing has run yet. Press **Run check**:
+   before → after scores, run id and Apify console link. **Evidence** shows every place, its source and time; unknown stays unknown.
+4. **Agents** tab: every tool call, which persona ran it, why, timing, parallel calls marked.
+5. **Start with HootRoute** → optional contact, opt-in for texts, "Demo: replay GPS" on → **Start journey**.
+6. Live: turn banner, minutes left, score. **Report a problem ahead → Construction → Find another way**: Mission Recovery
+   compares your route with alternatives; nothing switches until you press **Switch to this route**.
+7. Toggle **Share live location** off: the guardian link (`/guardian/<id>?g=…`) shows "Sharing was stopped".
 8. Close on the rules: conditions, not a safety rating; no crime data; no model in the score; never calls 911.
 
-The stage walk uses a labelled GPS replay (`?gps=replay`). Say so.
+The replay is labelled "GPS replay · demo" on screen. Say so.
 
 ## Release checklist
 
 - [ ] `.env` on the demo laptop: `ANTHROPIC_API_KEY`, `APIFY_TOKEN` (and Twilio only if you will show texts).
 - [ ] Run the golden workflow once with real keys; screenshot the Apify console run and Mission Control trace.
-- [ ] `./scripts/fetch_tiles.sh` on every demo laptop (venue Wi-Fi is the biggest risk); without it the map has routes but no basemap.
+- [ ] The basemap loads from Geoapify (`VITE_GEOAPIFY_KEY`) or CARTO (no key). Without internet the routes still draw on a plain background.
 - [ ] Full test suite green on the final commit (commands above).
 - [ ] Public deploy only with `HOOTROUTE_ENV=production`, `ADMIN_TOKEN`, https `PUBLIC_URL`, `CORS_ORIGINS`, `SMS_ALLOWLIST`; the gateway refuses to start otherwise.
 - [ ] Rotate the keys HANDOFF says were printed into an earlier session log.
