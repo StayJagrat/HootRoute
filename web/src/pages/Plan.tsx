@@ -13,7 +13,7 @@ import { ApprovalCard, CheckResult, type CheckView, Crew, EvidenceList, HootAnsw
 import type { AgentName } from '../lib/types';
 import { Link } from 'react-router-dom';
 import { Avatar } from '../Avatar';
-import { Brand, Icon, Spinner, Toggle } from '../ui';
+import { AutoText, Brand, Icon, Spinner, Toggle } from '../ui';
 
 type When = { day: number; minute: number } | null;
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -200,7 +200,7 @@ export default function Plan() {
                 <label className="field" style={{ alignItems: 'flex-start' }}>
                   <span style={{ paddingTop: 14, color: 'var(--moon)' }}><Icon name="spark" size={16} /></span>
                   <span className="sr">Ask Professor Hoot</span>
-                  <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Leaving the library at 11:40 PM, to Civic Center BART, fewer turns"
+                  <AutoText rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Leaving the library at 11:40 PM, to Civic Center BART, fewer turns"
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void ask(); } }} />
                   <button className="btn btn--ghost btn--sm" style={{ marginTop: 7 }} disabled={!text.trim() || !!busy} onClick={() => void ask()}>Ask</button>
                 </label>
@@ -271,7 +271,9 @@ export default function Plan() {
               <div className="tabs" role="tablist">
                 {(['routes', 'evidence', 'agents'] as const).map((t) => (
                   <button key={t} role="tab" className="tab" aria-selected={tab === t} onClick={() => setTab(t)}>
-                    {t === 'routes' ? 'Routes' : t === 'evidence' ? `Evidence${ev ? ` · ${ev.counts.unknown} unknown` : ''}` : `Agents${trace.length ? ` · ${trace.length}` : ''}`}
+                    {t === 'routes' ? 'Routes' : t === 'evidence'
+                      ? <>Evidence{ev && ev.counts.unknown > 0 && <span className="tab__n tab__n--amber" title={`${ev.counts.unknown} places with unknown hours`}>{ev.counts.unknown}<span className="sr"> unknown</span></span>}</>
+                      : <>Agents{trace.length > 0 && <span className="tab__n">{trace.length}</span>}</>}
                   </button>
                 ))}
               </div>
@@ -283,7 +285,7 @@ export default function Plan() {
                 <label className="field" style={{ alignItems: 'flex-start' }}>
                   <span style={{ paddingTop: 14, color: 'var(--moon)' }}><Icon name="spark" size={16} /></span>
                   <span className="sr">Ask a follow-up</span>
-                  <textarea rows={1} value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask Hoot: check the unknown hours · avoid Market St"
+                  <AutoText rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask Hoot: check the unknown hours · avoid Market St"
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void ask(); } }} />
                   <button className="btn btn--ghost btn--sm" style={{ marginTop: 7 }} disabled={!text.trim() || !!busy} onClick={() => void ask()}>Ask</button>
                 </label>
