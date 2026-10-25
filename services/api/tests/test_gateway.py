@@ -75,7 +75,7 @@ async def _full_walk(base):
     async with httpx.AsyncClient(base_url=base, timeout=60) as http:
         assert (await http.get("/api/health")).json()["ok"]
         plan = (await http.post("/api/plans", json={"origin": POWELL, "destination": CIVIC, "day": 4, "minute": 23 * 60})).json()
-        assert plan["planId"] and plan["route"] and plan["stats"]["streetwise"]["score"] >= plan["stats"]["shortest"]["score"]
+        assert plan["planId"] and plan["route"] and plan["stats"]["hootroute"]["score"] >= plan["stats"]["shortest"]["score"]
         bad = await http.post("/api/plans", json={"origin": POWELL, "destination": {"lat": 40.0, "lon": -74.0}})
         assert bad.status_code == 422
 
@@ -102,12 +102,12 @@ async def _full_walk(base):
         assert (await walker.wait("guardian.join"))["name"] == "Maya"
         assert "guardian.alert" not in walker.types()
 
-        await walker.send({"type": "walk.accept", "choice": "streetwise"}, wid)
+        await walker.send({"type": "walk.accept", "choice": "hootroute"}, wid)
         await walker.send({"type": "walk.start", "replay": True}, wid)
         await walker.wait("voice.say", where=lambda m: m["text"].startswith("Okay, I'm walking"))
 
         # walk to the engine's stop point on the empty stretch, then stand still
-        from streetwise_engine import geo
+        from hootroute_engine import geo
         line = data["route"]; cum = geo.cumulative(line); stop_m = geo.project(line, data["stopAt"], cum)[0]
         for m in range(0, int(stop_m), 30):
             await walker.send({"type": "walk.position", "lngLat": geo.point_at(line, m, cum), "heading": 0, "speed": 1.35, "progress": 0, "replay": True}, wid)
@@ -164,6 +164,9 @@ def test_head_and_checker(server):
         assert r["by"].startswith("fixed pipeline") and r["planId"] and "plan_routes" in tools and "find_route_unknowns" in tools, r
         assert {t["agent"] for t in r["trace"]} <= {"guide", "checker"}
         if "check_listed_hours" in tools: assert r["check"]["mock"] and "after" in r
+        ins = http.post("/api/check/route", json={"planId": r["planId"]}).json()
+        assert ins["verdict"].startswith(("Good to go", "Heads up")) and ins["items"] and all(i["level"] in ("ok", "note", "warn") for i in ins["items"])
+        assert "inspect_route" in tools
         u = http.post("/api/check/unknowns", json={"planId": r["planId"]}).json()
         assert all(p["id"] and p["name"] for p in u["places"])
         c = http.post("/api/check/hours", json={"planId": r["planId"]}).json()
@@ -180,7 +183,7 @@ def test_rescue_ladder(server):
                                                      "backupName": "Sam", "backupPhone": "+14155550199", "replay": True, "timeScale": 60})).json()
         w = await Client.open(server, r["walkId"], "walker", r["walkerToken"])
         data = (await w.wait("walk.plan"))["plan"]["data"]
-        await w.send({"type": "walk.accept", "choice": "streetwise"}, r["walkId"]); await w.send({"type": "walk.start", "replay": True}, r["walkId"])
+        await w.send({"type": "walk.accept", "choice": "hootroute"}, r["walkId"]); await w.send({"type": "walk.start", "replay": True}, r["walkId"])
         await w.send({"type": "walk.position", "lngLat": data["stopAt"], "heading": 0, "speed": 0, "progress": 0, "replay": True}, r["walkId"])
         steps = []
         for _ in range(4): steps.append((await w.wait("rescue.ladder", 20))["step"])
@@ -194,13 +197,13 @@ def test_rescue_ladder(server):
 def test_demo_rooms_still_relay(server):
     async def run():
         a = await Client.open(server, "demo-test", "walker"); b = await Client.open(server, "demo-test", "room")
-        await a.ws.send(json.dumps({"id": "x1", "walkId": "demo-test", "ts": 1, "from": "engine", "msg": {"type": "voice.say", "agent": "scout", "text": "hi"}}))
+        await a.ws.send(json.dumps({"id": "x1", "walkId": "demo-test", "ts": 1, "from": "engine", "msg": {"type": "voice.say", "agent": "guide", "text": "hi"}}))
         assert (await b.wait("voice.say", 5))["text"] == "hi"
     asyncio.run(run())
 
 
 def test_walk_survives_restart(tmp_path):
-    """Kill the gateway mid-walk; after it comes back the Watcher still asks and the Rescuer still alerts."""
+    """Kill the gateway mid-walk; after it comes back the Checker still asks and the Rescuer still alerts."""
     port = free_port(); base = f"http://127.0.0.1:{port}"
     env = {**os.environ, "DB_PATH": str(tmp_path / "r.db"), "ADMIN_TOKEN": "", "TWILIO_ACCOUNT_SID": "", "CARTESIA_API_KEY": ""}
 
@@ -218,7 +221,7 @@ def test_walk_survives_restart(tmp_path):
                                                   "replay": True, "timeScale": 60}, timeout=60).json()
         w = await Client.open(base, r["walkId"], "walker", r["walkerToken"])
         data = (await w.wait("walk.plan"))["plan"]["data"]
-        await w.send({"type": "walk.accept", "choice": "streetwise"}, r["walkId"]); await w.send({"type": "walk.start", "replay": True}, r["walkId"])
+        await w.send({"type": "walk.accept", "choice": "hootroute"}, r["walkId"]); await w.send({"type": "walk.start", "replay": True}, r["walkId"])
         await w.wait("voice.say", where=lambda m: m["text"].startswith("Okay"))
         await w.ws.close(); return r, data
 
@@ -243,7 +246,7 @@ def test_full_walk_under_uagents(tmp_path):
     port, bridge, bureau = free_port(), free_port(), free_port(); base = f"http://127.0.0.1:{port}"
     common = {**os.environ, "BRIDGE_SECRET": "test-secret", "TWILIO_ACCOUNT_SID": "", "CARTESIA_API_KEY": ""}
     b = subprocess.Popen([str(agents_py), "live_bureau.py"], cwd=ROOT / "services" / "agents",
-                         env={**common, "STREETWISE_MODE": "local", "STREETWISE_ALLOW_DEV_SEEDS": "1", "GATEWAY_URL": base, "BRIDGE_PORT": str(bridge), "BUREAU_PORT": str(bureau)})
+                         env={**common, "HOOTROUTE_MODE": "local", "HOOTROUTE_ALLOW_DEV_SEEDS": "1", "GATEWAY_URL": base, "BRIDGE_PORT": str(bridge), "BUREAU_PORT": str(bureau)})
     g = subprocess.Popen([sys.executable, "-m", "uvicorn", "main:app", "--port", str(port), "--log-level", "warning"], cwd=ROOT / "services" / "api",
                          env={**common, "DB_PATH": str(tmp_path / "u.db"), "ADMIN_TOKEN": "", "AGENT_RUNTIME": "uagents", "UAGENTS_BRIDGE_URL": f"http://127.0.0.1:{bridge}", "PUBLIC_URL": base})
     try:

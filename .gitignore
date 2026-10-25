@@ -16,7 +16,7 @@ data/cache/hours_evidence.mock.json
 services/**/.env
 services/agents/*_data.json
 legacy/web/public/tiles/*.pmtiles
-streetwise-web/public/tiles/*.pmtiles
+web/public/tiles/*.pmtiles
 data/cache/hours_*mock*.json
 data/cache/hours_matches_*.json
 

@@ -7,7 +7,7 @@
 
 **Inspiration:** A shift ends at 11:30 PM. The commute isn't over. Map apps give the fastest route; at that hour it is often the emptiest one, and the person walking texts a friend "home?" and hopes.
 
-**What it does:** (1) Ask in plain words. (2) See the fastest route and the HootRoute route with scores, minutes, and the longest stretch with nothing open. (3) The Checker shows where the score comes from and which places have unknown hours; one tap checks their listings live and the route is re-scored, with a before/after. (4) Walk with voice turns. If you stop on an empty stretch, the Checker asks if you're okay. (5) No answer: live link and text to your guardian, then a call, then your backup contact, then a Call 911 button for a person to press. (6) On arrival the Head writes a short report and a draft 311 streetlight note citing real open cases. Nothing is submitted.
+**What it does:** (0) A short walkthrough introduces the four agents. (1) Ask in plain words. (2) See the fastest route and the HootRoute route with scores, minutes, and the longest stretch with nothing open. (3) The Checker walks the route first and says "Good to go" or what to know: street closures and construction, the longest stretch with nothing open, open streetlight reports, lighting, and whether BART runs when you arrive. Places with unknown hours: one tap checks their listings live and the route is re-scored, with a before/after. (4) Walk with voice turns. If you stop on an empty stretch, the Checker asks if you're okay. (5) No answer: live link and text to your guardian, then a call, then your backup contact, then a Call 911 button for a person to press. (6) On arrival the Head writes a short report and a draft 311 streetlight note citing real open cases. Nothing is submitted.
 
 **How we built it:** React + Vite PWA (MapLibre, offline SF basemap), FastAPI gateway with one WebSocket room per walk and SQLite, deterministic Python engine over OSM (139,515 street segments), SF 311 streetlight history and the BART schedule, Claude tool use for the Head, Fetch.ai uAgents + Agent Chat Protocol on Agentverse, Apify Google Maps actor, Twilio, Cartesia Sonic.
 
@@ -22,7 +22,7 @@
 |---|---|---|
 | 0:00–0:20 | Teammate leaving work at night | "A shift ends at 11:30. The commute isn't over." |
 | 0:20–0:50 | `/plan`: type the request to the Head; the answer and agent activity appear | "The Head is Claude. It doesn't make up numbers; it hands the work to the Guide and the Checker." |
-| 0:50–1:20 | Checker card: score breakdown, unknown places, **Check listed hours · live** → before/after | "We don't just show stale data. We check it, and say when nothing changed." |
+| 0:50–1:20 | Step ② Checker: **Good to go / Heads up** with findings (closures, empty stretch, lamp reports, BART), then **Check listed hours · live** → before/after | "It walks the route before you do. And when it doesn't know, it checks, and says when nothing changed." |
 | 1:20–2:05 | Control room + guardian phone: stop on the empty stretch, "You stopped. All good?", no answer, guardian alert, ladder steps | "Your people first, one step at a time. It never dials 911; a person does." |
 | 2:05–2:30 | ASI:One chat: same request, "check the hours", "start my walk" | "The whole flow also runs inside ASI:One on Fetch.ai." |
 | 2:30–3:00 | Arrival report + architecture + rules | "Conditions, not a safety rating. Every number comes from the engine." |

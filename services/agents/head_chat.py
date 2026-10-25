@@ -57,7 +57,7 @@ def build_head():
         if re.match(r"^(start|begin)( the| my)?( walk|walking)?\b", low):
             plan = ctx.storage.get(f"plan:{sender}")
             if not plan: return "Tell me your walk first, for example: Moscone Center to City Hall at 11:30 PM."
-            w = await _post("/api/walks", {**plan, "walker": "Walker", "guardian": "Guardian", "choice": "streetwise"}, 60)
+            w = await _post("/api/walks", {**plan, "walker": "Walker", "guardian": "Guardian", "choice": "hootroute"}, 60)
             base = public or ENGINE_URL
             return (f"Your walk has started. Open this on your phone to walk with me (keep it private, it lets you act as the walker): {base}{w['walkPath']}&t={w['walkerToken']}\n"
                     f"Send this to the person watching over you: {w['guardianUrl']}\n"

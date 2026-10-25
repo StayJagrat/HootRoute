@@ -1,9 +1,9 @@
 """Live walks under Fetch.ai uAgents (AGENT_RUNTIME=uagents on the gateway).
 
 One Bureau runs the four registered HootRoute agents. They keep their ASI:One chat protocol, and each also speaks the
-`streetwise-walk` protocol: room envelopes from the gateway go to the agent that owns them, and every hand-off between
+`hootroute-walk` protocol: room envelopes from the gateway go to the agent that owns them, and every hand-off between
 agents (Checker → Rescuer, Checker → Head, Checker → Guide) is a uAgents message checked against the sender's address.
-The walk logic is streetwise_agents (the same code the gateway runs in-process), so the two runtimes cannot drift.
+The walk logic is hootroute_agents (the same code the gateway runs in-process), so the two runtimes cannot drift.
 
     ../../.venv-agents/bin/python live_bureau.py        # bridge on BRIDGE_PORT (8110), Bureau on BUREAU_PORT (8100)
 """
@@ -31,13 +31,13 @@ from uagents import Bureau, Context, Model, Protocol  # noqa: E402
 
 from common import BUREAU_PORT, local_bureau_policy, mode  # noqa: E402
 from registry import build_all  # noqa: E402
-from streetwise_agents.engine_port import EnginePort  # noqa: E402
-from streetwise_agents.notify import Notifier  # noqa: E402
-from streetwise_agents.runtime import Runtime  # noqa: E402
-from streetwise_agents.walk import Walk  # noqa: E402
-from streetwise_engine.engine import Engine  # noqa: E402
+from hootroute_agents.engine_port import EnginePort  # noqa: E402
+from hootroute_agents.notify import Notifier  # noqa: E402
+from hootroute_agents.runtime import Runtime  # noqa: E402
+from hootroute_agents.walk import Walk  # noqa: E402
+from hootroute_engine.engine import Engine  # noqa: E402
 
-log = logging.getLogger("streetwise.bureau")
+log = logging.getLogger("hootroute.bureau")
 GATEWAY = os.environ.get("GATEWAY_URL", "http://127.0.0.1:8000").rstrip("/")
 SECRET = os.environ.get("BRIDGE_SECRET", "")
 BRIDGE_PORT = int(os.environ.get("BRIDGE_PORT", "8110"))
@@ -45,7 +45,7 @@ CORE_KEY = {"head": "head", "guide": "guide", "checker": "checker", "rescuer": "
 
 
 class AgentTell(Model):
-    """One agent handing a walk event to another (e.g. watcher -> rescuer 'no_reply')."""
+    """One agent handing a walk event to another (e.g. checker -> rescuer 'no_reply')."""
     walk_id: str
     event: str
     data: str
@@ -69,7 +69,7 @@ class UAgentsRuntime(Runtime):
 
 
 def walk_protocol(rt: UAgentsRuntime, name: str) -> Protocol:
-    proto = Protocol(name="streetwise-walk", version="1.0.0")
+    proto = Protocol(name="hootroute-walk", version="1.0.0")
 
     @proto.on_message(AgentTell)
     async def on_tell(ctx: Context, sender: str, msg: AgentTell):

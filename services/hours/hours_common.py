@@ -1,4 +1,4 @@
-"""Shared helpers for the Streetwise hours-evidence pipeline.
+"""Shared helpers for the HootRoute hours-evidence pipeline.
 
 Paths, .env loading, OSM place loading, haversine, and the bridge to the engine's own
 `is_open` parser (imported, never copied) plus a strict validator for OSM opening_hours strings.
@@ -16,10 +16,10 @@ from functools import lru_cache
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[1]                       # .../StreetWise
+ROOT = HERE.parents[1]                       # .../HootRoute
 CACHE = ROOT / "data" / "cache"
 ENGINE_DIR = ROOT / "services" / "engine"
-WORLD_PY = ENGINE_DIR / "streetwise_engine" / "world.py"
+WORLD_PY = ENGINE_DIR / "hootroute_engine" / "world.py"
 
 DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
 DAY_FULL = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -115,8 +115,8 @@ def _load_is_open():
     fall back to compiling the very same function straight out of world.py via ast (still not a copy)."""
     sys.path.insert(0, str(ENGINE_DIR))
     try:
-        from streetwise_engine.world import is_open  # type: ignore
-        return is_open, "import streetwise_engine.world"
+        from hootroute_engine.world import is_open  # type: ignore
+        return is_open, "import hootroute_engine.world"
     except Exception:
         src = WORLD_PY.read_text()
         tree = ast.parse(src)

@@ -13,9 +13,9 @@ Map apps send you the fastest way. At 11:30 PM the fastest way is often the empt
 
 | Agent | Mascot | Job | Built with |
 |---|---|---|---|
-| **Head** | moth | Understands your request in plain words, delegates to the others, explains the result, writes your end-of-walk report, runs the overnight audit | Claude (tool use), Fetch.ai uAgents + ASI:One |
+| **Head** | owl | Understands your request in plain words, delegates to the others, explains the result, writes your end-of-walk report, runs the overnight audit | Claude (tool use), Fetch.ai uAgents + ASI:One |
 | **Guide** | pigeon | Plans the fastest route and the HootRoute route and scores both at the minute you pass each block; re-plans if you leave the route or a shop updates its hours | Deterministic Python engine (NetworkX, NumPy), OSM, SF 311, BART |
-| **Checker** | raccoon | Before you leave: the score breakdown and the places on your route whose hours are unknown, then a **live listing check** that the Guide re-scores with. During the walk: notices a stop on a stretch with nothing open and checks in | Apify (Google Maps actor), deterministic hours parser |
+| **Checker** | raccoon | Walks the route on the map before you do and says **Good to go** or what to know: permitted street closures and construction, the longest stretch with nothing open, open streetlight reports, mapped lighting, unknown hours, BART at arrival. Checks unknown hours **live** and the Guide re-scores. During the walk: checks in if you stop on an empty stretch | SFMTA closures (DataSF), SF 311, BART GTFS, Apify, deterministic hours parser |
 | **Rescuer** | sea lion | If you don't answer: live map link + SMS to your guardian → phone call → backup contact → a **Call 911 button** for people. It never dials 911 itself | Twilio |
 
 ```
@@ -38,11 +38,12 @@ PWA (walker · guardian · shop · control room)        ASI:One chat
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r services/requirements.txt
 cp .env.example .env        # fill in what you have; every provider is optional
+.venv/bin/python scripts/fetch_closures.py   # SFMTA street closures for the Checker (needs internet)
 cd services/api && ../../.venv/bin/uvicorn main:app --port 8000          # gateway + agents
-cd streetwise-web && npm install && npm run dev                          # PWA on :5173 (proxies /api and /ws)
+cd web && npm install && npm run dev                          # PWA on :5173 (proxies /api and /ws)
 ```
 
-Open `/` for the hub, `/plan` to ask the Head, `/room` for the control room (its QR code opens the guardian view on a second phone). For HTTPS to a phone: `cloudflared tunnel --url http://localhost:5173`. Deploy: `deploy/setup_vps.sh` (Vultr + Caddy).
+First visit opens a short walkthrough of the four agents. Then `/plan` (steps: ① Route ② Check ③ Walk ④ Report), `/room` for the control room (its QR code opens the guardian view on a second phone). For HTTPS to a phone: `cloudflared tunnel --url http://localhost:5173`. Deploy: `deploy/setup_vps.sh` (Vultr + Caddy).
 
 Keys (all optional, in the git-ignored `.env`): `ANTHROPIC_API_KEY` (Head), `APIFY_TOKEN` (live hours check), `TWILIO_*` (texts and calls), `CARTESIA_API_KEY` (voice), `MAPILLARY_TOKEN` (street imagery explanation). Without a key each feature says "not configured" and the walk carries on.
 
@@ -66,16 +67,16 @@ Setup: `services/agents/.env` with the four seeds, `python head_chat.py`, open t
 Named community: SF late-shift hospitality, service and healthcare workers walking after 11 PM. Claude is the Head: it reads a plain request, chooses tools (`find_place`, `plan_routes`, `find_route_unknowns`, `check_listed_hours`, `rescore_routes`), and explains. **Where it could go wrong, and what we did:** it could invent numbers (every number must come from a tool result; the trace shows each call), call "unknown" hours "closed" or call a street "unsafe" (prompt rules plus a filter on banned words), loop or stall (max 8 tool calls, 150 s deadline, schema checks on arguments), or be unavailable (a fixed pipeline runs and says so). Claude also writes the end-of-walk report from the walk's facts only.
 
 ### Apify
-The Checker runs `compass/crawler-google-places` live (`services/agents/streetwise_agents/hours_check.py`) on places along your route whose hours are unknown, matches listings by name within 80 m, parses the hours deterministically, and the Guide re-scores. Before/after is shown in the app with the source and time. The citywide hours cache came from the same actor (`services/hours/`, $7.07).
+The Checker runs `compass/crawler-google-places` live (`services/agents/hootroute_agents/hours_check.py`) on places along your route whose hours are unknown, matches listings by name within 80 m, parses the hours deterministically, and the Guide re-scores. Before/after is shown in the app with the source and time. The citywide hours cache came from the same actor (`services/hours/`, $7.07).
 
 ### Cartesia
 Voice is the walking interface: the Guide speaks turns, the Checker asks "You stopped. All good?" and the walker answers out loud. Sonic is proxied by the gateway (`/api/voice/tts`, key stays server-side) and falls back to on-device speech. Limits: speech input uses the browser's recognizer today.
 
 ### Figma
-One variable set (`streetwise-web/src/styles/tokens.css`) drives every screen; mascots and the logo come from the Figma file. See `docs/SUBMISSION.md` for the stage log.
+One variable set (`web/src/styles/tokens.css`) drives every screen; mascots and the logo come from the Figma file. See `docs/SUBMISSION.md` for the stage log.
 
 ## Honesty rules
 Demo replays carry a "DEMO · GPS REPLAY" tape. Simulated shops are labelled. Unknown hours are shown as unknown. 311 reports are drafts with real case ids and nothing is submitted. The guardian sees location only during an active walk; GPS traces are deleted after 24 h. HootRoute never dials 911; the last rung is a button a person presses.
 
 ## Layout
-`streetwise-web/` PWA · `services/api/` gateway · `services/agents/` agents (`streetwise_agents/` walk logic, `head_chat.py` ASI:One, `live_bureau.py` uAgents) · `services/engine/` scoring · `services/hours/` hours pipeline · `data/cache/` city data · `deploy/` Vultr + Caddy · `docs/` handoff and submission kit.
+`web/` PWA · `services/api/` gateway · `services/agents/` agents (`hootroute_agents/` walk logic, `head_chat.py` ASI:One, `live_bureau.py` uAgents) · `services/engine/` scoring · `services/hours/` hours pipeline · `data/cache/` city data · `deploy/` Vultr + Caddy · `docs/` handoff and submission kit.

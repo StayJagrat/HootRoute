@@ -4,7 +4,7 @@
 # and network once. The archive is ignored by Git and must exist on the demo host.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-TARGET="streetwise-web/public/tiles/sf.pmtiles"
+TARGET="web/public/tiles/sf.pmtiles"
 mkdir -p "$(dirname "$TARGET")"
 if [[ -s "$TARGET" ]]; then
   echo "Basemap already present: $TARGET"

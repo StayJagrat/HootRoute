@@ -12,9 +12,9 @@ import requests
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / "data" / "cache"; CACHE.mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(ROOT / "services" / "engine"))
-from streetwise_engine.config import BBOX, TILES  # noqa: E402
+from hootroute_engine.config import BBOX, TILES  # noqa: E402
 
-UA = {"User-Agent": "streetwise-calhacks/0.1 (hackathon project)", "Accept": "*/*"}
+UA = {"User-Agent": "hootroute-calhacks/0.1 (hackathon project)", "Accept": "*/*"}
 MIRRORS = ["https://overpass.private.coffee/api/interpreter", "https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
 WAYS = r'way["highway"~"^(pedestrian|residential|tertiary|secondary|primary|living_street|service|unclassified|path|steps|footway|tertiary_link|secondary_link|primary_link)$"]["footway"!~"sidewalk|crossing"]["access"!~"private|no"]["service"!~"driveway|parking_aisle"]'
 POINTS = r'''(

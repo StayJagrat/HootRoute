@@ -28,16 +28,16 @@ CORE = {
 
 
 def mode() -> str:
-    return os.environ.get("STREETWISE_MODE", "mailbox").lower()
+    return os.environ.get("HOOTROUTE_MODE", "mailbox").lower()
 
 
 def seed_for(seed_env: str) -> str:
-    """Seeds come from env only. STREETWISE_ALLOW_DEV_SEEDS=1 (set by test_local.py) derives throwaway seeds for offline tests."""
+    """Seeds come from env only. HOOTROUTE_ALLOW_DEV_SEEDS=1 (set by test_local.py) derives throwaway seeds for offline tests."""
     v = os.environ.get(seed_env, "").strip()
     if v:
         return v
-    if os.environ.get("STREETWISE_ALLOW_DEV_SEEDS") == "1":
-        return f"streetwise-offline-test-only-{seed_env.lower()}"
+    if os.environ.get("HOOTROUTE_ALLOW_DEV_SEEDS") == "1":
+        return f"hootroute-offline-test-only-{seed_env.lower()}"
     raise RuntimeError(f"{seed_env} is not set. Copy .env.example to .env and set a stable seed (python -c \"import secrets; print(secrets.token_hex(24))\").")
 
 
@@ -80,28 +80,6 @@ def make_agent(name: str, seed_env: str, port: int, readme: str):
                  readme_path=str(HERE / "readmes" / readme), description=None)
 
 
-# ---------------------------------------------------------------------------------------------------------------
-class Engine:
-    """Thin async client for the Streetwise FastAPI engine. Agents decide when to call it; they never compute the score."""
-
-    def __init__(self, base: str | None = None, timeout: float = 60.0):
-        self.base = (base or ENGINE_URL).rstrip("/"); self.timeout = timeout
-
-    async def _req(self, method: str, path: str, **kw):
-        async with httpx.AsyncClient(timeout=self.timeout) as c:
-            r = await c.request(method, self.base + path, **kw); r.raise_for_status(); return r.json()
-
-    async def landmarks(self): return await self._req("GET", "/api/landmarks")
-    async def places(self, session="demo", day=4, minute=1370): return await self._req("GET", "/api/places", params=dict(session=session, day=day, minute=minute))
-    async def route(self, session, o, d, day, minute):
-        return await self._req("POST", "/api/route", json=dict(session=session, origin=dict(lat=o[0], lon=o[1]), dest=dict(lat=d[0], lon=d[1]), day=day, minute=minute))
-    async def suggest(self, session): return await self._req("POST", "/api/agents/place/suggest", json=dict(session=session))
-    async def declare(self, session, place_id, until, day, minute):
-        return await self._req("POST", "/api/agents/place/declare", json=dict(session=session, place_id=place_id, until_minute=until, day=day, minute=minute))
-    async def audit(self, session="auditor"): return await self._req("POST", "/api/agents/auditor/run", json=dict(session=session))
-    async def reset(self, session): return await self._req("POST", "/api/session/reset", json=dict(session=session))
-
-
 def fmt_minute(m: float) -> str:
     m = int(round(m)) % 1440; h, mm = divmod(m, 60)
     return f"{(h % 12) or 12}:{mm:02d} {'AM' if h < 12 else 'PM'}"
@@ -111,7 +89,7 @@ DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday",
 
 
 def local_bureau_policy():
-    """Local/offline mode: never touch the Almanac or Agentverse (used by test_local.py and STREETWISE_MODE=local)."""
+    """Local/offline mode: never touch the Almanac or Agentverse (used by test_local.py and HOOTROUTE_MODE=local)."""
     from uagents_core.registration import BatchRegistrationPolicy
 
     class NoopBatch(BatchRegistrationPolicy):

@@ -1,4 +1,4 @@
-"""Streetwise Night Walk Score: a deterministic, route-level, time-aware score. No LLM in the loop.
+"""HootRoute Night Walk Score: a deterministic, route-level, time-aware score. No LLM in the loop.
 
 A route is sampled every 10 m. Each sample gets an arrival time (departure + distance / walking speed),
 and every component is evaluated at that time, so a shop only counts if it is open when you pass it.
@@ -291,7 +291,7 @@ def main():
                     coords=[ll(G.nodes[n]["p"]) for n in path], shops=shops, covered=[bool(x) for x in m["covered"][::3]])
     streets = [[*ll(G.nodes[a]["p"]), *ll(G.nodes[b]["p"]), round(d["score"])] for a, b, d in G.edges(data=True)]
     out = dict(bbox=S.BBOX, depart=f"{args.day} {args.hour}:{args.minute:02d}", weights=WEIGHTS, norm=dict(lo=N.lo, hi=N.hi), streets=streets,
-               fastest=pack(f, "Fastest route"), best=pack(b, "Streetwise route"), whatif=whatif,
+               fastest=pack(f, "Fastest route"), best=pack(b, "HootRoute route"), whatif=whatif,
                bart=[dict(name=x["name"], p=ll(x["p"]), departures=x["departures"]) for x in W.bart],
                stats=dict(n_walks=len(rows), same_pct=round(100 * same), gain_median=round(float(np.median(gains)), 1), gain_p75=round(float(p75), 1), extra_mean=round(float(extra.mean()), 1),
                           extra_median=round(float(np.median(extra)), 1), gap_fast_median=round(float(np.median(gap_f))), gap_best_median=round(float(np.median(gap_b))),

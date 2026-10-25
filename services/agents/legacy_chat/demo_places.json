@@ -1,8 +1,0 @@
-{
-  "_comment": "SIMULATED shop agents for the demo. place_id values are real ids from the engine's /api/places; the three below were returned by /api/agents/place/suggest for Powell St BART -> Civic Center BART, Fri 11:40 PM (minute 1420). Regenerate with: python discover_places.py. open_until is a minute offset after midnight of the query day (1500 = 1:00 AM next day).",
-  "places": [
-    {"place_id": "n4637773271", "name": "Chicos Pizza", "cat": "restaurant", "seed_env": "PLACE_AGENT_1_SEED", "port": 8011, "open_until": 1500, "simulated": true},
-    {"place_id": "n4637571919", "name": "Cafe Ellis", "cat": "cafe", "seed_env": "PLACE_AGENT_2_SEED", "port": 8012, "open_until": 1500, "simulated": true},
-    {"place_id": "n4637572294", "name": "Kim Huong", "cat": "cafe", "seed_env": "PLACE_AGENT_3_SEED", "port": 8013, "open_until": 1480, "simulated": true}
-  ]
-}

@@ -9,8 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "services" / "engine"))
-from streetwise_engine.engine import Engine  # noqa: E402
-from streetwise_engine.scoring import Ctx, Norm  # noqa: E402
+from hootroute_engine.engine import Engine  # noqa: E402
+from hootroute_engine.scoring import Ctx, Norm  # noqa: E402
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--days", type=int, nargs="*", default=[4, 5, 6])

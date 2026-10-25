@@ -1,4 +1,4 @@
-# Streetwise hours-evidence pipeline
+# HootRoute hours-evidence pipeline
 
 492 of 878 OSM places in the downtown pilot area have no `opening_hours`, so the engine counts them as closed.
 This module fetches Google Maps opening hours (via Apify), matches them to OSM places, converts them to OSM
@@ -15,13 +15,13 @@ run_pipeline.py runs all of it
 ## Setup
 
 ```bash
-cd /Users/aryabhatt/Documents/GitHub/StreetWise
+cd /Users/aryabhatt/Documents/GitHub/HootRoute
 python3 -m venv .venv-hours && .venv-hours/bin/pip install -r services/hours/requirements.txt   # venv already created
 cp services/hours/.env.example services/hours/.env     # then fill in keys (.env is git-ignored)
 ```
 
 Nothing here writes outside `services/hours/` and `data/cache/`, and nothing touches the engine. The engine's own
-`is_open` is imported from `services/engine/streetwise_engine/world.py` (needs numpy + networkx, both in requirements;
+`is_open` is imported from `services/engine/hootroute_engine/world.py` (needs numpy + networkx, both in requirements;
 if they are missing the function is compiled straight out of `world.py` via `ast`, never copied).
 
 ## Try it offline (no keys)

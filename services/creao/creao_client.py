@@ -13,7 +13,7 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[2]
 CACHE = ROOT / "data" / "cache"
 sys.path.insert(0, str(ROOT / "services" / "engine"))
-from streetwise_engine.world import World  # noqa: E402
+from hootroute_engine.world import World  # noqa: E402
 sys.path.insert(0, str(ROOT / "services" / "hours"))
 from hours_common import validate_osm_hours  # noqa: E402
 

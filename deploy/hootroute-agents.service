@@ -1,0 +1,15 @@
+# Only with AGENT_RUNTIME=uagents in /opt/hootroute/.env: the five agents as registered uAgents (Agentverse mailbox).
+[Unit]
+Description=HootRoute uAgents bureau (Head, Guide, Checker, Rescuer)
+After=network-online.target hootroute-gateway.service
+
+[Service]
+User=hootroute
+WorkingDirectory=/opt/hootroute/services/agents
+EnvironmentFile=/opt/hootroute/.env
+ExecStart=/opt/hootroute/.venv-agents/bin/python live_bureau.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

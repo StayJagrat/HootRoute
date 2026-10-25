@@ -1,0 +1,13 @@
+[Unit]
+Description=HootRoute gateway (FastAPI, rooms, engine, in-process agents)
+After=network-online.target
+
+[Service]
+User=hootroute
+WorkingDirectory=/opt/hootroute/services/api
+ExecStart=/opt/hootroute/.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000 --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
