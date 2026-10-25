@@ -2,7 +2,7 @@
 
 Agents live above this layer. They decide when to call it and what to do with the answer; they never compute the score.
 """
-import math, threading, time
+import math, re, threading, time
 from typing import Callable, Optional
 
 import networkx as nx
@@ -29,6 +29,14 @@ def short_street(name: str) -> str:
     """'Howard Street' -> 'Howard St' (only the last word, so 'Avenue of the Palms' stays as it is)."""
     head, _, last = name.rpartition(" ")
     return f"{head} {_SUFFIX[last]}" if head and last in _SUFFIX else name
+
+
+_ALIAS = {"street": "st", "avenue": "ave", "av": "ave", "boulevard": "blvd", "saint": "st", "and": "&", "station": "", "stn": ""}
+_STOP = {"the", "sf", "san", "francisco", "of", "at", ""}
+
+
+def _tokens(s: str) -> set[str]:
+    return {_ALIAS.get(w, w) for w in re.split(r"[^a-z0-9&']+", s.lower()) if w}
 
 
 class Engine:
@@ -203,13 +211,17 @@ class Engine:
             for k, (a, b, ed) in enumerate(self.W.edges):
                 if ed["name"]: streets.setdefault(ed["name"], []).append(k)
             self._names = [(n.lower(), n, "Landmark", [lo, la]) for n, la, lo in LANDMARKS]
+            stations = {b["name"]: b for b in self.W.bart}            # one entry per station (GTFS lists each platform)
+            self._names += [(f"{n} bart".lower(), f"{n} BART", "BART station", self.W.proj.ll(b["p"])) for n, b in stations.items()]
             self._names += [(pl["name"].lower(), pl["name"], pl["cat"].replace("_", " ").title(), pl["ll"]) for pl in self.W.places if pl["name"]]
             for n, ks in streets.items():
                 mid = self.W.e_mid[ks[len(ks) // 2]]; self._names.append((n.lower(), n, "Street", self.W.proj.ll(mid)))
-        scored = []
+        scored = []; qt = _tokens(q) - _STOP
         for low, name, kind, ll in self._names:
             if q in low:
-                scored.append((0 if low.startswith(q) else 1, 0 if kind == "Landmark" else 1 if kind == "Street" else 2, len(low), name, kind, ll))
+                scored.append((0 if low.startswith(q) else 1, 0 if kind in ("Landmark", "BART station") else 1 if kind == "Street" else 2, len(low), name, kind, ll))
+            elif qt and qt <= _tokens(low):          # every word matters, order and spelling of "st"/"street" don't
+                scored.append((2, 0 if kind in ("Landmark", "BART station") else 1 if kind == "Street" else 2, len(low), name, kind, ll))
         scored.sort(); out, seen = [], set()
         for _, _, _, name, kind, ll in scored:
             key = (name.lower(), round(ll[0], 3), round(ll[1], 3))

@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from typing import Literal
 
-from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, Query, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -30,11 +30,11 @@ from .settings import ROOT, settings
 sys.path.insert(0, str(ROOT / "services" / "engine"))
 sys.path.insert(0, str(ROOT / "services" / "agents"))
 
-from hootroute_agents import evidence as evidence_mod, hours_check, inspect_route  # noqa: E402
+from hootroute_agents import evidence as evidence_mod, hours_check, inspect_route, narration  # noqa: E402
 from hootroute_agents.brand import PERSONAS  # noqa: E402
 from hootroute_agents.preferences import Preferences, choose_option  # noqa: E402
 from hootroute_agents.engine_port import EnginePort  # noqa: E402
-from hootroute_agents.head_brain import HeadBrain, enabled as claude_enabled  # noqa: E402
+from hootroute_agents.head_brain import HeadBrain, enabled as claude_enabled, lookup  # noqa: E402
 from hootroute_agents.notify import E164, Notifier  # noqa: E402
 from hootroute_agents.plan_data import build_demo_data, build_route_data  # noqa: E402
 from hootroute_agents.runtime import Runtime  # noqa: E402
@@ -285,8 +285,11 @@ async def meta(request: Request): return request.app.state.engine.meta()
 
 
 @app.get("/api/search")
-async def search(request: Request, q: str, limit: int = 8):
-    return await run_in_threadpool(request.app.state.engine.search, q, min(limit, 20))
+async def search(request: Request, q: str = Query("", max_length=120), limit: int = 8):
+    """Places, landmarks and addresses in San Francisco: the offline map first, then a geocoder (Geoapify or Photon)."""
+    limit_n = max(1, min(limit, 12))
+    if len(q.strip()) < 2: return []
+    return await lookup(request.app.state.engine, q, limit_n)
 
 
 @app.post("/api/plans")
@@ -541,6 +544,14 @@ async def check_hours(body: CheckReq, request: Request):
         if avoid: new_routes = {**new_routes, "_avoid": routes["_avoid"]}
     pid = _store_plan(s, {"origin": o, "destination": d, "day": key[4], "minute": key[5]}, new, new_routes)
     return {**res, "before": data["stats"], "after": new["stats"], "routeChanged": new_routes["best"]["coords"] != routes["best"]["coords"], "planId": pid, "plan": {"planId": pid, **new}}
+
+
+@app.get("/api/plans/{plan_id}/narration")
+async def plan_narration(plan_id: str, request: Request, route: str = "best"):
+    """Voice guide: every route option compared, then turn-by-turn with listed-open places, as plain sentences for Cartesia
+    or on-device speech. Built from the engine's route only."""
+    s = request.app.state; _, key, data, routes = _plan_by_id(s, plan_id)
+    return narration.describe(data, routes, _route_key(routes, route), key[5])
 
 
 @app.get("/api/plans/{plan_id}/evidence")

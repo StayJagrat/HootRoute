@@ -20,6 +20,8 @@ const PATHS: Record<string, string> = {
   clock: 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z',
   swap: 'M7 4v16m0 0-3-3m3 3 3-3M17 20V4m0 0-3 3m3-3 3 3',
   dots: 'M5 12h.01M12 12h.01M19 12h.01',
+  mic: 'M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Zm-6 9a6 6 0 0 0 12 0M12 18v3',
+  speaker: 'M4 9v6h4l5 4V5L8 9H4Zm12.5-1.5a5 5 0 0 1 0 9M19 5a8.5 8.5 0 0 1 0 14',
 };
 
 export function Icon({ name, size = 18, stroke = 1.7 }: { name: keyof typeof PATHS | string; size?: number; stroke?: number }) {

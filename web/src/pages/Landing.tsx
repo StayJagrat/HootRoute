@@ -10,8 +10,8 @@ import { Brand, Icon } from '../ui';
 
 const CREW: AgentName[] = ['head', 'guide', 'checker', 'rescuer'];
 const RULES = ['Conditions, not a safety rating', 'No crime data, no neighbourhood grades', 'No model in the score', 'Unknown stays unknown', 'Paid checks need your OK', 'Sharing is yours to stop', 'Never calls 911 for you'];
-// The stage corridor, scored live by the engine (not a picture): Moscone Center → City Hall, Friday 11:30 PM.
-const STAGE = { from: { name: 'Moscone Center', lngLat: [-122.4016, 37.7842] as [number, number] }, to: { name: 'City Hall', lngLat: [-122.4193, 37.7793] as [number, number] }, when: { day: 4, minute: 1410 } };
+// One example journey, scored live by the engine when the page opens (not a picture or a stored number).
+const STAGE = { from: { name: 'Moscone Center', lngLat: [-122.4016, 37.7842] as [number, number] }, to: { name: 'Ferry Building', lngLat: [-122.3937, 37.7955] as [number, number] }, when: { day: 4, minute: 1410 } };
 
 export default function Landing() {
   const [hp, setHp] = useState<Health | null>(null);
@@ -64,10 +64,10 @@ export default function Landing() {
 
           <aside className="ticket" aria-label="Live engine result for the corridor on the map">
             <div className="ticket__top">
-              <span>Tonight's walk</span>
+              <span>Example · scored live</span>
               <span className="mono">FRI 11:30 PM</span>
             </div>
-            <div className="ticket__trip"><b>Moscone Center</b><span>to</span><b>City Hall</b></div>
+            <div className="ticket__trip"><b>{STAGE.from.name}</b><span>to</span><b>{STAGE.to.name}</b></div>
             {best && fast ? (
               <>
                 <div className="ticket__rows">

@@ -7,7 +7,8 @@ import { PERSONA } from '../lib/personas';
 import { GpsReplay } from '../lib/replay';
 import { useWalk } from '../lib/store';
 import type { AgentName, LngLat, ObstacleKind, RouteStep } from '../lib/types';
-import { isMuted, setMuted, speak } from '../lib/voice';
+import { canListen, dictate, isMuted, setMuted, speak, speakLong, voiceGuideOn } from '../lib/voice';
+import { project as projectOn } from '../lib/geo';
 import { MapCanvas } from '../Map';
 import { minuteClock } from '../parts';
 import { Agent, Brand, Icon, Toggle } from '../ui';
@@ -86,6 +87,42 @@ export default function Walk() {
   const remainMin = total ? Math.max(0, (total - meters) / speed / 60) : stats?.minutes ?? 0;
   const turn = nextTurn(steps, meters);
   const rec = state.recovery && !state.recovery.chosen ? state.recovery : null;
+  const guide = voiceGuideOn();
+  // "What's next?": everything a walker who can't see the screen needs, from the plan and the live position
+  const nextPlace = useMemo(() => {
+    if (!data || line.length < 2) return null;
+    const ahead = data.places.filter((pl) => pl.openUntil !== 'closed' && pl.openUntil !== 'unknown')
+      .map((pl) => ({ pl, at: projectOn(line, pl.lngLat).meters })).filter((x) => x.at > meters + 10).sort((a, b) => a.at - b.at);
+    return ahead[0] ?? null;
+  }, [data, line, meters]);
+  const whatsNext = () => {
+    if (!data) return;
+    const parts = [turn ? `${turn.text} in about ${Math.max(10, Math.round(turn.inM / 10) * 10)} metres.` : `Keep going to ${data.end.name}.`,
+      `About ${Math.max(1, Math.round(remainMin))} minutes and ${Math.max(10, Math.round((total - meters) / 10) * 10)} metres left.`,
+      nextPlace ? `${nextPlace.pl.name} is listed open about ${Math.max(10, Math.round((nextPlace.at - meters) / 10) * 10)} metres ahead.` : 'No listed-open place is marked ahead on this route.',
+      sharing ? 'Your live link is on.' : 'Sharing is off.'];
+    void speakLong(parts.join(' '));
+  };
+  const [hearing, setHearing] = useState(false);
+  const voiceCommand = () => {
+    setHearing(true);
+    void dictate().done.then((said) => {
+      setHearing(false);
+      if (!said) return;
+      if (/what'?s next|where am i|how far|next turn/i.test(said)) return whatsNext();
+      if (/i'?m (fine|ok|okay)|all good/i.test(said)) return send({ type: 'checkin.reply', reply: 'fine', via: 'voice' });
+      const k: ObstacleKind | null = /block|closed off|fence/i.test(said) ? 'blocked' : /construct|work/i.test(said) ? 'construction' : /closed/i.test(said) ? 'place_closed' : /different|another way|detour/i.test(said) ? 'want_detour' : null;
+      if (k) { send({ type: 'obstacle.report', kind: k, note: said.slice(0, 140) }); void speak('Got it. Looking for another way. Your route stays the same until you choose.'); return; }
+      void speak('Say what\'s next, path blocked, construction, or I\'m fine.');
+    });
+  };
+  // voice guide: read Mission Recovery choices aloud as soon as they arrive
+  const readRec = useRef('');
+  useEffect(() => {
+    if (!guide || !rec || readRec.current === rec.recoveryId) return;
+    readRec.current = rec.recoveryId;
+    void speakLong(`${rec.reason} ${rec.explanation} Options: ${rec.options.map((o, i) => `option ${i + 1}, ${o.label}, about ${Math.round(o.stats.minutes)} minutes${o.avoidsReport ? ', avoids your report' : ''}`).join('; ')}. Your route stays the same until you tap a choice.`);
+  }, [guide, rec]);
   const link = sharing ? walkCreds(walkId)?.guardianUrl ?? null : null;
   const log = [...state.log].reverse().slice(0, 40);
 
@@ -150,6 +187,10 @@ export default function Walk() {
               {tab === 'journey' && (
                 <>
                   {state.say && <div key={state.say.ts} className="card reveal stack--tight"><Agent id={state.say.agent} state={Date.now() - state.say.ts < 6000 ? 'talking' : 'idle'} /><p style={{ margin: 0 }}>{state.say.text}</p></div>}
+                  <div className="row" style={{ gap: 8 }}>
+                    <button className="btn btn--primary" style={{ flex: 1 }} onClick={whatsNext}><Icon name="speaker" size={16} /> What's next?</button>
+                    {canListen() && <button className="btn btn--ghost" onClick={voiceCommand} aria-pressed={hearing} aria-label="Speak a command">{hearing ? 'Listening…' : <><Icon name="mic" size={16} /> Speak</>}</button>}
+                  </div>
                   <button className="btn btn--ghost btn--block" onClick={() => setReport(true)}><Icon name="flag" size={16} /> Report a problem ahead</button>
                   <div className="card stack--tight">
                     <div className="between"><span style={{ fontWeight: 600 }}>Share live location</span><Toggle on={sharing} onChange={(v) => void flipShare(v)} label="Share live location" /></div>

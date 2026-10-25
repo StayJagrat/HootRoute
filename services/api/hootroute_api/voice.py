@@ -14,7 +14,7 @@ CARTESIA_VERSION = "2026-08-14"
 
 
 class SayReq(BaseModel):
-    text: str = Field(min_length=1, max_length=400)
+    text: str = Field(min_length=1, max_length=600)
 
 
 @router.post("/tts")

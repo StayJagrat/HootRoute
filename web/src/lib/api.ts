@@ -239,3 +239,7 @@ export const agents = () => call<AgentInfo[]>('/api/agents');
 export const health = () => call<Health>('/api/health');
 
 export type { RouteStats };
+
+export interface Narration { route: RouteKey; overview: string; directions: string[]; text: string }
+/** Voice guide: every route option compared, then turn-by-turn with listed-open places, in plain sentences. */
+export const planNarration = (planId: string, route: RouteKey = 'best') => call<Narration>(`/api/plans/${encodeURIComponent(planId)}/narration?route=${route}`);

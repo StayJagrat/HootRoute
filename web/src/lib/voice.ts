@@ -193,3 +193,48 @@ export function listen(onIntent: (i: Intent, transcript: string) => void): Liste
 
 export const canListen = () =>
   typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
+// ---------------------------------------------------------------- voice guide (blind and low-vision walkers)
+let longToken = 0;
+/** Read a long text (a full route description) in sentence-sized chunks so Cartesia can voice it; stopSpeaking() or a new call interrupts. */
+export async function speakLong(text: string, onChunk?: (i: number, n: number) => void) {
+  const token = ++longToken;
+  const sentences = text.replace(/\s+/g, ' ').match(/[^.!?]+[.!?]+|[^.!?]+$/g) ?? [text];
+  const chunks: string[] = [];
+  for (const s of sentences) {
+    const last = chunks[chunks.length - 1];
+    if (last && last.length + s.length < 360) chunks[chunks.length - 1] = `${last} ${s.trim()}`; else chunks.push(s.trim());
+  }
+  for (let i = 0; i < chunks.length; i++) {
+    if (token !== longToken || muted) return;
+    onChunk?.(i, chunks.length);
+    await speaker.speak(chunks[i]);
+  }
+}
+export function stopLong() { longToken++; stopSpeaking(); }
+
+const GUIDE = 'hootroute:voice-guide:v1';
+export function voiceGuideOn(): boolean { try { return localStorage.getItem(GUIDE) === '1'; } catch { return false; } }
+export function setVoiceGuide(on: boolean) { try { localStorage.setItem(GUIDE, on ? '1' : '0'); } catch { /* storage blocked */ } }
+
+/** One-shot dictation: say where you're going; resolves with the final transcript (or '' if nothing was heard). */
+export function dictate(onPartial?: (t: string) => void): { done: Promise<string>; stop: () => void } {
+  const Ctor = (window as unknown as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR }).SpeechRecognition ??
+    (window as unknown as { webkitSpeechRecognition?: new () => SR }).webkitSpeechRecognition;
+  if (!Ctor) return { done: Promise.resolve(''), stop: () => undefined };
+  stopLong();
+  const rec = new Ctor(); rec.continuous = false; rec.interimResults = true; rec.lang = 'en-US';
+  let finalText = '';
+  const done = new Promise<string>((resolve) => {
+    rec.onresult = (e) => {
+      let t = '';
+      for (let i = 0; i < e.results.length; i++) { t += e.results[i][0].transcript; if (e.results[i].isFinal) finalText = t; }
+      onPartial?.(t);
+    };
+    rec.onend = () => resolve(finalText.trim());
+    rec.onerror = () => resolve(finalText.trim());
+    rec.onspeechstart = null;
+    try { rec.start(); } catch { resolve(''); }
+  });
+  return { done, stop: () => { try { rec.stop(); } catch { /* noop */ } } };
+}

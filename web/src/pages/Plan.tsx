@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  approveHead, areaAround, askHead, checkHours, createPlan, createWalk, errorText, gpsMode, health, planEvidence,
+  approveHead, areaAround, askHead, checkHours, planNarration, createPlan, createWalk, errorText, gpsMode, health, planEvidence,
   type AreaView, type HeadAnswer, type Health, type Plan as LivePlan, type PlanEvidence, type RouteKey, type Spot, type TraceEvent,
 } from '../lib/api';
 import { loadPrefs, PREF_LABEL, savePrefs } from '../lib/prefs';
-import { DEMO_SPOTS, nameForPin, searchPlaces, type DestinationResult } from '../lib/search';
+import { canListen, dictate, setVoiceGuide, speakLong, stopLong, voiceGuideOn } from '../lib/voice';
+import { nameForPin, recentPlaces, rememberPlace, searchPlaces, type DestinationResult } from '../lib/search';
 import type { Preferences } from '../lib/api';
 import type { LngLat } from '../lib/types';
 import { MapCanvas, type MapPlace } from '../Map';
@@ -32,7 +33,7 @@ function PlaceField({ label, dot, value, onPick, onLocate }: { label: string; do
   const [open, setOpen] = useState(false);
   useEffect(() => { setQ(value?.name ?? ''); }, [value]);
   useEffect(() => {
-    if (open && q.trim() === '') { setRes(DEMO_SPOTS); return; }
+    if (open && q.trim() === '') { setRes(recentPlaces()); return; }
     if (!open || q.trim().length < 2 || q === value?.name) { setRes([]); return; }
     const ac = new AbortController();
     const t = setTimeout(() => void searchPlaces(q, ac.signal).then(setRes).catch(() => setRes([])), 220);
@@ -51,7 +52,7 @@ function PlaceField({ label, dot, value, onPick, onLocate }: { label: string; do
           {q.trim() === '' && <div className="result" style={{ cursor: 'default' }}><small>Demo spots · downtown streets with cached hours</small></div>}
           {res.map((r) => (
             <button key={`${r.name}${r.lngLat.join()}`} type="button" className="result" disabled={!r.covered} onMouseDown={(e) => e.preventDefault()}
-              onClick={() => { onPick({ name: r.name, lngLat: r.lngLat }); setOpen(false); }}>
+              onClick={() => { onPick({ name: r.name, lngLat: r.lngLat }); rememberPlace(r); setOpen(false); }}>
               {r.name}<small>{r.covered ? r.detail : `${r.detail} · outside San Francisco`}</small>
             </button>
           ))}
@@ -87,6 +88,9 @@ export default function Plan() {
   const [confirm, setConfirm] = useState(false);
   const [starting, setStarting] = useState(false);
   const ac = useRef<AbortController | null>(null);
+  const [voiceGuide, setGuide] = useState(voiceGuideOn());
+  const [listening, setListening] = useState(false);
+  const [narrating, setNarrating] = useState(false);
   const [shown, setShown] = useState(0);            // how many real trace events the crew has replayed so far
   useEffect(() => {
     if (shown >= trace.length) return;
@@ -144,6 +148,10 @@ export default function Plan() {
 
   const take = (a: HeadAnswer) => {
     setAnswer(a); setSession(a.session); setTrace((t) => [...t, ...a.trace]);
+    if (voiceGuide) {                         // read the answer aloud, and say how to answer Sherlock without a screen
+      const ap = a.pendingApproval;
+      void speakLong(a.answer + (ap && ap.provider !== 'unavailable' ? ` Sherlock asks to check the published listings of ${ap.places.map((x) => x.name).join(', ')}, up to ${ap.maxUsd.toFixed(2)} dollars. Say approve, or say not now.` : ''));
+    }
     if (a.check) setCheck({ ...a.check, before: a.before, after: a.after, routeChanged: a.routeChanged });
     if (a.plan && a.planId && a.req) {
       const f: Spot = { name: a.req.origin.name, lngLat: [a.req.origin.lon, a.req.origin.lat] };
@@ -153,8 +161,8 @@ export default function Plan() {
     }
   };
 
-  const ask = async () => {
-    const q = text.trim();
+  const ask = async (spoken?: string) => {
+    const q = (spoken ?? text).trim();
     if (!q) return;
     setBusy('Professor Hoot is choosing tools and delegating…'); setErr(null);
     try { take(await askHead(q, session, false, undefined, travel)); setText(''); }
@@ -170,6 +178,33 @@ export default function Plan() {
     catch (e) { setErr(errorText(e, 'The check could not run.')); }
     finally { setBusy(null); }
   };
+
+  // ---------- voice guide: speak your request, hear every route, approve by voice ----------
+  const mic = () => {
+    if (listening) return;
+    setListening(true); setErr(null);
+    const d = dictate((t) => setText(t));
+    void d.done.then((said) => {
+      setListening(false);
+      if (!said) { setErr('I didn\'t catch that. Try again, or type it.'); return; }
+      const ap = answer?.pendingApproval;
+      if (ap && !check && /^(approve|approved|yes|run( it| the check)?|go ahead|ok(ay)?)\b/i.test(said)) { setText(''); void answerApproval(true); return; }
+      if (ap && !check && /^(no|not now|skip|cancel|don'?t)\b/i.test(said)) { setText(''); void answerApproval(false); return; }
+      void ask(said);
+    });
+  };
+  const listenRoutes = async () => {
+    if (!planId) return;
+    try { const n = await planNarration(planId, pick); setNarrating(true); await speakLong(n.text); }
+    catch (e) { setErr(errorText(e, 'Could not read the routes.')); }
+    finally { setNarrating(false); }
+  };
+  const toggleGuide = () => { const v = !voiceGuide; setGuide(v); setVoiceGuide(v); if (v) void speakLong('Voice guide on. Say where you are going after the tone, or type it. I will read every route aloud.'); else stopLong(); };
+  const micButton = canListen() && (
+    <button type="button" className={`btn btn--sm ${listening ? 'btn--primary' : 'btn--ghost'}`} style={{ marginTop: 7 }} onClick={mic} aria-label={listening ? 'Listening' : 'Speak your request'} aria-pressed={listening}>
+      <Icon name="mic" size={15} />{listening ? 'Listening…' : ''}
+    </button>
+  );
 
   const investigate = async () => {
     if (!planId || !ev || !planReq) return;
@@ -214,7 +249,12 @@ export default function Plan() {
       <section className={`panel ${plan ? 'panel--tall' : ''}`} aria-label="Journey">
         <header className="panel__head">
           <Link to="/" aria-label="HootRoute home" style={{ color: 'inherit', textDecoration: 'none' }}><Brand /></Link>
-          {plan && <button className="btn btn--quiet btn--sm" onClick={reset}><Icon name="back" size={16} /> New journey</button>}
+          <div className="row" style={{ gap: 4 }}>
+            <button className="btn btn--quiet btn--sm" onClick={toggleGuide} aria-pressed={voiceGuide} title="Reads routes and answers aloud with Cartesia">
+              <Icon name="speaker" size={15} /> {voiceGuide ? 'Voice guide on' : 'Voice guide'}
+            </button>
+            {plan && <button className="btn btn--quiet btn--sm" onClick={reset}><Icon name="back" size={16} /> New journey</button>}
+          </div>
         </header>
 
         <div className="panel__body">
@@ -234,6 +274,7 @@ export default function Plan() {
                   <span className="sr">Ask Professor Hoot</span>
                   <AutoText rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Leaving the library at 11:40 PM, to Civic Center BART, fewer turns"
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void ask(); } }} />
+                  {micButton}
                   <button className="btn btn--ghost btn--sm" style={{ marginTop: 7 }} disabled={!text.trim() || !!busy} onClick={() => void ask()}>Ask</button>
                 </label>
                 <span className="faint tiny">
@@ -311,6 +352,12 @@ export default function Plan() {
                   </button>
                 ))}
               </div>
+              {tab === 'routes' && (
+                <div className="row" style={{ gap: 6 }}>
+                  <button className="btn btn--ghost btn--sm" onClick={() => void listenRoutes()} disabled={narrating}><Icon name="speaker" size={15} /> {narrating ? 'Reading routes…' : 'Listen to every route'}</button>
+                  {narrating && <button className="btn btn--quiet btn--sm" onClick={() => { stopLong(); setNarrating(false); }}>Stop</button>}
+                </div>
+              )}
               {tab === 'routes' && <RouteList options={options} pick={pick} onPick={setPick} depart={depart} recommended={plan.recommended} choiceReason={plan.preferenceChoice?.reason} travelMode={plan.travelMode} />}
               {tab === 'dashboard' && <Dashboard option={options.find((o) => o.id === pick)} options={options} pick={pick} area={area} focus={focus} onFocus={setFocus}
                 names={{ from: planReq.from.name, to: planReq.to.name }} depart={depart} loading={areaBusy} />}
@@ -323,6 +370,7 @@ export default function Plan() {
                   <span className="sr">Ask a follow-up</span>
                   <AutoText rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask Hoot: check the unknown hours · avoid Market St"
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void ask(); } }} />
+                  {micButton}
                   <button className="btn btn--ghost btn--sm" style={{ marginTop: 7 }} disabled={!text.trim() || !!busy} onClick={() => void ask()}>Ask</button>
                 </label>
               </div>
