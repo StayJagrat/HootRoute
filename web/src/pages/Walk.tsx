@@ -146,7 +146,7 @@ export default function Walk() {
               </div>
               {tab === 'journey' && (
                 <>
-                  {state.say && <div className="card fade stack--tight"><Agent id={state.say.agent} /><p style={{ margin: 0 }}>{state.say.text}</p></div>}
+                  {state.say && <div key={state.say.ts} className="card reveal stack--tight"><Agent id={state.say.agent} state={Date.now() - state.say.ts < 6000 ? 'talking' : 'idle'} /><p style={{ margin: 0 }}>{state.say.text}</p></div>}
                   <button className="btn btn--ghost btn--block" onClick={() => setReport(true)}><Icon name="flag" size={16} /> Report a problem ahead</button>
                   <div className="card stack--tight">
                     <div className="between"><span style={{ fontWeight: 600 }}>Share live location</span><Toggle on={sharing} onChange={(v) => void flipShare(v)} label="Share live location" /></div>

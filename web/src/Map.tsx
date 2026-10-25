@@ -12,22 +12,25 @@ const KEY = (import.meta.env.VITE_GEOAPIFY_KEY as string | undefined) || '';
 const STYLE_URL = KEY
   ? `https://maps.geoapify.com/v1/styles/dark-matter-dark-grey/style.json?apiKey=${encodeURIComponent(KEY)}`
   : 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
-/** When the basemap can't load (offline venue Wi-Fi), the routes still draw on plain ink. */
+/** When the basemap can't load (offline venue Wi-Fi), routes still draw on plain ink. */
 const BLANK: StyleSpecification = { version: 8, sources: {}, layers: [{ id: 'bg', type: 'background', paint: { 'background-color': '#06080c' } }] };
-
-async function loadStyle(): Promise<StyleSpecification | string> {
-  try {
-    const r = await fetch(STYLE_URL, { signal: AbortSignal.timeout(5000) });
-    if (!r.ok) throw new Error(String(r.status));
-    return (await r.json()) as StyleSpecification;
-  } catch {
-    return BLANK;
-  }
+let styleCache: Promise<StyleSpecification> | null = null;
+function loadStyle(): Promise<StyleSpecification> {
+  styleCache ??= fetch(STYLE_URL, { signal: AbortSignal.timeout(6000) })
+    .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json() as Promise<StyleSpecification>; })
+    .catch(() => { styleCache = null; return BLANK; });
+  return styleCache;
 }
 
 const fc = (features: GeoJSON.Feature[]): GeoJSON.FeatureCollection => ({ type: 'FeatureCollection', features });
 const line = (c: LngLat[], props: Record<string, unknown> = {}): GeoJSON.Feature => ({ type: 'Feature', properties: props, geometry: { type: 'LineString', coordinates: c } });
+const MOON = '#a9c1ff';
+const GLOW = 'rgba(169,193,255,0.22)';
+const CLEAR = 'rgba(0,0,0,0)';
+const reduced = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const flat = (c: string) => ['interpolate', ['linear'], ['line-progress'], 0, c, 1, c];
 
+/** Night basemap with 3D buildings, the active route drawn in, a light pulse travelling along it, and alternatives. */
 export function MapCanvas(p: {
   routes: MapRoute[];
   places?: MapPlace[];
@@ -39,56 +42,101 @@ export function MapCanvas(p: {
   pad?: { left: number; bottom: number };
   onTap?: (ll: LngLat) => void;
   follow?: boolean;
+  cinematic?: boolean;
+  interactive?: boolean;
 }) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const markers = useRef<Record<string, maplibregl.Marker>>({});
   const tap = useRef(p.onTap); tap.current = p.onTap;
+  const anim = useRef<{ raf: number; reveal: number; t0: number }>({ raf: 0, reveal: 1, t0: 0 });
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let dead = false;
     void loadStyle().then((style) => {
       if (dead || !el.current) return;
-      const m = new maplibregl.Map({ container: el.current, style, center: SF, zoom: 12.6, attributionControl: { compact: true }, pitchWithRotate: false, dragRotate: false });
-      m.touchZoomRotate.disableRotation();
+      const m = new maplibregl.Map({
+        container: el.current, style, center: SF, zoom: p.cinematic ? 13.4 : 12.6, pitch: p.cinematic ? 58 : 40, bearing: p.cinematic ? -18 : 0,
+        attributionControl: { compact: true }, interactive: p.interactive !== false, maxPitch: 70,
+      });
       m.on('click', (e) => tap.current?.([e.lngLat.lng, e.lngLat.lat]));
       m.on('load', () => {
-        m.addSource('routes', { type: 'geojson', data: fc([]) });
+        // 3D buildings from whichever vector source the basemap uses for buildings
+        const b = (m.getStyle().layers ?? []).find((l) => 'source-layer' in l && l['source-layer'] === 'building') as { source?: string } | undefined;
+        if (b?.source) {
+          m.addLayer({ id: 'hr-3d', type: 'fill-extrusion', source: b.source, 'source-layer': 'building', minzoom: 13.5,
+            paint: { 'fill-extrusion-color': ['interpolate', ['linear'], ['zoom'], 14, '#10151f', 17, '#18202e'],
+              'fill-extrusion-height': ['coalesce', ['get', 'render_height'], ['get', 'height'], 12],
+              'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], ['get', 'min_height'], 0],
+              'fill-extrusion-opacity': 0.88 } });
+        }
+        m.addSource('alts', { type: 'geojson', data: fc([]) });
+        m.addSource('active', { type: 'geojson', data: fc([]), lineMetrics: true });
         m.addSource('walked', { type: 'geojson', data: fc([]) });
         m.addSource('places', { type: 'geojson', data: fc([]) });
-        m.addLayer({ id: 'alt', type: 'line', source: 'routes', filter: ['all', ['!', ['get', 'active']], ['!', ['get', 'dashed']]], layout: { 'line-cap': 'round', 'line-join': 'round' },
-          paint: { 'line-color': '#7b8496', 'line-width': 3, 'line-opacity': 0.55 } });
-        m.addLayer({ id: 'alt-dash', type: 'line', source: 'routes', filter: ['all', ['!', ['get', 'active']], ['get', 'dashed']], layout: { 'line-join': 'round' },
-          paint: { 'line-color': '#f3b75e', 'line-width': 3, 'line-opacity': 0.8, 'line-dasharray': [1.5, 1.5] } });
-        m.addLayer({ id: 'glow', type: 'line', source: 'routes', filter: ['get', 'active'], layout: { 'line-cap': 'round', 'line-join': 'round' },
-          paint: { 'line-color': '#a9c1ff', 'line-width': 16, 'line-opacity': 0.16, 'line-blur': 6 } });
-        m.addLayer({ id: 'active', type: 'line', source: 'routes', filter: ['get', 'active'], layout: { 'line-cap': 'round', 'line-join': 'round' },
-          paint: { 'line-color': '#a9c1ff', 'line-width': 4.5 } });
-        m.addLayer({ id: 'walked', type: 'line', source: 'walked', layout: { 'line-cap': 'round' }, paint: { 'line-color': '#3a4356', 'line-width': 5 } });
+        m.addLayer({ id: 'alt', type: 'line', source: 'alts', filter: ['!', ['get', 'dashed']], layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: { 'line-color': '#8a93a6', 'line-width': 3, 'line-opacity': 0.5 } });
+        m.addLayer({ id: 'alt-dash', type: 'line', source: 'alts', filter: ['get', 'dashed'], layout: { 'line-join': 'round' },
+          paint: { 'line-color': '#f3b75e', 'line-width': 3.5, 'line-opacity': 0.85, 'line-dasharray': [1.4, 1.4] } });
+        m.addLayer({ id: 'glow', type: 'line', source: 'active', layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: { 'line-width': 18, 'line-blur': 8, 'line-gradient': flat(GLOW) as never } });
+        m.addLayer({ id: 'active', type: 'line', source: 'active', layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: { 'line-width': 5, 'line-gradient': flat(MOON) as never } });
+        m.addLayer({ id: 'pulse', type: 'line', source: 'active', layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: { 'line-width': 5, 'line-gradient': flat(CLEAR) as never } });
+        m.addLayer({ id: 'walked', type: 'line', source: 'walked', layout: { 'line-cap': 'round' }, paint: { 'line-color': '#3a4356', 'line-width': 6 } });
+        m.addLayer({ id: 'places-halo', type: 'circle', source: 'places', filter: ['==', ['get', 'state'], 'open'],
+          paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 12, 6, 16, 14], 'circle-color': '#63e2b4', 'circle-opacity': 0.12, 'circle-blur': 0.6 } });
         m.addLayer({ id: 'places', type: 'circle', source: 'places',
           paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 12, 2.5, 16, 5.5],
             'circle-color': ['match', ['get', 'state'], 'open', '#63e2b4', 'unknown', '#06080c', '#4a5263'],
-            'circle-stroke-width': ['match', ['get', 'state'], 'unknown', 1.5, 0], 'circle-stroke-color': '#f3b75e' } });
+            'circle-stroke-width': ['match', ['get', 'state'], 'unknown', 1.6, 0], 'circle-stroke-color': '#f3b75e' } });
         setReady(true);
       });
       map.current = m;
     });
-    return () => { dead = true; map.current?.remove(); map.current = null; markers.current = {}; };
+    return () => { dead = true; cancelAnimationFrame(anim.current.raf); map.current?.remove(); map.current = null; markers.current = {}; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // draw the route in, then let a light pulse travel along it; the landing page slowly orbits the city
+  useEffect(() => {
+    const m = map.current;
+    if (!m || !ready) return;
+    anim.current.reveal = reduced() ? 1 : 0; anim.current.t0 = performance.now();
+    const tick = (now: number) => {
+      const a = anim.current; const mm = map.current;
+      if (!mm || !mm.getLayer('active')) return;
+      if (a.reveal < 1) {
+        a.reveal = Math.min(1, a.reveal + 0.02);
+        const edge = Math.max(0.0001, Math.min(0.9999, a.reveal));
+        mm.setPaintProperty('active', 'line-gradient', (a.reveal >= 1 ? flat(MOON) : ['step', ['line-progress'], MOON, edge, CLEAR]) as never);
+        mm.setPaintProperty('glow', 'line-gradient', (a.reveal >= 1 ? flat(GLOW) : ['step', ['line-progress'], GLOW, edge, CLEAR]) as never);
+      } else if (!reduced()) {
+        const t = ((now - a.t0) / 3400) % 1; const lo = Math.max(0.0002, t - 0.06), hi = Math.min(0.9998, t + 0.06);
+        if (hi > lo + 0.001 && t > lo && t < hi) mm.setPaintProperty('pulse', 'line-gradient',
+          ['interpolate', ['linear'], ['line-progress'], 0, CLEAR, lo, CLEAR, t, 'rgba(255,255,255,0.9)', hi, CLEAR, 1, CLEAR] as never);
+      }
+      if (p.cinematic && !reduced()) mm.setBearing(mm.getBearing() + 0.03);
+      a.raf = requestAnimationFrame(tick);
+    };
+    cancelAnimationFrame(anim.current.raf);
+    anim.current.raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(anim.current.raf);
+  }, [ready, p.fitKey, p.cinematic]);
 
   const active = p.routes.find((r) => r.active)?.coords ?? [];
   useEffect(() => {
     const m = map.current;
-    if (!m || !ready || !m.getSource('routes')) return;
-    (m.getSource('routes') as GeoJSONSource).setData(fc([...p.routes].sort((a, b) => Number(a.active) - Number(b.active)).map((r) => line(r.coords, { active: r.active, dashed: !!r.dashed }))));
-    const cum = active.length > 1 ? cumulative(active) : [];
-    const done = p.progressM && active.length > 1 ? sliceTo(active, p.progressM, cum) : [];
+    if (!m || !ready || !m.getSource('active')) return;
+    (m.getSource('alts') as GeoJSONSource).setData(fc(p.routes.filter((r) => !r.active && r.coords.length > 1).map((r) => line(r.coords, { dashed: !!r.dashed }))));
+    (m.getSource('active') as GeoJSONSource).setData(fc(active.length > 1 ? [line(active)] : []));
+    const done = p.progressM && active.length > 1 ? sliceTo(active, p.progressM, cumulative(active)) : [];
     (m.getSource('walked') as GeoJSONSource).setData(fc(done.length > 1 ? [line(done)] : []));
     (m.getSource('places') as GeoJSONSource).setData(fc((p.places ?? []).map((pl) => ({ type: 'Feature', properties: { state: pl.state }, geometry: { type: 'Point', coordinates: pl.lngLat } }))));
   }, [ready, p.routes, p.places, p.progressM, active]);
 
-  // start / end / you-are-here markers
   useEffect(() => {
     const m = map.current;
     if (!m || !ready) return;
@@ -100,19 +148,22 @@ export function MapCanvas(p: {
     }
   }, [ready, p.start, p.end, p.puck]);
 
-  // frame the journey when it changes; follow the walker during a walk
+  // frame the journey with a camera flight; follow the walker during a walk
   useEffect(() => {
     const m = map.current;
     if (!m || !ready) return;
     const lines = p.routes.map((r) => r.coords).filter((c) => c.length > 1);
-    const pad = { top: 80, right: 60, left: (p.pad?.left ?? 0) + 60, bottom: (p.pad?.bottom ?? 0) + 60 };
-    if (lines.length) m.fitBounds(bounds(lines), { padding: pad, duration: 700, maxZoom: 16.5 });
-    else if (p.start || p.end) m.easeTo({ center: (p.end ?? p.start)!, zoom: 14.5, duration: 600 });
+    const h = m.getContainer().clientHeight, w = m.getContainer().clientWidth;
+    const pad = { top: 70, right: 50, left: Math.min(w * 0.6, (p.pad?.left ?? 0) + 50), bottom: Math.min(h * 0.72, (p.pad?.bottom ?? 0) + 40) };
+    if (lines.length) {
+      const cam = m.cameraForBounds(bounds(lines), { padding: pad, maxZoom: 16.2 });
+      if (cam) m.flyTo({ ...cam, pitch: p.cinematic ? 58 : 45, bearing: p.cinematic ? m.getBearing() : -12, duration: reduced() ? 0 : 1800, essential: true });
+    } else if (p.start || p.end) m.flyTo({ center: (p.end ?? p.start)!, zoom: 14.8, pitch: 45, duration: 1200 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, p.fitKey]);
   useEffect(() => {
     const m = map.current;
-    if (m && ready && p.follow && p.puck) m.easeTo({ center: p.puck, zoom: Math.max(m.getZoom(), 16), duration: 800 });
+    if (m && ready && p.follow && p.puck) m.easeTo({ center: p.puck, zoom: Math.max(m.getZoom(), 16.4), pitch: 55, duration: 900 });
   }, [ready, p.follow, p.puck]);
 
   return <div className="map" aria-label="Map"><div ref={el} style={{ position: 'absolute', inset: 0 }} /></div>;

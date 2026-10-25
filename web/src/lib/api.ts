@@ -155,7 +155,7 @@ export const placeInfo = (id: string) => call<PlaceInfo>(`/api/places/${encodeUR
 export const declareHours = (id: string, d: { openUntil: string; safeHaven: boolean; frontLight: boolean }) =>
   call<{ ok: boolean; walksNotified: number }>(`/api/places/${encodeURIComponent(id)}/declaration`, { method: 'POST', body: JSON.stringify(d) });
 
-export interface Health { ok: boolean; tts: 'cartesia' | 'device'; sms: boolean; runtime: string; claude?: boolean; apify?: boolean }
+export interface Health { ok: boolean; tts: 'cartesia' | 'device'; sms: boolean; runtime: string; claude?: boolean; apify?: boolean; apifyMock?: boolean; apifyRunsLeft?: number; engine?: { segments: number; boot_seconds: number } }
 
 // ---------------------------------------------------------------- Professor Hoot (the Head) and Sherlock Hoots (the Checker)
 export interface TraceEvent {

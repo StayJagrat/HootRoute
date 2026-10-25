@@ -9,7 +9,10 @@ import { nameForPin, searchPlaces, type DestinationResult } from '../lib/search'
 import type { Preferences } from '../lib/api';
 import type { LngLat } from '../lib/types';
 import { MapCanvas, type MapPlace } from '../Map';
-import { ApprovalCard, CheckResult, type CheckView, EvidenceList, HootAnswer, minuteClock, ROUTE_NAME, RouteList, TraceList } from '../parts';
+import { ApprovalCard, CheckResult, type CheckView, Crew, EvidenceList, HootAnswer, minuteClock, ROUTE_NAME, RouteList, TraceList } from '../parts';
+import type { AgentName } from '../lib/types';
+import { Link } from 'react-router-dom';
+import { Avatar } from '../Avatar';
 import { Brand, Icon, Spinner, Toggle } from '../ui';
 
 type When = { day: number; minute: number } | null;
@@ -74,6 +77,16 @@ export default function Plan() {
   const [confirm, setConfirm] = useState(false);
   const [starting, setStarting] = useState(false);
   const ac = useRef<AbortController | null>(null);
+  const [shown, setShown] = useState(0);            // how many real trace events the crew has replayed so far
+  useEffect(() => {
+    if (shown >= trace.length) return;
+    const t = setTimeout(() => setShown((n) => n + 1), 420);
+    return () => clearTimeout(t);
+  }, [shown, trace.length]);
+  const replaying = shown < trace.length;
+  const current = replaying ? trace[shown] : null;
+  const crewActive: AgentName | null = busy?.startsWith('Professor') ? 'head' : busy?.startsWith('Sherlock') ? 'checker' : busy?.startsWith('Scoot') ? 'guide' : current ? current.agent : null;
+  const crewDone = useMemo(() => new Set(trace.slice(0, shown).map((e) => e.agent)), [trace, shown]);
 
   useEffect(() => { void health().then(setHp).catch(() => setHp(null)); }, []);
   useEffect(() => { savePrefs(prefs); }, [prefs]);
@@ -170,7 +183,7 @@ export default function Plan() {
 
       <section className={`panel ${plan ? 'panel--tall' : ''}`} aria-label="Journey">
         <header className="panel__head">
-          <Brand />
+          <Link to="/" aria-label="HootRoute home" style={{ color: 'inherit', textDecoration: 'none' }}><Brand /></Link>
           {plan && <button className="btn btn--quiet btn--sm" onClick={reset}><Icon name="back" size={16} /> New journey</button>}
         </header>
 
@@ -178,6 +191,7 @@ export default function Plan() {
           {!plan && (
             <>
               <div className="stack--tight" style={{ marginTop: 10 }}>
+                <Avatar id="head" state={text.trim() ? 'thinking' : 'idle'} size={52} />
                 <h1 className="h1">Where to tonight?</h1>
                 <p className="p">Routes compared by what is listed open, lit and running at the minute you pass each block. Conditions, not a safety rating.</p>
               </div>
@@ -242,7 +256,15 @@ export default function Plan() {
                 <span className="eyebrow">{whenLabel(planReq.when)}</span>
                 <h2 className="h2">{planReq.from.name} <span className="faint">→</span> {planReq.to.name}</h2>
               </div>
-              {answer && <HootAnswer a={answer} />}
+              {(busy || replaying || trace.length > 0) && (
+                <div className="card stack--tight">
+                  <Crew active={crewActive} done={crewDone} />
+                  <span className="faint tiny" aria-live="polite">
+                    {busy ?? (current ? `${current.persona}: ${current.tool.replace(/_/g, ' ')} · ${current.summary}` : `${trace.length} real tool calls · replayed from the trace`)}
+                  </span>
+                </div>
+              )}
+              {answer && !replaying && <HootAnswer a={answer} />}
               {pending && <ApprovalCard ap={pending} busy={!!busy} onAnswer={(y) => void answerApproval(y)} />}
               {check && <CheckResult r={check} route={pick} />}
 
@@ -255,7 +277,7 @@ export default function Plan() {
               </div>
               {tab === 'routes' && <RouteList options={options} pick={pick} onPick={setPick} depart={depart} recommended={plan.recommended} choiceReason={plan.preferenceChoice?.reason} />}
               {tab === 'evidence' && <EvidenceList ev={ev} busy={!!busy} onInvestigate={() => setConfirm(true)} />}
-              {tab === 'agents' && <TraceList events={trace} />}
+              {tab === 'agents' && <TraceList events={trace} shown={shown} />}
 
               <div className="stack--tight">
                 <label className="field" style={{ alignItems: 'flex-start' }}>
@@ -269,7 +291,7 @@ export default function Plan() {
             </>
           )}
 
-          {busy && <Spinner label={busy} />}
+          {busy && !plan && <><Crew active={crewActive} done={crewDone} /><Spinner label={busy} /></>}
           {err && <p className="error" role="alert">{err}</p>}
         </div>
 
@@ -294,19 +316,17 @@ export default function Plan() {
         </div>
       )}
       {starting && plan && planReq && <StartDialog onClose={() => setStarting(false)} onStart={async (o) => {
-        const w = await createWalk({ planId: plan.planId, from: planReq.from, to: planReq.to, when: planReq.when, choice: CHOICE[pick], notifyConsent: o.consent,
-          walker: o.name, guardian: o.contact, guardianPhone: o.phone, thresholds: { stopSeconds: 90, replySeconds: 45, escalateSeconds: 90 }, replay: o.replay, timeScale: o.replay ? 6 : 1 });
+        const w = await createWalk({ planId: plan.planId, from: planReq.from, to: planReq.to, when: planReq.when, choice: CHOICE[pick], notifyConsent: false,
+          walker: o.name, guardian: o.contact, thresholds: { stopSeconds: 90, replySeconds: 45, escalateSeconds: 90 }, replay: o.replay, timeScale: o.replay ? 6 : 1 });
         nav(`/walk?walk=${encodeURIComponent(w.walkId)}${o.replay ? '&gps=replay' : ''}`);
       }} />}
     </div>
   );
 }
 
-function StartDialog({ onClose, onStart }: { onClose: () => void; onStart: (o: { name: string; contact: string; phone: string; consent: boolean; replay: boolean }) => Promise<void> }) {
+function StartDialog({ onClose, onStart }: { onClose: () => void; onStart: (o: { name: string; contact: string; replay: boolean }) => Promise<void> }) {
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
-  const [phone, setPhone] = useState('');
-  const [consent, setConsent] = useState(false);
   const [replay, setReplay] = useState(gpsMode() === 'replay');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -314,18 +334,16 @@ function StartDialog({ onClose, onStart }: { onClose: () => void; onStart: (o: {
     <div className="overlay" role="dialog" aria-modal="true" aria-label="Start journey">
       <div className="dialog">
         <h2 className="h2">Start your journey</h2>
-        <p className="p small">Wingman Wally follows the route, checks in if you stop where nothing is listed open, and takes your reports. Sharing is optional and you can stop it any time.</p>
+        <div className="row" style={{ gap: 12 }}><Avatar id="rescuer" state="talking" size={44} /><p className="p small" style={{ margin: 0 }}>Wingman Wally follows the route, checks in if you stop where nothing is listed open, and takes your reports. Sharing is optional and you can stop it any time.</p></div>
         <label className="field"><span className="sr">Your name</span><input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your first name (optional)" /></label>
         <label className="field"><span className="sr">Trusted contact</span><input value={contact} onChange={(e) => setContact(e.target.value)} placeholder="Trusted contact's name (optional)" /></label>
-        <label className="field"><span className="sr">Contact phone</span><input value={phone} inputMode="tel" onChange={(e) => setPhone(e.target.value)} placeholder="Their phone, +1… (optional)" /></label>
-        <div className="between small"><span>Text or call them if I don't answer a check-in</span><Toggle on={consent} onChange={setConsent} label="Allow texts and calls" /></div>
         <div className="between small"><span>Demo: replay GPS along the route <span className="faint">(labelled)</span></span><Toggle on={replay} onChange={setReplay} label="Replay GPS" /></div>
-        <p className="faint tiny" style={{ margin: 0 }}>Without the toggle, only a live link you choose to send is used. HootRoute never calls 911.</p>
+        <p className="faint tiny" style={{ margin: 0 }}>Share a live link with your contact from the journey screen if you want to. Nothing is texted or called. HootRoute never calls 911.</p>
         {err && <p className="error">{err}</p>}
         <div className="row">
           <button className="btn btn--primary" disabled={busy} onClick={async () => {
             setBusy(true); setErr(null);
-            try { await onStart({ name: name.trim() || 'Walker', contact: contact.trim() || 'Trusted contact', phone: phone.trim(), consent, replay }); }
+            try { await onStart({ name: name.trim() || 'Walker', contact: contact.trim() || 'Trusted contact', replay }); }
             catch (e) { setErr(errorText(e, 'Could not start the journey.')); setBusy(false); }
           }}>{busy ? 'Starting…' : 'Start journey'}</button>
           <button className="btn btn--quiet" onClick={onClose}>Cancel</button>

@@ -3,6 +3,8 @@ import type { ApifyRun, Approval, EvidencePlace, HeadAnswer, HoursCheck, PlanEvi
 import { clock } from './lib/format';
 import { PERSONA } from './lib/personas';
 import type { RouteOption } from './lib/types';
+import { Avatar } from './Avatar';
+import type { AgentName } from './lib/types';
 import { Agent, Icon } from './ui';
 
 export const ROUTE_NAME: Record<RouteKey, string> = { fast: 'Fastest', balanced: 'Balanced', best: 'HootRoute' };
@@ -85,15 +87,15 @@ export function ApprovalCard({ ap, busy, onAnswer }: { ap: Approval; busy: boole
 }
 
 /** What actually executed, in order. Only events the gateway returned. */
-export function TraceList({ events }: { events: TraceEvent[] }) {
+export function TraceList({ events, shown = events.length }: { events: TraceEvent[]; shown?: number }) {
   if (!events.length) return <p className="p small">No agent activity yet. Ask Professor Hoot to see every tool call, why it ran and what it returned.</p>;
   const t0 = events[0].startedAt;
   return (
     <div className="trace">
-      {events.map((e, i) => {
+      {events.slice(0, shown).map((e, i) => {
         const par = e.group !== undefined && events.some((x, j) => j !== i && x.group === e.group);
         return (
-          <div key={e.id} className={`step step--${e.status}`}>
+          <div key={e.id} className={`step step--${e.status} reveal`}>
             <span className="step__rail"><i /></span>
             <span className="step__title">{e.tool.replace(/_/g, ' ')} <span>· {e.persona || PERSONA[e.agent]}</span></span>
             <span className="step__ms">+{((e.startedAt - t0) / 1000).toFixed(1)}s · {e.ms} ms</span>
@@ -181,6 +183,23 @@ export function CheckResult({ r, route }: { r: CheckView; route: RouteKey }) {
         {consoleUrl && <> · <a href={consoleUrl} target="_blank" rel="noopener noreferrer">Apify console</a></>}
         {!r.run && r.note ? r.note : ''}
       </span>
+    </div>
+  );
+}
+
+const CREW: AgentName[] = ['head', 'guide', 'checker', 'rescuer'];
+const CREW_JOB: Record<AgentName, string> = { head: 'orchestrates', guide: 'routes', checker: 'evidence', rescuer: 'journey' };
+
+/** The four agents with who is working right now. `active` comes from the real trace being replayed (or Hoot while waiting). */
+export function Crew({ active, done }: { active: AgentName | null; done: Set<AgentName> }) {
+  return (
+    <div className="crew" aria-label="Agent crew">
+      {CREW.map((id) => (
+        <div key={id} className={`crew__m ${active === id ? 'crew__m--on' : ''}`}>
+          <Avatar id={id} state={active === id ? (id === 'head' ? 'thinking' : 'talking') : done.has(id) ? 'done' : 'idle'} size={40} />
+          <span>{PERSONA[id].split(' ')[0] === 'Professor' ? 'Hoot' : PERSONA[id].split(' ')[0]}<br />{CREW_JOB[id]}</span>
+        </div>
+      ))}
     </div>
   );
 }

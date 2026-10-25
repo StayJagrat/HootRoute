@@ -31,7 +31,7 @@ from .config import env
 log = logging.getLogger("hootroute.head")
 SF = ZoneInfo("America/Los_Angeles")
 API = "https://api.anthropic.com/v1/messages"
-MAX_TOOL_CALLS = 8
+MAX_TOOL_CALLS = 14
 DEADLINE_S = 150
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 BANNED = re.compile(r"\b(safe(st|r)?|unsafe|dangerous|sketchy)\b", re.I)
@@ -78,7 +78,7 @@ async def write_report(facts: dict) -> tuple[str, str]:
     """(report text, who wrote it). Claude writes it from the facts; the template is the fallback."""
     if not enabled(): return template_report(facts), "template (Claude not configured)"
     try:
-        r = await claude([{"role": "user", "content": json.dumps(facts)}], REPORT_SYSTEM, max_tokens=300, mdl=report_model(), timeout=15)
+        r = await claude([{"role": "user", "content": json.dumps(facts)}], REPORT_SYSTEM, max_tokens=450, mdl=report_model(), timeout=15)
         text = "".join(b.get("text", "") for b in r.get("content", []) if b.get("type") == "text").strip()
         if text: return clean(text), f"Claude ({report_model()})"
     except Exception as e:
@@ -104,10 +104,10 @@ def template_recovery(f: dict) -> str:
 async def explain_recovery(facts: dict) -> tuple[str, str]:
     if enabled():
         try:
-            r = await claude([{"role": "user", "content": json.dumps(facts)}], RECOVERY_SYSTEM, max_tokens=220, mdl=report_model(), timeout=12)
+            r = await claude([{"role": "user", "content": json.dumps(facts)}], RECOVERY_SYSTEM, max_tokens=400, mdl=report_model(), timeout=15)
             text = clean("".join(b.get("text", "") for b in r.get("content", []) if b.get("type") == "text").strip())
             chk = numbers_check(text, [facts])
-            if text and chk["ok"]: return text, f"Claude ({report_model()})"
+            if text and chk["ok"] and r.get("stop_reason") != "max_tokens": return text, f"Claude ({report_model()})"
             if text: log.warning("recovery explanation had unverified numbers %s; using the template", chk["unverified"])
         except Exception as e:
             log.warning("recovery explanation fallback: %s", e)
@@ -272,7 +272,10 @@ class HeadBrain:
     async def tool(self, s: Session, name: str, args: dict, out: dict, allow_checks: bool = False) -> dict:
         if name == "find_place":
             q = str(args.get("query", ""))[:80]
-            hits = await asyncio.to_thread(self.engine.search, q, 5)
+            hits = []
+            for variant in place_variants(q):          # "San Francisco City Hall", "Moscone Center, SF" → the names the map knows
+                hits = await asyncio.to_thread(self.engine.search, variant, 5)
+                if hits: break
             return {"candidates": hits} if hits else {"candidates": [], "note": "No match in the San Francisco map. Try a landmark, a street or a business name."}
         if name == "plan_routes":
             o, d = args["origin"], args["destination"]
@@ -351,14 +354,14 @@ class HeadBrain:
         msgs = (list(history) if history else list(s.history))[-8:] + [{"role": "user", "content": text[:1000]}]
         sysmsg = system_prompt(now, prior, allow_checks)
         tools = [t for t in TOOLS if allow_checks or t["name"] != "check_listed_hours"]
-        answer = ""; calls = 0; group = 0
+        answer = ""; calls = 0; group = 0; truncated = False
         try:
             while True:
                 r = await claude(msgs, sysmsg, tools)
                 blocks = r.get("content", []); msgs.append({"role": "assistant", "content": blocks})
                 uses = [b for b in blocks if b.get("type") == "tool_use"]
                 if not uses or r.get("stop_reason") != "tool_use":
-                    answer = "".join(b.get("text", "") for b in blocks if b.get("type") == "text").strip(); break
+                    answer = "".join(b.get("text", "") for b in blocks if b.get("type") == "text").strip(); truncated = r.get("stop_reason") == "max_tokens"; break
                 lead = " ".join(b.get("text", "") for b in blocks if b.get("type") == "text").strip()
 
                 async def run_one(u, grp):
@@ -388,10 +391,10 @@ class HeadBrain:
             answer = answer or ""
         answer = clean(answer); by = f"Claude ({model()})"
         chk = numbers_check(answer, sources)
-        if not answer or not chk["ok"]:
+        if not answer or not chk["ok"] or truncated:
             if answer: log.warning("Hoot's answer had numbers not found in tool results: %s", chk["unverified"])
             answer = self.facts_text(s, out) if s.plan else (answer or "I couldn't finish that. Try again with a start and a destination.")
-            by += " · prose replaced by engine summary" + (" (unverified numbers)" if not chk["ok"] else "")
+            by += " · prose replaced by engine summary" + (" (unverified numbers)" if not chk["ok"] else " (answer was cut off)" if truncated else "")
         s.history += [{"role": "user", "content": text[:1000]}, {"role": "assistant", "content": answer or "(no answer)"}]
         return self.result(sid, s, answer, by, trace, out, t0, chk)
 
@@ -440,9 +443,9 @@ class HeadBrain:
             r = await claude([{"role": "user", "content": json.dumps(facts, default=str)}],
                              f"You are Professor Hoot in {BRAND}. Explain in 2 to 3 short plain sentences what the listing check found and what changed in the route numbers, "
                              "or why nothing changed. Use ONLY numbers in the JSON. Published hours are not proof a place is staffed. Never use safe, unsafe, dangerous or sketchy.",
-                             max_tokens=250, mdl=report_model(), timeout=15)
+                             max_tokens=500, mdl=report_model(), timeout=20)
             text = clean("".join(x.get("text", "") for x in r.get("content", []) if x.get("type") == "text").strip())
-            if text and numbers_check(text, [facts])["ok"]: return text, f"Claude ({report_model()})"
+            if text and r.get("stop_reason") != "max_tokens" and numbers_check(text, [facts])["ok"]: return text, f"Claude ({report_model()})"
         except Exception as e:
             log.warning("explain_change fallback: %s", e)
         return tmpl, "template"
@@ -495,6 +498,20 @@ class HeadBrain:
             else:
                 await run("propose_hours_check", {"place_ids": ids, "reason": "You asked to check listed hours of places with unknown hours on the route."}, "The walker asked for a check; it costs money, so ask first.")
         return self.facts_text(s, out)
+
+
+CITY = re.compile(r"\b(san francisco|sf|s\.f\.|california|ca|usa)\b", re.I)
+
+
+def place_variants(q: str) -> list[str]:
+    """The query, then without city qualifiers, then shorter prefixes: the offline search wants the map's own names."""
+    base = re.sub(r"\s+", " ", CITY.sub(" ", q)).strip(" ,.-")
+    words = base.split()
+    out = [q.strip(), base, base.split(",")[0].strip()] + [" ".join(words[:n]) for n in range(len(words) - 1, 1, -1)] + [" ".join(words[1:])] if words else [q]
+    seen: list[str] = []
+    for v in out:
+        if v and len(v) >= 3 and (v == q.strip() or len(v.split()) >= 2) and v.lower() not in [x.lower() for x in seen]: seen.append(v)
+    return seen[:6]
 
 
 def parse_when(text: str) -> tuple[int, int]:

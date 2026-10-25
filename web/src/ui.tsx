@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Avatar, type AvatarState } from './Avatar';
 import { PERSONA } from './lib/personas';
 import type { AgentName } from './lib/types';
 
@@ -47,16 +48,12 @@ export function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boo
   return <button type="button" role="switch" aria-checked={on} aria-label={label} className="toggle" onClick={() => onChange(!on)} />;
 }
 
-const AGENT_COLOR: Record<AgentName, string> = { head: 'var(--moon)', guide: 'var(--fg)', checker: 'var(--amber)', rescuer: 'var(--mint)' };
-
-/** A persona as a small coloured monogram, e.g. "PH Professor Hoot". */
-export function Agent({ id, children }: { id: AgentName; children?: ReactNode }) {
-  const name = PERSONA[id];
-  const initials = name.split(' ').map((w) => w[0]).join('').slice(0, 2);
+/** A persona with its animated avatar, e.g. Professor Hoot. */
+export function Agent({ id, state = 'idle', children }: { id: AgentName; state?: AvatarState; children?: ReactNode }) {
   return (
     <span className="row" style={{ gap: 8 }}>
-      <span className="mono" aria-hidden style={{ width: 22, height: 22, borderRadius: 7, display: 'grid', placeItems: 'center', fontSize: 10, border: '1px solid var(--line-2)', color: AGENT_COLOR[id] }}>{initials}</span>
-      <span style={{ fontWeight: 600, fontSize: 13 }}>{name}</span>
+      <Avatar id={id} state={state} size={26} label={false} />
+      <span style={{ fontWeight: 600, fontSize: 13 }}>{PERSONA[id]}</span>
       {children}
     </span>
   );
