@@ -31,6 +31,7 @@ export function RouteList({ options, pick, onPick, depart, recommended, choiceRe
           </span>
           <span className="route__min">{Math.round(o.stats.minutes)}<span className="faint" style={{ fontSize: 12 }}> min</span></span>
           <span className="route__meta">
+            {travelMode === 'cycle' && o.modeConditions && <span>Bike lanes <b>{o.modeConditions.cyclewayPct}%</b></span>}
             <span>Score <b>{o.stats.score}</b></span>
             <span>Longest stretch with nothing listed open <b>{o.stats.longestEmptyM} m</b></span>
             <span>Listed open <b>{o.placesOpen}</b></span>
@@ -40,6 +41,7 @@ export function RouteList({ options, pick, onPick, depart, recommended, choiceRe
         </button>
       ))}
       {choiceReason && <p className="p small">{choiceReason}</p>}
+      {travelMode === 'cycle' && <p className="p small">With "Prefer mapped bike lanes" on, the recommended ride is the one with the most mapped bike lanes; the score still describes open places, lighting and gaps.</p>}
       <p className="faint tiny">{travelMode === 'walk' ? 'Score compares this walk with typical walks nearby at the same hour.' : 'Score compares this journey with routes nearby for this travel mode at the same hour.'} Conditions, not a safety rating. No crime data.</p>
     </div>
   );

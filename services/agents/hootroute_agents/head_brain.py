@@ -190,6 +190,7 @@ TOOLS = [
           ["origin", "destination", "day", "minute"]),
     _tool("rank_by_preferences", "Scoot McRoute: choose among the planned candidate routes by the walker's stated preferences (deterministic rule; the scores do not change).",
           {"fewerTurns": {"type": "boolean"}, "preferOpenPlaces": {"type": "boolean"}, "preferMainRoads": {"type": "boolean"}, "fastest": {"type": "boolean"},
+           "preferBikeLanes": {"type": "boolean", "description": "cycling: most of the ride on mapped bike lanes or cycleways"},
            "lowDistraction": {"type": "boolean", "description": "simpler, quieter guidance; does not pick a route"}}, []),
     _tool("inspect_route", "Sherlock Hoots: walk the planned route on the map and report what to know: permitted street closures and construction, the longest stretch with nothing listed open, open streetlight reports, mapped lighting, unknown hours, and whether BART runs at arrival. Returns a verdict (Good to go / Heads up).",
           {"route": ROUTE_ENUM}, ["route"]),
@@ -294,7 +295,7 @@ class HeadBrain:
             if "error" not in res: out.setdefault("before", s.plan["stats"])
             return res
         if name == "rank_by_preferences":
-            s.preferences = Preferences(**{k: bool(args.get(k)) for k in ("fewerTurns", "preferOpenPlaces", "preferMainRoads", "fastest", "lowDistraction")})
+            s.preferences = Preferences(**{k: bool(args.get(k)) for k in ("fewerTurns", "preferOpenPlaces", "preferMainRoads", "fastest", "lowDistraction", "preferBikeLanes")})
             out["preferences"] = s.preferences.model_dump()
             if not s.plan: return {"ok": True, "preferences": out["preferences"], "note": "Saved. They apply once a walk is planned."}
             ch = choose_option(s.plan.get("options") or [], s.preferences); out["preferenceChoice"] = ch
@@ -504,7 +505,7 @@ class HeadBrain:
             ts = time.time(); res = await self.tool(s, name, args, out, allow_checks)
             trace.append(event(name, args, res, round((time.time() - ts) * 1000), why, ts)); return res
         wants_check = bool(re.search(r"\b(check|verify)\b", text, re.I))
-        prefs = {"fewerTurns": bool(re.search(r"fewer turns|simple|simpler|straight", text, re.I)), "preferMainRoads": bool(re.search(r"main (roads?|streets?)", text, re.I)),
+        prefs = {"fewerTurns": bool(re.search(r"fewer turns|simple|simpler|straight", text, re.I)), "preferMainRoads": bool(re.search(r"main (roads?|streets?)", text, re.I)), "preferBikeLanes": bool(re.search(r"bike lanes?|cycle ?ways?|protected lanes?", text, re.I)),
                  "fastest": bool(re.search(r"\bfastest\b|\bquickest\b", text, re.I)), "preferOpenPlaces": bool(re.search(r"\bopen\b|stopping|somewhere to stop", text, re.I)),
                  "lowDistraction": bool(re.search(r"low.distraction|quiet|fewer prompts", text, re.I))}
         if not (s.plan and not re.search(r"\bfrom\s+.+\s+to\s+", text, re.I)):
@@ -549,6 +550,8 @@ async def lookup(engine, q: str, limit: int = 5) -> list[dict]:
         k = (round(h["lat"], 3), round(h["lon"], 3))
         if k in seen: continue
         seen.add(k); out.append(h)
+    ql = q.strip().lower()
+    out.sort(key=lambda h: 0 if h["name"].lower() == ql else 1)       # stable: an exact name ("Mission Dolores Park") beats a cafe named after it
     return out[:limit]
 
 
