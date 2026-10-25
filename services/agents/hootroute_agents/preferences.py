@@ -19,6 +19,8 @@ class Preferences(BaseModel):
 def choose_option(options: list[dict], prefs: Preferences | dict | None) -> dict | None:
     """{optionId, reason, rule} or None when there is nothing to choose between or no route preference is set."""
     if prefs is None or not options: return None
+    options = [o for o in options if o.get("meetsLimits", True)]
+    if not options: return None
     p = prefs if isinstance(prefs, Preferences) else Preferences(**prefs)
     if not (p.fewerTurns or p.preferOpenPlaces or p.preferMainRoads or p.fastest): return None
     fast = next((o for o in options if o["id"] == "fast"), options[0])

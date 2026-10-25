@@ -6,7 +6,7 @@ from math import hypot
 
 from hootroute_engine.engine import Engine
 from hootroute_engine.scoring import Ctx, metrics, score, WALK_SPEED
-from hootroute_engine.world import is_open
+from hootroute_engine.world import day_minute, is_open
 
 DAY = 4  # Friday
 DEPART = 23 * 60 + 30
@@ -162,7 +162,8 @@ def _clock(minute: int) -> str:
 def _option(engine: Engine, route: dict, depart: int) -> dict:
     return {"id": route["id"], "label": route["label"], "coords": route["coords"], "steps": route["steps"],
             "stats": _stats(route), "km": route["km"], "placesOpen": route["places_open"], "lightPct": route["light_pct"],
-            "points": route["points"], "weights": route["weights"], "turnsPerKm": route["turns_per_km"], "mainPct": route["main_pct"], "avoidsReport": route.get("avoids", True)}
+            "points": route["points"], "weights": route["weights"], "turnsPerKm": route["turns_per_km"], "mainPct": route["main_pct"],
+            "avoidsReport": route.get("avoids", True), "meetsLimits": route.get("meets_limits", True)}
 
 
 def build_route_data(engine: Engine, lat: float, lon: float, name: str, origin: tuple[float, float] | None = None, origin_name: str | None = None,
@@ -178,9 +179,10 @@ def initials(name: str) -> str:
 
 def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[float, float] | None = None, origin_name: str | None = None,
                day: int = DAY, depart: int = DEPART, walker: str = "Arya", guardian: str = "Maya Chen", session: str = SESSION,
-               simulated_shops: bool = True, avoid: list | None = None) -> tuple[dict, dict]:
+               simulated_shops: bool = True, avoid: list | None = None, limits: dict | None = None) -> tuple[dict, dict]:
     """(DemoData for the PWA, the engine's own route dicts keyed 'best' and 'fast' for the agents)."""
     name = name.strip()[:100]
+    day, depart = day_minute(day, depart)
     if not name:
         raise ValueError("Choose a destination.")
     if not (-90 <= lat <= 90 and -180 <= lon <= 180):
@@ -200,7 +202,8 @@ def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[
             raise ValueError("Start and destination are the same place. Pick a different destination.")
         engine.clear(session)
         try:
-            result = engine.route(session, origin, destination, day, depart, avoid=avoid)
+            result = engine.route(session, origin, destination, day, depart, avoid=avoid,
+                                  max_extra_minutes=(limits or {}).get("maxExtraMinutes"), max_gap_m=(limits or {}).get("maxGapM"))
             fastest = next(r for r in result["routes"] if r["id"] == "fast")
             best = next((r for r in result["routes"] if r["id"] == "best"), fastest)
             suggested = engine.suggest_declarations(session, best, day, depart)
@@ -245,10 +248,14 @@ def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[
                 "routeSteps": {"hootroute": best["steps"], "shortest": fastest["steps"]},
                 "options": [_option(engine, r, depart) for r in result["routes"]],
                 "recommended": result["recommended"],
+                "routingLimits": limits or {},
+                "evidenceCoverage": {"unknownHoursNearby": best["unknown_hours_nearby"], "mappedLightingPct": best["light_known_pct"],
+                                     "helpAccessUnknown": best.get("help_access_unknown", 0), "confirmedStaffing": False},
                 "whatIf": what_if,
                 "dataNote": f"Scores compare this walk with typical walks in the same neighbourhood at the same hour. Places without listed hours earn no credit (unknown, not closed). The destination is snapped to the nearest mapped street, {destination_snap_m} m away. Darkness debt is modeled walker-minutes, not observed foot traffic.",
             }
             routes = {"best": best, "fast": fastest}
+            if limits: routes["_limits"] = limits
             if balanced_r: routes["balanced"] = balanced_r
             return data, routes
         finally:

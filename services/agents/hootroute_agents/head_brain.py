@@ -216,7 +216,7 @@ def system_prompt(now: datetime, session: dict | None, allow_checks: bool) -> st
 classes or libraries, and late-shift hospitality, healthcare, retail and cleaning workers. You coordinate two specialists through tools:
 Scoot McRoute (find_place, plan_routes, rank_by_preferences, rescore_routes, replan_avoiding) and Sherlock Hoots (inspect_route, find_route_unknowns,
 propose_hours_check{', check_listed_hours' if allow_checks else ''}).
-It is now {DAYS[now.weekday()]} {now.strftime('%-I:%M %p')} in San Francisco (day {now.weekday()}, minute {now.hour * 60 + now.minute}). If no time is given, plan for now.
+It is now {DAYS[now.weekday()]} {now.strftime('%I:%M %p').lstrip('0')} in San Francisco (day {now.weekday()}, minute {now.hour * 60 + now.minute}). If no time is given, plan for now.
 {cur}
 How to work (give every call a short `why`):
 1. Resolve places with find_place (several in one turn is fine), then plan_routes.
@@ -299,7 +299,8 @@ class HeadBrain:
             return {"verdict": ins["verdict"], "items": [{k: i[k] for k in ("level", "title", "detail")} for i in ins["items"]], "missing": ins["missing"]}
         if name == "find_route_unknowns":
             limit = max(1, min(6, int(args.get("limit", 5))))
-            s.unknowns = await asyncio.to_thread(hours_check.unknowns, self.engine, s.routes[key]["coords"], s.req["day"], s.req["minute"], limit)
+            s.unknowns = await asyncio.to_thread(hours_check.unknowns, self.engine, s.routes[key]["coords"], s.req["day"], s.req["minute"], limit,
+                                               gap_range=s.routes[key]["gap"]["range"])
             out["unknowns"] = s.unknowns
             return {"places": [{k: p[k] for k in ("id", "name", "cat", "atM", "passMinute")} for p in s.unknowns], "count": len(s.unknowns),
                     "route_unknown_total": s.routes[key].get("unknown_hours_nearby")}

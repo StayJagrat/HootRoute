@@ -102,6 +102,8 @@ class Walk:
         self.data, self.routes, self._line, self._cum = data, routes, None, None
 
     def set_choice(self, choice: str):
+        key = {"usual": "fast", "balanced": "balanced"}.get(choice, "best")
+        if self.routes and not self.routes.get(key, self.routes["best"]).get("meets_limits", True): return
         self.choice = choice if choice in ("usual", "balanced") else "hootroute"; self._line = self._cum = None
 
     @property

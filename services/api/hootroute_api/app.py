@@ -71,9 +71,10 @@ class Plans:
         return (v[2], v[3]) if v and v[1] == key and time.time() - v[0] < self.ttl else None
 
 
-def plan_key(o, d, day, minute) -> tuple:
+def plan_key(o, d, day, minute, limits=None) -> tuple:
     g = lambda p, k: p[k] if isinstance(p, dict) else getattr(p, k)
-    return (round(g(o, "lat"), 5), round(g(o, "lon"), 5), round(g(d, "lat"), 5), round(g(d, "lon"), 5), day, minute)
+    key = (round(g(o, "lat"), 5), round(g(o, "lon"), 5), round(g(d, "lat"), 5), round(g(d, "lon"), 5), day, minute)
+    return (*key, tuple(sorted(limits.items()))) if limits else key
 
 
 # ------------------------------------------------------------------------------------------------ lifespan
@@ -202,6 +203,11 @@ class PlanReq(BaseModel):
     origin: Point; destination: Point
     day: int | None = Field(None, ge=0, le=6); minute: int | None = Field(None, ge=0, le=1439)
     preferences: Preferences | None = None
+    maxExtraMinutes: float | None = Field(None, ge=0, le=120, allow_inf_nan=False)
+    maxGapM: float | None = Field(None, ge=0, le=10000, allow_inf_nan=False)
+
+    def routing_limits(self):
+        return {k: getattr(self, k) for k in ("maxExtraMinutes", "maxGapM") if getattr(self, k) is not None}
 
 
 class WalkReq(PlanReq):
@@ -267,11 +273,11 @@ async def create_plan(req: PlanReq, request: Request):
     """Score Fastest vs HootRoute for any two points in San Francisco. Returns DemoData plus a planId to start the walk on."""
     limit(request, "plan"); s = request.app.state; day, minute = _when(req)
     try:
-        data, routes = await s.port.plan(req.origin.model_dump(), req.destination.model_dump(), day, minute, "Walker", "Guardian")
+        data, routes = await s.port.plan(req.origin.model_dump(), req.destination.model_dump(), day, minute, "Walker", "Guardian", limits=req.routing_limits())
     except ValueError as e:
         raise HTTPException(422, str(e)) from e
     choice = choose_option(data.get("options") or [], req.preferences) if req.preferences else None
-    return {"planId": s.plans.put(plan_key(req.origin, req.destination, day, minute), data, routes), **data, "preferenceChoice": choice}
+    return {"planId": s.plans.put(plan_key(req.origin, req.destination, day, minute, req.routing_limits()), data, routes), **data, "preferenceChoice": choice}
 
 
 @app.get("/api/route-demo")
@@ -294,6 +300,16 @@ async def demo(request: Request):
 async def create_walk(req: WalkReq, request: Request):
     """Start a walk: unique id, a walker token for the walker's phone, and the guardian's live link. The Guide plans it in the room."""
     limit(request, "walk"); s = request.app.state; day, minute = _when(req)
+    cached = s.plans.get(req.planId, plan_key(req.origin, req.destination, day, minute, req.routing_limits()))
+    if req.routing_limits() and not cached:
+        try:
+            cached = await s.port.plan(req.origin.model_dump(), req.destination.model_dump(), day, minute, req.walker, req.guardian, limits=req.routing_limits())
+        except ValueError as e: raise HTTPException(422, str(e)) from e
+    if cached:
+        selected = {"usual": "fast", "balanced": "balanced"}.get(req.choice, "best")
+        chosen = cached[1].get(selected, cached[1]["best"])
+        if not chosen.get("meets_limits", True):
+            raise HTTPException(422, "The selected route does not meet the requested walking-time and gap limits.")
     wid = secrets.token_urlsafe(12).replace("-", "a").replace("_", "b"); token = secrets.token_urlsafe(24); gtoken = secrets.token_urlsafe(18)
     rec = dict(id=wid, created_at=time.time(), status="planning", walker_token=token, walker_name=req.walker.strip(), guardian_name=req.guardian.strip(),
                guardian_phone=req.guardianPhone, origin=req.origin.model_dump(), destination=req.destination.model_dump(), depart_day=day, depart_minute=minute,
@@ -302,7 +318,6 @@ async def create_walk(req: WalkReq, request: Request):
                guardian_token=gtoken, notify_consent=req.notifyConsent, sharing=True)
     s.db.create_walk(rec); s.hub.room(wid, persistent=True)
     gurl = guardian_url(request, wid, gtoken)
-    cached = s.plans.get(req.planId, plan_key(req.origin, req.destination, day, minute))
     if cached:      # the plan was made for placeholder names; put the real ones in
         data, routes = cached; data = {**data, "walker": {"id": "walker", "name": rec["walker_name"]},
                                        "guardian": {**data["guardian"], "name": rec["guardian_name"], "initials": "".join(p[0] for p in rec["guardian_name"].split()[:2]).upper()}}
@@ -415,7 +430,7 @@ class AskReq(BaseModel):
 
 
 def _store_plan(s, req: dict, data: dict, routes: dict) -> str:
-    return s.plans.put(plan_key(req["origin"], req["destination"], req["day"], req["minute"]), data, routes)
+    return s.plans.put(plan_key(req["origin"], req["destination"], req["day"], req["minute"], routes.get("_limits")), data, routes)
 
 
 def _with_plan(s, res: dict) -> dict:
@@ -474,7 +489,7 @@ async def check_route(body: CheckReq, request: Request):
 async def check_unknowns(body: CheckReq, request: Request):
     """Checker, no network: named places on the route whose hours are unknown (they earn no credit in the score)."""
     s = request.app.state; _, key, data, routes = _plan_by_id(s, body.planId); rk = _route_key(routes, body.route)
-    places = await run_in_threadpool(hours_check.unknowns, s.engine, routes[rk]["coords"], key[4], key[5], 6)
+    places = await run_in_threadpool(hours_check.unknowns, s.engine, routes[rk]["coords"], key[4], key[5], 6, gap_range=routes[rk]["gap"]["range"])
     return {"places": places, "total": routes[rk].get("unknown_hours_nearby"), "apify": bool(settings.apify_token) or hours_check.mock_mode()}
 
 
@@ -484,14 +499,14 @@ async def check_hours(body: CheckReq, request: Request):
     Requires confirm=true (the walker pressed the button). Places checked recently are reused, not re-billed."""
     if not body.confirm: raise HTTPException(428, "A listing check costs money. Send confirm: true once the walker has approved it.")
     limit(request, "check"); s = request.app.state; _, key, data, routes = _plan_by_id(s, body.planId); rk = _route_key(routes, body.route)
-    places = await run_in_threadpool(hours_check.unknowns, s.engine, routes[rk]["coords"], key[4], key[5], 40 if body.placeIds else 6)
+    places = await run_in_threadpool(hours_check.unknowns, s.engine, routes[rk]["coords"], key[4], key[5], 10000 if body.placeIds else 6, gap_range=routes[rk]["gap"]["range"])
     if body.placeIds: places = [p for p in places if p["id"] in set(body.placeIds)]       # only unknown-hours places on this route, never arbitrary ids
     res = await hours_check.investigate(s.engine, places[:6], s.budget)
     o = {"lat": key[0], "lon": key[1], "name": data["start"]["name"]}; d = {"lat": key[2], "lon": key[3], "name": data["end"]["name"]}
     new, new_routes = (data, routes)
     if res["changed"]:
         avoid = [tuple(a) for a in routes.get("_avoid") or []] or None
-        new, new_routes = await s.port.plan(o, d, key[4], key[5], "Walker", "Guardian", avoid=avoid)
+        new, new_routes = await s.port.plan(o, d, key[4], key[5], "Walker", "Guardian", avoid=avoid, limits=routes.get("_limits"))
         if avoid: new_routes = {**new_routes, "_avoid": routes["_avoid"]}
     pid = _store_plan(s, {"origin": o, "destination": d, "day": key[4], "minute": key[5]}, new, new_routes)
     return {**res, "before": data["stats"], "after": new["stats"], "routeChanged": new_routes["best"]["coords"] != routes["best"]["coords"], "planId": pid, "plan": {"planId": pid, **new}}
