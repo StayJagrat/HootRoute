@@ -10,7 +10,7 @@ import numpy as np
 
 from .config import BBOX, STEP, WALK_SPEED, WEIGHTS
 from .scoring import Ctx, Norm, metrics, place_open, score
-from .world import DAYS, LATE_OK, World
+from .world import DAYS, LATE_OK, World, day_minute, public_entrance
 
 Emit = Optional[Callable[[str, str, str, dict], None]]    # (agent, kind, message, data)
 LANDMARKS = [  # approximate coordinates, used for search and snapping only
@@ -48,7 +48,8 @@ class Engine:
     def norm(self, ctx: Ctx, near=None) -> Norm:
         """Reference distribution for the neighbourhood of `near` (projected x, y in metres, or a (lon, lat) list via center_of)."""
         cell = Norm.cell_of(near if near is not None else self.W.proj.xy(37.7890, -122.4080))
-        k = (cell, ctx.day, ctx.minute // 30)
+        day, minute = day_minute(ctx.day, ctx.minute)
+        k = (cell, day, minute // 30)
         if k not in self._norms: self._norms[k] = Norm.build(self.W, ctx, cell)
         return self._norms[k]
 
@@ -62,7 +63,7 @@ class Engine:
         if k in self._quick: return self._quick[k]
         W = self.W; m = (ctx.minute // 15) * 15
         open_p = np.array([pl["p"] for pl in W.places if not pl["help"] and place_open(W, pl, m, ctx)]) if W.places else np.zeros((0, 2))
-        help_p = [pl["p"] for pl in W.places if (pl["help"] or pl["pharm"]) and place_open(W, pl, m, ctx)] + [b["p"] for b in W.bart if W.bart_running(b, ctx.day, m)]
+        help_p = [pl["p"] for pl in W.places if (pl["help"] or pl["pharm"]) and public_entrance(pl) and place_open(W, pl, m, ctx)]
         n_open = W.count_edges_near(open_p, 0.5, 50); n_help = W.count_edges_near(np.array(help_p) if help_p else np.zeros((0, 2)), 0.5, 120)
         q = 0.45 * W.e_light + 0.35 * np.minimum(1.0, n_open / 3.0) + 0.20 * np.minimum(1.0, n_help)
         self._quick[k] = q; return q
@@ -83,10 +84,14 @@ class Engine:
             d = np.hypot(*(A + AB * t[:, None] - p).T); out |= {frozenset(E[i]) for i in np.where(d <= r)[0]}
         return out
 
-    def route(self, session, origin, dest, day, minute, emit: Emit = None, max_extra=0.25, avoid=None):
+    def route(self, session, origin, dest, day, minute, emit: Emit = None, max_extra=0.25, avoid=None,
+              max_extra_minutes=None, max_gap_m=None):
         """Candidate routes scored at the minute each block is passed. `avoid` = [(lat, lon, radius_m)]: segments there cost
         10,000x (a detour unless there is no other way). The score itself never sees `avoid`."""
         with self.lock:
+            for label, value in (("Extra walking time", max_extra_minutes), ("Longest gap", max_gap_m), ("Extra walking fraction", max_extra)):
+                if value is not None and (not math.isfinite(value) or value < 0): raise ValueError(f"{label} must be a finite nonnegative number.")
+            day, minute = day_minute(day, minute)
             t0 = time.time(); W = self.W; ctx = self.ctx(session, day, minute); say = emit or (lambda *a, **k: None)
             a, da = W.nearest_node(*origin); b, db = W.nearest_node(*dest)
             say("guide", "start", f"Planning {DAYS[day]} {minute // 60 % 24}:{minute % 60:02d}. Snapped to the street graph ({da:.0f} m and {db:.0f} m from your points).", {})
@@ -103,27 +108,48 @@ class Engine:
                 nx.set_edge_attributes(W.G, w, f"w{lam}"); paths[f"l{lam}"] = self._astar(a, b, f"w{lam}")
             for seed in range(6):                      # seeded perturbations of the quality-weighted cost give genuinely different alternatives
                 rng = np.random.default_rng(seed)
-                jit = rng.uniform(0.7, 1.6, len(W.edges))
+                # Edge costs stay at least geometric length, so the A* heuristic remains admissible.
+                jit = rng.uniform(1.0, 1.9, len(W.edges))
                 w = {(u, v): d["length"] * (1 + 3 * (1 - q[eidx[frozenset((u, v))]])) * jit[eidx[frozenset((u, v))]] * pen(u, v) for u, v, d in W.G.edges(data=True)}
                 nx.set_edge_attributes(W.G, w, "wj"); paths[f"j{seed}"] = self._astar(a, b, "wj")
+            # Bounded alternatives also consider conditions at expected arrival
+            # and penalize reused edges, rather than relying only on departure-time jitter.
+            travel = sum(W.G.edges[u, v]["length"] for u, v in zip(paths["fast"], paths["fast"][1:])) / WALK_SPEED / 60
+            arrival_q = self.quick(Ctx(day, minute + travel, ctx.overrides))
+            quality = (q + arrival_q) / 2; reused = {}
+            previous = paths["fast"]
+            for iteration in range(3):
+                for u, v in zip(previous, previous[1:]):
+                    key = frozenset((u, v)); reused[key] = reused.get(key, 0) + 1
+                w = {(u, v): d["length"] * (1 + 3 * (1 - quality[eidx[frozenset((u, v))]]))
+                     * (1 + 0.6 * reused.get(frozenset((u, v)), 0)) * pen(u, v) for u, v, d in W.G.edges(data=True)}
+                nx.set_edge_attributes(W.G, w, "wd"); previous = self._astar(a, b, "wd"); paths[f"d{iteration}"] = previous
             uniq = {}; [uniq.setdefault(tuple(p), k) for k, p in paths.items()]
             say("guide", "step", f"Found {len(uniq)} distinct candidate routes. Scoring each at the minute you pass every block.", {"n": len(uniq), "why": "alternatives come from the quality-weighted search plus seeded perturbations"})
             N = self.norm(ctx, (W.G.nodes[a]["p"] + W.G.nodes[b]["p"]) / 2); ev = []
             for p in uniq:
                 m = metrics(W, ctx, list(p)); sc, pts, comp = score(m, N); ev.append(dict(path=list(p), m=m, score=sc, pts=pts, comp=comp))
-            fast = next(e for e in ev if e["path"] == paths["fast"]); limit = fast["m"]["minutes"] * (1 + max_extra)
-            ok = [e for e in ev if e["m"]["minutes"] <= limit]; best = max(ok, key=lambda e: e["score"])
-            near = [e for e in ev if e["m"]["minutes"] <= fast["m"]["minutes"] * 1.08]; balanced = max(near, key=lambda e: e["score"])
+            fast = next(e for e in ev if e["path"] == paths["fast"])
+            limit = fast["m"]["minutes"] + max_extra_minutes if max_extra_minutes is not None else fast["m"]["minutes"] * (1 + max_extra)
+            ok = [e for e in ev if e["m"]["minutes"] <= limit + 1e-9 and (max_gap_m is None or e["m"]["gap_m"] <= max_gap_m + 1e-9)]
+            if not ok: raise ValueError("No candidate route meets the requested walking-time and gap limits. Relax a limit and plan again.")
+            rank = lambda e: (e["score"], -e["m"]["gap_m"], -e["m"]["minutes"])
+            best = max(ok, key=rank)
+            near = [e for e in ok if e["m"]["minutes"] <= fast["m"]["minutes"] * 1.08]
+            balanced = max(near, key=rank) if near else best
             say("guide", "done", f"Best route scores {best['score']} against {fast['score']} for the fastest, {best['m']['minutes'] - fast['m']['minutes']:+.1f} min. Longest empty stretch {fast['m']['gap_m']:.0f} m to {best['m']['gap_m']:.0f} m.",
-                {"best": best["score"], "fast": fast["score"], "why": "scored every candidate at the minute you pass each block; picked the highest score within +25% walking time"})
+                {"best": best["score"], "fast": fast["score"], "why": "highest-scoring searched candidate within the requested walking-time and gap limits"})
             options = [self._pack("fast", "Fastest", fast, ctx)]
             if balanced["path"] not in (fast["path"], best["path"]): options.append(self._pack("balanced", "Balanced", balanced, ctx))
             if best["path"] != fast["path"]: options.append(self._pack("best", "HootRoute", best, ctx))
             for o in options:
                 path = {"fast": fast, "balanced": balanced, "best": best}[o["id"]]["path"]
                 o["avoids"] = not blocked or not any(frozenset((u, v)) in blocked for u, v in zip(path, path[1:]))
+                e = {"fast": fast, "balanced": balanced, "best": best}[o["id"]]
+                o["meets_limits"] = any(e is candidate for candidate in ok)
             out = dict(depart=dict(day=DAYS[day], minute=minute), recommended="best" if best is not fast else "fast", norm=dict(lo=N.lo, hi=N.hi),
-                       routes=options, candidates=len(uniq), ms=round((time.time() - t0) * 1000), avoided=len(blocked))
+                       routes=options, candidates=len(uniq), ms=round((time.time() - t0) * 1000), avoided=len(blocked),
+                       limits={"maxExtraMinutes": max_extra_minutes, "maxGapM": max_gap_m, "maxExtraFraction": max_extra})
             return out
 
     def _pack(self, rid, label, e, ctx):
@@ -133,6 +159,7 @@ class Engine:
         return dict(id=rid, label=label, score=e["score"], points=e["pts"], weights=WEIGHTS, minutes=round(m["minutes"], 1), km=round(m["length"] / 1000, 2), places_open=m["n_open"],
                     gap=dict(m=round(m["gap_m"]), range=[round(x) for x in m["gap_range"]] if m["gap_range"] else None), light_pct=round(100 * m["light"]), main_pct=round(100 * m["main"]),
                     turns_per_km=round(m["tpk"], 1), outages_near=m["outages_near"], light_known_pct=round(100 * m["light_known"]), unknown_hours_nearby=m["unknown_hours"],
+                    help_access_unknown=m["help_unverified"],
                     coords=[W.G.nodes[n]["ll"] for n in e["path"]], shops=shops, covered=[bool(x) for x in m["covered"][::3]], steps=self.steps(e["path"]))
 
     # ---------- map layers ----------
@@ -146,7 +173,7 @@ class Engine:
         ctx = self.ctx(session, day, minute); out = []
         for pl in self.W.places:
             if not pl["name"]: continue
-            o = place_open(self.W, pl, minute, ctx); unknown = pl["hours"] is None and not pl["help"] and pl["id"] not in ctx.overrides
+            o = place_open(self.W, pl, minute, ctx); unknown = pl["hours"] is None and pl["id"] not in ctx.overrides
             out.append([pl["id"], pl["ll"][0], pl["ll"][1], pl["name"], pl["cat"], -1 if unknown else int(o), int(pl["id"] in ctx.overrides)])
         return out
 

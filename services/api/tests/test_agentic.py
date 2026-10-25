@@ -284,3 +284,28 @@ def test_stale_recovery_choice_is_closed(gw):
         assert (await c.wait("recovery.closed", 10))["recoveryId"] == "old"
         await c.ws.close()
     asyncio.run(run())
+
+
+def test_backend_route_limits_and_reviewed_walk(gw):
+    """Optional API limits apply without changing the frontend or the reviewed-plan handoff."""
+    request = {"origin": MOSCONE, "destination": CITY_HALL, "day": 4, "minute": 1410, "maxExtraMinutes": 0}
+    response = httpx.post(gw + "/api/plans", json=request, timeout=120)
+    assert response.status_code == 200, response.text
+    plan = response.json()
+    assert plan["recommended"] == "fast" and plan["routingLimits"] == {"maxExtraMinutes": 0}
+    assert plan["evidenceCoverage"]["confirmedStaffing"] is False
+    bad = httpx.post(gw + "/api/plans", json={**request, "maxGapM": 0}, timeout=120)
+    assert bad.status_code == 422 and "No candidate" in bad.json()["detail"]
+
+    async def run():
+        async with httpx.AsyncClient(base_url=gw, timeout=120) as client:
+            response = await client.post("/api/walks", json={**request, "planId": plan["planId"], "guardian": "Contact", "replay": True})
+            assert response.status_code == 201
+            walk = response.json()
+        walker = await Client.open(gw, walk["walkId"], "walker", walk["walkerToken"])
+        try:
+            reviewed = (await walker.wait("walk.plan", 30))["plan"]["data"]
+            assert reviewed["route"] == plan["route"] and reviewed["routingLimits"] == plan["routingLimits"]
+            await walker.send({"type": "walk.end", "outcome": "ended", "summary": "Test complete."}, walk["walkId"])
+        finally: await walker.ws.close()
+    asyncio.run(run())

@@ -12,7 +12,7 @@ def _dotenv() -> dict[str, str]:
     """Parse ROOT/.env without exporting it to a shell (a malformed line must never echo a value)."""
     path = ROOT / ".env"; out: dict[str, str] = {}
     if not path.exists(): return out
-    for line in path.read_text().splitlines():
+    for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line: continue
         key, value = line.split("=", 1)
@@ -24,7 +24,8 @@ _FILE = _dotenv()
 
 
 def env(name: str, default: str = "") -> str:
-    return os.environ.get(name) or _FILE.get(name) or default
+    if name in os.environ: return os.environ[name] or default
+    return _FILE.get(name) or default
 
 
 def _flag(name: str, default: bool) -> bool:

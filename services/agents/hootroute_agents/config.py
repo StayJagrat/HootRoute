@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[3]
 def _dotenv() -> dict[str, str]:
     path = ROOT / ".env"; out: dict[str, str] = {}
     if not path.exists(): return out
-    for line in path.read_text().splitlines():
+    for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line: continue
         k, v = line.split("=", 1); v = v.split(" #", 1)[0].strip().strip('"').strip("'")

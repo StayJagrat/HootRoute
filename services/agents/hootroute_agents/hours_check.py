@@ -14,7 +14,9 @@ import json
 import logging
 import math
 import sys
+import threading
 import time
+import uuid
 from pathlib import Path
 
 import httpx
@@ -29,10 +31,11 @@ sys.path.insert(0, str(ROOT / "services" / "hours"))
 LIVE_FILE = Path(env("HOURS_LIVE_FILE", str(ROOT / "data" / "cache" / "hours_live.json")))
 ACTOR = "compass~crawler-google-places"
 USEFUL = {"cafe", "restaurant", "fast_food", "bar", "pub", "convenience", "supermarket", "pharmacy", "ice_cream", "bakery", "deli", "hotel", "fuel", "kiosk"}
+_STORE_LOCK = threading.RLock()
 
 
 # ---------------------------------------------------------------------------------------------------- unknowns
-def unknowns(engine, coords: list[list[float]], day: int, minute: int, limit: int = 5, radius: float = 50.0) -> list[dict]:
+def unknowns(engine, coords: list[list[float]], day: int, minute: int, limit: int = 5, radius: float = 50.0, gap_range=None) -> list[dict]:
     """Named places within `radius` m of the route whose hours are unknown, most useful first (shops people can walk into,
     near the longest empty stretch). Pure engine data, no network."""
     W = engine.W; WALK = 1.35
@@ -49,13 +52,17 @@ def unknowns(engine, coords: list[list[float]], day: int, minute: int, limit: in
     out = []
     for idx in cand:
         pl = W.places[idx]
-        if pl["hours"] is not None or pl["help"] or not pl.get("name"): continue
+        stale = evidence.is_stale(pl.get("hours_at"))
+        if (pl["hours"] is not None and not stale) or not pl.get("name"): continue
+        if pl.get("access") in {"no", "private"} or pl.get("foot") in {"no", "private"}: continue
         d = np.hypot(D[:, 0] - pl["p"][0], D[:, 1] - pl["p"][1]); j = int(d.argmin())
         if d[j] > radius: continue
         at = float(A[j])
+        gap_distance = max(gap_range[0] - at, at - gap_range[1], 0) if gap_range else 0.0
         out.append(dict(id=pl["id"], name=pl["name"], cat=pl["cat"], lngLat=pl["ll"], atM=round(at), offM=round(float(d[j])),
-                        passMinute=int(minute + at / WALK / 60) % 1440, useful=pl["cat"] in USEFUL))
-    out.sort(key=lambda p: (not p["useful"], p["offM"] > 25, p["atM"]))
+                        passMinute=int(minute + at / WALK / 60) % 1440, useful=pl["cat"] in USEFUL,
+                        checkReason="stale_hours" if stale else "unknown_hours", gapDistanceM=round(gap_distance)))
+    out.sort(key=lambda p: (p["gapDistanceM"], not p["useful"], p["offM"] > 25, p["atM"], p["id"]))
     return out[:limit]
 
 
@@ -162,25 +169,39 @@ def check(places: list[dict]) -> dict:
 
 
 # ---------------------------------------------------------------------------------------------------- evidence
-def apply(engine, results: list[dict], run: dict | None = None) -> int:
+def apply(engine, results: list[dict], run: dict | None = None, *, persist=True) -> int:
     """Write found hours into the engine (and data/cache/hours_live.json so a restart keeps them). Returns how many changed."""
     W = engine.W; changed = 0
     with engine.lock:
         for r in results:
-            if r["status"] not in ("hours found", "closed") or not r.get("hours"): continue
+            if r["status"] not in ("hours found", "closed", "no hours", "not found"): continue
             i = W.place_index.get(r["id"])
-            if i is None or W.places[i]["hours"] is not None: continue
-            W.places[i]["hours"] = r["hours"]; changed += 1
-            W.places[i]["hours_source"] = "mock" if str(r.get("source") or "").startswith("mock://") else "apify-live"
+            if i is None: continue
+            pl = W.places[i]; mock = str(r.get("source") or "").startswith("mock://")
+            # Community OSM hours retain precedence. New real checks may refresh
+            # earlier listing evidence, including a listing that no longer has hours.
+            if pl["hours"] is not None and (pl.get("hours_source") == "osm" or mock): continue
+            prior = evidence.parse_ts(pl.get("hours_at")); checked = evidence.parse_ts(r.get("checkedAt"))
+            if prior is not None and (checked is None or checked < prior): continue
+            spec = r.get("hours") if r["status"] in ("hours found", "closed") else None
+            confidence = r.get("confidence")
+            if spec and confidence is not None and confidence < 0.6: continue
+            if pl["hours"] != spec: changed += 1
+            pl.update(hours=spec, hours_source="mock" if mock else "apify-live", hours_at=r.get("checkedAt"), hours_conf=r.get("confidence"))
         if changed: engine._quick.clear()
-    record(results, run)
+    if persist: record(results, run)
     return changed
 
 
 def record(results: list[dict], run: dict | None = None) -> bool:
+    with _STORE_LOCK:
+        return _record(results, run)
+
+
+def _record(results: list[dict], run: dict | None = None) -> bool:
     """Remember every completed check (found, no hours, not found, closed) with its source, time and run id, so a repeat
     within EVIDENCE_TTL_HOURS reuses it instead of paying again. Failed checks are not remembered."""
-    store = json.loads(LIVE_FILE.read_text()) if LIVE_FILE.exists() else {}; n = 0
+    store = evidence.live_store(LIVE_FILE); n = 0
     for r in results:
         kind = evidence.KIND_OF_STATUS.get(r.get("status"))
         if kind in (None, "check_failed") or str(r.get("source") or "").startswith("mock://"): continue     # test stand-ins are never kept
@@ -189,20 +210,23 @@ def record(results: list[dict], run: dict | None = None) -> bool:
                           "listing_name": r.get("listingName"), "run_id": (run or {}).get("runId")}
         n += 1
     if n:
-        try: LIVE_FILE.parent.mkdir(parents=True, exist_ok=True); LIVE_FILE.write_text(json.dumps(store, indent=1))
-        except OSError: log.warning("could not persist live hours"); return False
+        temporary = LIVE_FILE.with_name(f".{LIVE_FILE.name}.{uuid.uuid4().hex}.tmp")
+        try:
+            LIVE_FILE.parent.mkdir(parents=True, exist_ok=True)
+            temporary.write_text(json.dumps(store, indent=1), encoding="utf-8")
+            temporary.replace(LIVE_FILE)
+        except OSError:
+            log.warning("could not persist live hours"); return False
+        finally: temporary.unlink(missing_ok=True)
     return bool(n)
 
 
 def load_live(engine) -> int:
     """At boot: re-apply hours found by earlier live checks."""
     if not LIVE_FILE.exists(): return 0
-    W = engine.W; n = 0
-    for pid, e in json.loads(LIVE_FILE.read_text()).items():
-        i = W.place_index.get(pid)
-        if i is not None and W.places[i]["hours"] is None and e.get("opening_hours"):
-            W.places[i]["hours"] = e["opening_hours"]; W.places[i]["hours_source"] = "apify-live"; n += 1
-    return n
+    results = [evidence.result_from_store(pid, e) for pid, e in evidence.live_store(LIVE_FILE).items()
+               if e.get("kind", "published_hours") != "check_failed" and not evidence.is_stale(e.get("checked_at"))]
+    return apply(engine, results, persist=False)
 
 
 # ---------------------------------------------------------------------------------------------------- the investigation
@@ -222,7 +246,8 @@ async def investigate(engine, places: list[dict], budget=None) -> dict:
             res = await asyncio.to_thread(check, fresh); results, run, ok, note = res["results"], res["run"], res["ok"], res["note"]
     if reused: note = (note + " " if note else "") + f"Reused {len(reused)} check{'s' if len(reused) != 1 else ''} from the last {evidence.TTL_HOURS:g} h (no new charge)."
     allr = reused + results
-    changed = await asyncio.to_thread(apply, engine, results, run) if ok and results else 0       # reused evidence is already in the engine
+    changed = await asyncio.to_thread(apply, engine, reused, persist=False) if reused else 0
+    if ok and results: changed += await asyncio.to_thread(apply, engine, results, run)
     ev = [evidence.from_result(r, run, mock, reused=r in reused) for r in allr]
     return {"ok": ok or bool(reused), "results": allr, "run": run, "mock": mock, "note": note or "Nothing to check.", "changed": changed, "evidence": ev,
             "reused": len(reused), "checked": len(results)}
