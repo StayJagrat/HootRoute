@@ -18,6 +18,8 @@ from datetime import datetime, timezone
 import numpy as np
 
 from hootroute_engine.scoring import place_open
+from hootroute_engine.world import public_entrance
+from hootroute_engine.mobility import travel_profile
 
 from .config import env
 
@@ -62,7 +64,7 @@ def from_result(r: dict, run: dict | None, mock: bool, reused: bool = False) -> 
     provider = "mock" if mock or (isinstance(url, str) and url.startswith("mock://")) else "apify"
     return {"placeId": r["id"], "name": r.get("name"), "kind": kind, "hours": r.get("hours") if kind in ("published_hours", "listed_closed") else None,
             "source": {"provider": provider, "url": url if isinstance(url, str) and url.startswith("http") else None, "actor": (run or {}).get("actor"),
-                       "runId": (run or {}).get("runId"), "consoleUrl": (run or {}).get("consoleUrl"), "listingName": r.get("listingName")},
+                       "runId": (run or {}).get("runId") or r.get("runId"), "consoleUrl": (run or {}).get("consoleUrl") or r.get("consoleUrl"), "listingName": r.get("listingName")},
             "retrievedAt": r.get("checkedAt"), "confidence": r.get("confidence"), "stale": is_stale(r.get("checkedAt")), "reused": reused,
             "confirmedOpenNow": False, "note": NOTE_OF_KIND[kind] + (" (Offline test stand-in, not a real listing.)" if provider == "mock" else "")}
 
@@ -76,11 +78,12 @@ def reusable(entry: dict | None, ttl_hours: float = TTL_HOURS) -> bool:
 def result_from_store(pid: str, e: dict) -> dict:
     status = {v: k for k, v in KIND_OF_STATUS.items()}.get(e.get("kind") or "published_hours", "hours found")
     return {"id": pid, "name": e.get("name"), "status": status, "hours": e.get("opening_hours"), "source": e.get("url"), "checkedAt": e.get("checked_at"),
-            "confidence": e.get("confidence"), "listingName": e.get("listing_name")}
+            "confidence": e.get("confidence"), "listingName": e.get("listing_name"), "runId": e.get("run_id"),
+            "consoleUrl": f"https://console.apify.com/actors/runs/{e['run_id']}" if e.get("run_id") else None}
 
 
 # ---------------------------------------------------------------------------------------------- places along a route
-def along(engine, coords: list[list[float]], minute: int, radius: float = 50.0, named_only: bool = True) -> list[dict]:
+def along(engine, coords: list[list[float]], minute: int, radius: float = 50.0, named_only: bool = True, speed=WALK) -> list[dict]:
     """Places within `radius` m of the route with distance along it and the minute you pass them. Pure engine data."""
     W = engine.W
     pts = np.array([W.proj.xy(lat, lon) for lon, lat in coords])
@@ -99,30 +102,37 @@ def along(engine, coords: list[list[float]], minute: int, radius: float = 50.0, 
         if named_only and not pl.get("name"): continue
         d = np.hypot(D[:, 0] - pl["p"][0], D[:, 1] - pl["p"][1]); j = int(d.argmin())
         if d[j] > radius: continue
-        at = float(A[j]); out.append((pl, round(at), round(float(d[j])), int(minute + at / WALK / 60)))
+        at = float(A[j]); out.append((pl, round(at), round(float(d[j])), int(minute + at / speed / 60)))
     out.sort(key=lambda t: t[1])
     return out
 
 
 def live_store(path) -> dict:
-    try: return json.loads(path.read_text()) if path.exists() else {}
+    try: return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     except (OSError, ValueError): return {}
 
 
-def route_evidence(engine, coords, day: int, minute: int, route_key: str, limit: int = 40) -> dict:
+def route_evidence(engine, coords, day: int, minute: int, route_key: str, limit: int = 40, travel_mode="walk", travel_options=None) -> dict:
     """Evidence Explorer rows for one route: hours, listed open at your pass minute (or unknown), and provenance."""
     from .hours_check import LIVE_FILE
-    store = live_store(LIVE_FILE); rows = []; counts = {"listed": 0, "live": 0, "shopkeeper": 0, "unknown": 0, "stale": 0}
+    store = live_store(LIVE_FILE); rows = []; help_points = []; counts = {"listed": 0, "live": 0, "shopkeeper": 0, "unknown": 0, "stale": 0}
     with engine.lock:
-        ctx = engine.ctx("_evidence", day, minute)
-        for pl, at, off, pass_min in along(engine, coords, minute):
-            if pl["help"] and pl["cat"] not in ("pharmacy",): continue
+        profile = travel_profile(travel_mode, travel_options)
+        ctx = engine.ctx("_evidence", day, minute, profile)
+        for pl, at, off, pass_min in along(engine, coords, minute, speed=profile.speed):
+            if pl["help"]:
+                help_points.append({"id": pl["id"], "name": pl["name"], "hoursKnown": pl["hours"] is not None,
+                                    "mappedPublicEntrance": public_entrance(pl), "confirmedOpenNow": False,
+                                    "note": "Hours and public entrance access must be established separately; staffing is unverified."})
+                continue
             declared = pl["id"] in ctx.overrides; src = pl.get("hours_source")
             if declared:
                 ev = {"kind": "shopkeeper", "provider": "shopkeeper", "retrievedAt": None, "stale": False, "note": "Declared tonight on the shop page. Not verified."}
                 counts["shopkeeper"] += 1
             elif pl["hours"] is None:
-                ev = {"kind": "none", "provider": "none", "retrievedAt": None, "stale": False, "note": "Unknown hours. They earn no credit in the score; that does not mean closed."}
+                checked = store.get(pl["id"], {}) if src == "apify-live" else {}
+                ev = {"kind": "none", "provider": "apify" if checked else "none", "retrievedAt": checked.get("checked_at"),
+                      "stale": is_stale(checked.get("checked_at")), "note": "Unknown hours. They earn no credit in the score; that does not mean closed."}
                 counts["unknown"] += 1
             elif src == "osm":
                 ev = {"kind": "osm_tag", "provider": "osm", "retrievedAt": None, "stale": False, "note": "OpenStreetMap opening_hours tag; when it was last edited is not in our extract. " + STAFFED}
@@ -143,5 +153,5 @@ def route_evidence(engine, coords, day: int, minute: int, route_key: str, limit:
             known = declared or pl["hours"] is not None
             rows.append({"id": pl["id"], "name": pl["name"], "cat": pl["cat"], "lngLat": pl["ll"], "atM": at, "offM": off, "passMinute": pass_min % 1440,
                          "hours": pl["hours"], "openAtPass": bool(place_open(engine.W, pl, pass_min, ctx)) if known else None, "evidence": ev})
-    return {"route": route_key, "places": rows[:limit], "total": len(rows), "counts": counts, "confirmedOpenNow": False,
+    return {"route": route_key, "places": rows[:limit], "total": len(rows), "counts": counts, "helpPoints": help_points, "confirmedOpenNow": False,
             "note": "Conditions, not a safety rating. " + STAFFED}

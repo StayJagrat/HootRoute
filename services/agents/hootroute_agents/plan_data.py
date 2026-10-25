@@ -6,7 +6,8 @@ from math import hypot
 
 from hootroute_engine.engine import Engine
 from hootroute_engine.scoring import Ctx, metrics, score, WALK_SPEED
-from hootroute_engine.world import is_open
+from hootroute_engine.world import day_minute, is_open
+from hootroute_engine.mobility import travel_profile
 
 DAY = 4  # Friday
 DEPART = 23 * 60 + 30
@@ -43,11 +44,12 @@ def _stats(route: dict) -> dict:
 
 
 def _path_nodes(engine: Engine, route: dict) -> list[int]:
-    return [engine.W.nearest_node(lat, lon)[0] for lon, lat in route["coords"]]
+    W = engine.world(travel_profile(route.get("travelMode", "walk"), route.get("travelOptions")))
+    return [W.nearest_node(lat, lon)[0] for lon, lat in route["coords"]]
 
 
 def _fixed_route_stats(engine: Engine, route: dict, ctx: Ctx) -> dict:
-    m = metrics(engine.W, ctx, _path_nodes(engine, route))
+    m = metrics(engine.world(ctx.profile), ctx, _path_nodes(engine, route))
     value, _, _ = score(m, engine.norm(ctx, engine.center_of(route["coords"])))
     return {"score": round(value), "longestEmptyM": round(m["gap_m"]), "minutes": round(m["minutes"], 1)}
 
@@ -74,12 +76,13 @@ def _stretch(engine: Engine, route: dict, on_route: bool, ident: str, day: int =
     end = max(start, min(float(end), cumulative[-1]))
     mid = (start + end) / 2
     line = _slice(coords, cumulative, start, end)
-    pass_minute = depart + round(mid / WALK_SPEED / 60)
-    why = engine.why(SESSION, line[len(line) // 2][1], line[len(line) // 2][0], day, pass_minute)
+    profile = travel_profile(route.get("travelMode", "walk"), route.get("travelOptions"))
+    pass_minute = depart + round(mid / profile.speed / 60)
+    why = engine.why(SESSION, line[len(line) // 2][1], line[len(line) // 2][0], day, pass_minute, profile=profile)
     lo = max(0, bisect_right(cumulative, start) - 1)
     hi = min(len(coords) - 1, max(lo + 1, bisect_left(cumulative, end)))
-    local_ctx = Ctx(day, depart + round(start / WALK_SPEED / 60))
-    local = metrics(engine.W, local_ctx, _path_nodes(engine, {"coords": coords[lo:hi + 1]}))
+    local_ctx = Ctx(day, depart + round(start / profile.speed / 60), profile=profile)
+    local = metrics(engine.world(profile), local_ctx, _path_nodes(engine, {**route, "coords": coords[lo:hi + 1]}))
     local_score, _, _ = score(local, engine.norm(local_ctx, engine.center_of(coords)))
     known = local["light_known"]
     confidence = "high" if known >= 0.8 else "medium" if known >= 0.5 else "low"
@@ -132,8 +135,8 @@ def _close_time(spec: str | None, arrival: int, day: int = DAY) -> str:
     return "24h"
 
 
-def _place(engine: Engine, shop: dict, day: int = DAY, depart: int = DEPART, simulated: bool = True) -> dict:
-    arrival = depart + round(shop.get("d", 0) / WALK_SPEED / 60)
+def _place(engine: Engine, shop: dict, day: int = DAY, depart: int = DEPART, simulated: bool = True, speed=WALK_SPEED) -> dict:
+    arrival = depart + round(shop.get("d", 0) / speed / 60)
     known = engine.W.places[engine.W.place_index[shop["id"]]] if shop["id"] in engine.W.place_index else {}
     return {
         "id": shop["id"], "name": shop["name"] or shop["cat"].replace("_", " ").title(),
@@ -162,7 +165,8 @@ def _clock(minute: int) -> str:
 def _option(engine: Engine, route: dict, depart: int) -> dict:
     return {"id": route["id"], "label": route["label"], "coords": route["coords"], "steps": route["steps"],
             "stats": _stats(route), "km": route["km"], "placesOpen": route["places_open"], "lightPct": route["light_pct"],
-            "points": route["points"], "weights": route["weights"], "turnsPerKm": route["turns_per_km"], "mainPct": route["main_pct"], "avoidsReport": route.get("avoids", True)}
+            "points": route["points"], "weights": route["weights"], "turnsPerKm": route["turns_per_km"], "mainPct": route["main_pct"],
+            "avoidsReport": route.get("avoids", True), "meetsLimits": route.get("meets_limits", True), "modeConditions": route.get("modeConditions")}
 
 
 def build_route_data(engine: Engine, lat: float, lon: float, name: str, origin: tuple[float, float] | None = None, origin_name: str | None = None,
@@ -178,9 +182,11 @@ def initials(name: str) -> str:
 
 def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[float, float] | None = None, origin_name: str | None = None,
                day: int = DAY, depart: int = DEPART, walker: str = "Arya", guardian: str = "Maya Chen", session: str = SESSION,
-               simulated_shops: bool = True, avoid: list | None = None) -> tuple[dict, dict]:
+               simulated_shops: bool = True, avoid: list | None = None, limits: dict | None = None, travel_mode="walk", travel_options=None) -> tuple[dict, dict]:
     """(DemoData for the PWA, the engine's own route dicts keyed 'best' and 'fast' for the agents)."""
     name = name.strip()[:100]
+    day, depart = day_minute(day, depart)
+    profile = travel_profile(travel_mode, travel_options)
     if not name:
         raise ValueError("Choose a destination.")
     if not (-90 <= lat <= 90 and -180 <= lon <= 180):
@@ -189,8 +195,12 @@ def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[
     origin_name = (origin_name or ORIGIN_NAME).strip()[:100]
     destination = (lat, lon)
     with engine.lock:
-        origin_node, origin_snap = engine.W.nearest_node(*origin)
-        destination_node, snap_distance = engine.W.nearest_node(*destination)
+        W = engine.world(profile)
+        origin_node, origin_snap = W.nearest_node(*origin)
+        destination_node, snap_distance = W.nearest_node(*destination)
+        snap_limit = 50 if profile.require_known_access else 250
+        if profile.mode != "walk" and max(origin_snap, snap_distance) > snap_limit:
+            raise ValueError(f"No mapped connection for the selected travel options within {snap_limit} m of the start or destination. Choose a closer point or relax the access options.")
         if origin_snap > 250:
             raise ValueError("The start is outside the mapped part of San Francisco. Pick a point inside the city.")
         destination_snap_m = round(snap_distance)
@@ -200,7 +210,9 @@ def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[
             raise ValueError("Start and destination are the same place. Pick a different destination.")
         engine.clear(session)
         try:
-            result = engine.route(session, origin, destination, day, depart, avoid=avoid)
+            result = engine.route(session, origin, destination, day, depart, avoid=avoid,
+                                  max_extra_minutes=(limits or {}).get("maxExtraMinutes"), max_gap_m=(limits or {}).get("maxGapM"),
+                                  travel_mode=profile.mode, travel_options=profile.options)
             fastest = next(r for r in result["routes"] if r["id"] == "fast")
             best = next((r for r in result["routes"] if r["id"] == "best"), fastest)
             suggested = engine.suggest_declarations(session, best, day, depart)
@@ -211,16 +223,16 @@ def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[
                 available = [p for p in named if p["id"] not in {s["id"] for s in selected}]
                 if available:
                     selected.append(min(available, key=lambda p: abs(p["d"] - fraction * best["km"] * 1000)))
-            places = [_place(engine, p, day, depart, simulated_shops) for p in selected]
+            places = [_place(engine, p, day, depart, simulated_shops, profile.speed) for p in selected]
             what_if = None
             if shop:
                 closed = {"id": shop["id"], "name": shop["name"], "cat": shop["cat"], "ll": shop["ll"], "hours": shop["hours"], "d": shop["at"]}
-                places.append(_place(engine, closed, day, depart, simulated_shops))      # not open when you pass: closed, or unknown hours
+                places.append(_place(engine, closed, day, depart, simulated_shops, profile.speed))
                 engine.declare(session, shop["id"], depart + 150, day, depart)
-                ctx = engine.ctx(session, day, depart)
+                ctx = engine.ctx(session, day, depart, profile)
                 what_if = {
                     "placeId": shop["id"],
-                    "passMinute": depart + round(shop["at"] / WALK_SPEED / 60),
+                    "passMinute": depart + round(shop["at"] / profile.speed / 60),
                     "statsOpen": {"hootroute": _fixed_route_stats(engine, best, ctx), "shortest": _fixed_route_stats(engine, fastest, ctx)},
                 }
                 engine.clear(session)
@@ -245,10 +257,18 @@ def build_plan(engine: Engine, lat: float, lon: float, name: str, origin: tuple[
                 "routeSteps": {"hootroute": best["steps"], "shortest": fastest["steps"]},
                 "options": [_option(engine, r, depart) for r in result["routes"]],
                 "recommended": result["recommended"],
+                "travelMode": profile.mode, "travelOptions": profile.options, "travelProfile": profile.summary(),
+                "modeConditions": best.get("modeConditions"),
+                "routingLimits": limits or {},
+                "evidenceCoverage": {"unknownHoursNearby": best["unknown_hours_nearby"], "mappedLightingPct": best["light_known_pct"],
+                                     "helpAccessUnknown": best.get("help_access_unknown", 0), "confirmedStaffing": False},
                 "whatIf": what_if,
-                "dataNote": f"Scores compare this walk with typical walks in the same neighbourhood at the same hour. Places without listed hours earn no credit (unknown, not closed). The destination is snapped to the nearest mapped street, {destination_snap_m} m away. Darkness debt is modeled walker-minutes, not observed foot traffic.",
+                "dataNote": ("Scores compare this walk with typical walks in the same neighbourhood at the same hour. " if profile.mode == "walk" else
+                             "Scores compare routes nearby for this travel mode at the same hour. Missing access details remain unknown. ")
+                            + f"Places without listed hours earn no credit (unknown, not closed). The destination is snapped to the nearest mapped street, {destination_snap_m} m away. Darkness debt is modeled walker-minutes, not observed foot traffic.",
             }
             routes = {"best": best, "fast": fastest}
+            if limits: routes["_limits"] = limits
             if balanced_r: routes["balanced"] = balanced_r
             return data, routes
         finally:

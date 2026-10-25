@@ -27,6 +27,7 @@ from . import hours_check, inspect_route
 from .brand import BRAND, PERSONA
 from .preferences import Preferences, choose_option
 from .config import env
+from hootroute_engine.mobility import travel_profile
 
 log = logging.getLogger("hootroute.head")
 SF = ZoneInfo("America/Los_Angeles")
@@ -209,15 +210,17 @@ APPROVAL_TTL_S = 600
 MAX_USD = 0.5
 
 
-def system_prompt(now: datetime, session: dict | None, allow_checks: bool) -> str:
+def system_prompt(now: datetime, session: dict | None, allow_checks: bool, profile=None) -> str:
     cur = (f"\nThe walker already has a plan in this conversation: {session['origin']['name']} → {session['destination']['name']}, "
            f"{DAYS[session['day']]} at {session['minute'] // 60 % 24:02d}:{session['minute'] % 60:02d}. Work on it unless they ask for a different walk.") if session else ""
-    return f"""You are Professor Hoot, the coordinator of {BRAND}, a journey companion for people walking in San Francisco after dark: students leaving late
+    mode_context = f"Selected travel profile: {json.dumps(profile.summary())}. Keep this mode and its options in every route, re-score and recovery. Missing wheelchair access, kerb, surface or incline information is unknown; do not claim confirmed access." if profile else ""
+    return f"""You are Professor Hoot, the coordinator of {BRAND}, a journey companion for people travelling in San Francisco after dark: students leaving late
 classes or libraries, and late-shift hospitality, healthcare, retail and cleaning workers. You coordinate two specialists through tools:
 Scoot McRoute (find_place, plan_routes, rank_by_preferences, rescore_routes, replan_avoiding) and Sherlock Hoots (inspect_route, find_route_unknowns,
 propose_hours_check{', check_listed_hours' if allow_checks else ''}).
-It is now {DAYS[now.weekday()]} {now.strftime('%-I:%M %p')} in San Francisco (day {now.weekday()}, minute {now.hour * 60 + now.minute}). If no time is given, plan for now.
+It is now {DAYS[now.weekday()]} {now.strftime('%I:%M %p').lstrip('0')} in San Francisco (day {now.weekday()}, minute {now.hour * 60 + now.minute}). If no time is given, plan for now.
 {cur}
+{mode_context}
 How to work (give every call a short `why`):
 1. Resolve places with find_place (several in one turn is fine), then plan_routes.
 2. If the walker states preferences (fewer turns or simpler directions, main roads, fastest, places listed open on the way, low-distraction guidance), call rank_by_preferences.
@@ -240,6 +243,7 @@ class Session:
         self.history: list[dict] = []      # text-only turns, so a follow-up ("check those hours") keeps its context
         self.approvals: dict[str, dict] = {}
         self.preferences: Preferences | None = None
+        self.travel_mode = "walk"; self.travel_options = {}
 
 
 def event(name: str, args: dict, res: dict, ms: int, why: str, t0: float, group: int | None = None) -> dict:
@@ -260,8 +264,10 @@ class HeadBrain:
 
     # ---------- tool implementations ----------
     async def _plan(self, s: Session, req: dict, out: dict) -> dict:
+        req = {**req, "travelMode": s.travel_mode, "travelOptions": s.travel_options}
         o, d = req["origin"], req["destination"]
-        try: data, routes = await self.port.plan(o, d, req["day"], req["minute"], "Walker", "Guardian", avoid=req.get("avoid"))
+        try: data, routes = await self.port.plan(o, d, req["day"], req["minute"], "Walker", "Guardian", avoid=req.get("avoid"),
+                                               travel_mode=s.travel_mode, travel_options=s.travel_options)
         except ValueError as e: return {"error": str(e)}
         if req.get("avoid"): routes = {**routes, "_avoid": [list(a) for a in req["avoid"]]}      # later re-plans of this plan keep avoiding it
         s.plan, s.routes, s.req = data, routes, req; s.unknowns = []
@@ -299,7 +305,8 @@ class HeadBrain:
             return {"verdict": ins["verdict"], "items": [{k: i[k] for k in ("level", "title", "detail")} for i in ins["items"]], "missing": ins["missing"]}
         if name == "find_route_unknowns":
             limit = max(1, min(6, int(args.get("limit", 5))))
-            s.unknowns = await asyncio.to_thread(hours_check.unknowns, self.engine, s.routes[key]["coords"], s.req["day"], s.req["minute"], limit)
+            s.unknowns = await asyncio.to_thread(hours_check.unknowns, self.engine, s.routes[key]["coords"], s.req["day"], s.req["minute"], limit,
+                                               gap_range=s.routes[key]["gap"]["range"], speed=s.routes[key].get("speedMps", 1.35))
             out["unknowns"] = s.unknowns
             return {"places": [{k: p[k] for k in ("id", "name", "cat", "atM", "passMinute")} for p in s.unknowns], "count": len(s.unknowns),
                     "route_unknown_total": s.routes[key].get("unknown_hours_nearby")}
@@ -344,15 +351,30 @@ class HeadBrain:
                 "run_id": (res.get("run") or {}).get("runId"), "results": [{k: r.get(k) for k in ("name", "status", "hours", "source", "checkedAt")} for r in res["results"]]}
 
     # ---------- entry points ----------
-    async def ask(self, text: str, sid: str | None = None, allow_checks: bool = False, history: list[dict] | None = None) -> dict:
+    async def ask(self, text: str, sid: str | None = None, allow_checks: bool = False, history: list[dict] | None = None,
+                  travel_mode=None, travel_options=None) -> dict:
         sid, s = self.session(sid); t0 = time.time(); trace: list[dict] = []; out: dict = {}; sources: list = [text]
+        inferred = "wheelchair" if re.search(r"wheelchair|step.free|mobility aid", text, re.I) else "cycle" if re.search(r"\b(cycle|cycling|bicycle|bike)\b", text, re.I) else None
+        profile = travel_profile(travel_mode or inferred or s.travel_mode, travel_options if travel_mode is not None else s.travel_options if not inferred or inferred == s.travel_mode else {})
+        previous = travel_profile(s.travel_mode, s.travel_options)
+        if profile.key != previous.key:
+            s.approvals.clear()
+            s.travel_mode, s.travel_options = profile.mode, profile.options
+            if s.req:
+                ts = time.time(); replanned = await self._plan(s, s.req, out)
+                trace.append(event("plan_routes", {"travelMode": profile.mode}, replanned, round((time.time() - ts) * 1000), "Re-plan with the selected travel profile.", ts))
+                sources.append(replanned)
+                if "error" in replanned:
+                    s.plan = s.routes = s.req = None
+                    return self.result(sid, s, replanned["error"], "Professor Hoot", trace, out, t0, {"ok": True, "unverified": []})
+        else: s.travel_mode, s.travel_options = profile.mode, profile.options
         prior = s.req
         if not enabled():
             ans = await self.fallback(text, s, allow_checks, trace, out)
             return self.result(sid, s, ans, "fixed pipeline (Claude not configured)", trace, out, t0, {"ok": True, "unverified": []})
         now = datetime.now(SF)
         msgs = (list(history) if history else list(s.history))[-8:] + [{"role": "user", "content": text[:1000]}]
-        sysmsg = system_prompt(now, prior, allow_checks)
+        sysmsg = system_prompt(now, prior, allow_checks, profile)
         tools = [t for t in TOOLS if allow_checks or t["name"] != "check_listed_hours"]
         answer = ""; calls = 0; group = 0; truncated = False
         try:
@@ -474,9 +496,9 @@ class HeadBrain:
         prefs = {"fewerTurns": bool(re.search(r"fewer turns|simple|simpler|straight", text, re.I)), "preferMainRoads": bool(re.search(r"main (roads?|streets?)", text, re.I)),
                  "fastest": bool(re.search(r"\bfastest\b|\bquickest\b", text, re.I)), "preferOpenPlaces": bool(re.search(r"\bopen\b|stopping|somewhere to stop", text, re.I)),
                  "lowDistraction": bool(re.search(r"low.distraction|quiet|fewer prompts", text, re.I))}
-        if not (s.plan and re.search(r"^\s*(check|verify)", text, re.I)):
+        if not (s.plan and not re.search(r"\bfrom\s+.+\s+to\s+", text, re.I)):
             m = re.search(r"from\s+(.+?)\s+to\s+(.+?)(?:\s+at\s+.+)?[.?!]*$", text, re.I) or re.search(r"(?:to|towards)\s+(.+?)[.?!]*$", text, re.I)
-            if not m: return "Tell me where you're walking, for example: from Moscone Center to City Hall at 11:30 PM."
+            if not m: return "Tell me where you're travelling, for example: from Moscone Center to City Hall at 11:30 PM."
             if m.lastindex != 2: return "Where are you starting from? For example: from Moscone Center to City Hall."
             cut = lambda x: re.split(r",|;|\s+(?:and|then|but|please|at|around|by|with|tonight|today|on|this|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b", x.strip(), maxsplit=1, flags=re.I)[0].strip(" .?!")
             a, b = cut(m.group(1)), cut(m.group(2))
@@ -528,7 +550,8 @@ def summarize(data: dict, routes: dict) -> dict:
     def r(x, st): return {"score": st["score"], "minutes": st["minutes"], "longest_empty_m": st["longestEmptyM"], "km": x["km"], "places_listed_open": x["places_open"],
                           "mapped_light_pct": x["light_pct"], "turns_per_km": x.get("turns_per_km"), "points": x["points"], "unknown_hours_nearby": x.get("unknown_hours_nearby")}
     out = {"recommended": r(routes["best"], data["stats"]["hootroute"]), "fastest": r(routes["fast"], data["stats"]["shortest"]),
-           "same_route": routes["best"]["coords"] == routes["fast"]["coords"], "note": data.get("dataNote")}
+           "same_route": routes["best"]["coords"] == routes["fast"]["coords"], "note": data.get("dataNote"),
+           "travelProfile": data.get("travelProfile"), "modeConditions": data.get("modeConditions")}
     bal = next((o for o in data.get("options") or [] if o["id"] == "balanced"), None)
     if bal and "balanced" in routes: out["balanced"] = r(routes["balanced"], bal["stats"])
     return out

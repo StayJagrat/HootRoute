@@ -9,6 +9,7 @@ import uuid
 
 from hootroute_engine.engine import Engine
 from hootroute_engine.world import DAYS
+from hootroute_engine.mobility import travel_profile
 
 from .plan_data import _fixed_route_stats, build_plan
 
@@ -19,16 +20,18 @@ class EnginePort:
 
     async def _run(self, fn, *args, **kw): return await asyncio.to_thread(fn, *args, **kw)
 
-    async def plan(self, origin: dict, dest: dict, day: int, minute: int, walker: str, guardian: str, avoid: list | None = None) -> tuple[dict, dict]:
+    async def plan(self, origin: dict, dest: dict, day: int, minute: int, walker: str, guardian: str, avoid: list | None = None, limits: dict | None = None,
+                   travel_mode="walk", travel_options=None) -> tuple[dict, dict]:
         """(DemoData, {'best', 'fast'[, 'balanced']} engine routes). Raises ValueError with a walker-readable message when the points cannot be routed.
         `avoid` = [(lat, lon, radius_m)] for reported obstacles."""
         return await self._run(build_plan, self.engine, dest["lat"], dest["lon"], dest.get("name") or "Destination", (origin["lat"], origin["lon"]),
-                               origin.get("name") or "Start", day, minute, walker, guardian, f"plan:{uuid.uuid4().hex[:8]}", False, avoid)
+                               origin.get("name") or "Start", day, minute, walker, guardian, f"plan:{uuid.uuid4().hex[:8]}", False, avoid, limits, travel_mode, travel_options)
 
     async def rescore(self, routes: dict, day: int, minute: int) -> dict:
         def run():
             with self.engine.lock:
-                ctx = self.engine.ctx("_rescore", day, minute)
+                route = routes["best"]
+                ctx = self.engine.ctx("_rescore", day, minute, travel_profile(route.get("travelMode", "walk"), route.get("travelOptions")))
                 return {"hootroute": _fixed_route_stats(self.engine, routes["best"], ctx), "shortest": _fixed_route_stats(self.engine, routes["fast"], ctx)}
         return await self._run(run)
 

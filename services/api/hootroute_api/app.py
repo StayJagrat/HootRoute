@@ -16,13 +16,14 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+from typing import Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .settings import ROOT, settings
 
@@ -39,6 +40,7 @@ from hootroute_agents.plan_data import build_demo_data, build_route_data  # noqa
 from hootroute_agents.runtime import Runtime  # noqa: E402
 from hootroute_engine import geo  # noqa: E402
 from hootroute_engine.engine import Engine  # noqa: E402
+from hootroute_engine.mobility import travel_profile  # noqa: E402
 
 from . import vision, voice  # noqa: E402
 from .security import DailyBudget, RateLimiter, install_log_redaction, limit  # noqa: E402
@@ -71,9 +73,12 @@ class Plans:
         return (v[2], v[3]) if v and v[1] == key and time.time() - v[0] < self.ttl else None
 
 
-def plan_key(o, d, day, minute) -> tuple:
+def plan_key(o, d, day, minute, limits=None, travel_mode="walk", travel_options=None) -> tuple:
     g = lambda p, k: p[k] if isinstance(p, dict) else getattr(p, k)
-    return (round(g(o, "lat"), 5), round(g(o, "lon"), 5), round(g(d, "lat"), 5), round(g(d, "lon"), 5), day, minute)
+    key = (round(g(o, "lat"), 5), round(g(o, "lon"), 5), round(g(d, "lat"), 5), round(g(d, "lon"), 5), day, minute)
+    if limits: key = (*key, tuple(sorted(limits.items())))
+    profile = travel_profile(travel_mode, travel_options)
+    return (*key, profile.key) if profile.mode != "walk" else key
 
 
 # ------------------------------------------------------------------------------------------------ lifespan
@@ -198,10 +203,32 @@ class Point(BaseModel):
     lat: float = Field(ge=37.6, le=37.9); lon: float = Field(ge=-122.6, le=-122.3); name: str = Field("", max_length=100)
 
 
+class TravelOptions(BaseModel):
+    preferCycleways: bool | None = None
+    avoidRoughSurfaces: bool | None = None
+    requireKnownAccess: bool | None = None
+    maxInclinePct: float | None = Field(None, ge=0, le=15, allow_inf_nan=False)
+    speedKmh: float | None = Field(None, ge=1, le=30, allow_inf_nan=False)
+
+
 class PlanReq(BaseModel):
     origin: Point; destination: Point
     day: int | None = Field(None, ge=0, le=6); minute: int | None = Field(None, ge=0, le=1439)
     preferences: Preferences | None = None
+    maxExtraMinutes: float | None = Field(None, ge=0, le=120, allow_inf_nan=False)
+    maxGapM: float | None = Field(None, ge=0, le=10000, allow_inf_nan=False)
+    travelMode: Literal["walk", "cycle", "wheelchair"] = "walk"
+    travelOptions: TravelOptions = Field(default_factory=TravelOptions)
+
+    def profile(self): return travel_profile(self.travelMode, self.travelOptions.model_dump(exclude_none=True))
+
+    @model_validator(mode="after")
+    def valid_profile(self):
+        self.profile()
+        return self
+
+    def routing_limits(self):
+        return {k: getattr(self, k) for k in ("maxExtraMinutes", "maxGapM") if getattr(self, k) is not None}
 
 
 class WalkReq(PlanReq):
@@ -267,11 +294,12 @@ async def create_plan(req: PlanReq, request: Request):
     """Score Fastest vs HootRoute for any two points in San Francisco. Returns DemoData plus a planId to start the walk on."""
     limit(request, "plan"); s = request.app.state; day, minute = _when(req)
     try:
-        data, routes = await s.port.plan(req.origin.model_dump(), req.destination.model_dump(), day, minute, "Walker", "Guardian")
+        data, routes = await s.port.plan(req.origin.model_dump(), req.destination.model_dump(), day, minute, "Walker", "Guardian", limits=req.routing_limits(),
+                                       travel_mode=req.travelMode, travel_options=req.profile().options)
     except ValueError as e:
         raise HTTPException(422, str(e)) from e
     choice = choose_option(data.get("options") or [], req.preferences) if req.preferences else None
-    return {"planId": s.plans.put(plan_key(req.origin, req.destination, day, minute), data, routes), **data, "preferenceChoice": choice}
+    return {"planId": s.plans.put(plan_key(req.origin, req.destination, day, minute, req.routing_limits(), req.travelMode, req.profile().options), data, routes), **data, "preferenceChoice": choice}
 
 
 @app.get("/api/route-demo")
@@ -294,27 +322,37 @@ async def demo(request: Request):
 async def create_walk(req: WalkReq, request: Request):
     """Start a walk: unique id, a walker token for the walker's phone, and the guardian's live link. The Guide plans it in the room."""
     limit(request, "walk"); s = request.app.state; day, minute = _when(req)
+    cached = s.plans.get(req.planId, plan_key(req.origin, req.destination, day, minute, req.routing_limits(), req.travelMode, req.profile().options))
+    if (req.routing_limits() or req.travelMode != "walk") and not cached:
+        try:
+            cached = await s.port.plan(req.origin.model_dump(), req.destination.model_dump(), day, minute, req.walker, req.guardian, limits=req.routing_limits(),
+                                       travel_mode=req.travelMode, travel_options=req.profile().options)
+        except ValueError as e: raise HTTPException(422, str(e)) from e
+    if cached:
+        selected = {"usual": "fast", "balanced": "balanced"}.get(req.choice, "best")
+        chosen = cached[1].get(selected, cached[1]["best"])
+        if not chosen.get("meets_limits", True):
+            raise HTTPException(422, "The selected route does not meet the requested walking-time and gap limits.")
     wid = secrets.token_urlsafe(12).replace("-", "a").replace("_", "b"); token = secrets.token_urlsafe(24); gtoken = secrets.token_urlsafe(18)
     rec = dict(id=wid, created_at=time.time(), status="planning", walker_token=token, walker_name=req.walker.strip(), guardian_name=req.guardian.strip(),
                guardian_phone=req.guardianPhone, origin=req.origin.model_dump(), destination=req.destination.model_dump(), depart_day=day, depart_minute=minute,
                choice=req.choice, thresholds=req.thresholds or {}, replay=req.replay, time_scale=req.timeScale if req.replay else 1.0,
                started_at=None, ended_at=None, outcome=None, summary=None, backup_name=(req.backupName or "").strip() or None, backup_phone=req.backupPhone,
-               guardian_token=gtoken, notify_consent=req.notifyConsent, sharing=True)
+               guardian_token=gtoken, notify_consent=req.notifyConsent, sharing=True, travel_mode=req.travelMode, travel_options=req.profile().options)
     s.db.create_walk(rec); s.hub.room(wid, persistent=True)
     gurl = guardian_url(request, wid, gtoken)
-    cached = s.plans.get(req.planId, plan_key(req.origin, req.destination, day, minute))
     if cached:      # the plan was made for placeholder names; put the real ones in
         data, routes = cached; data = {**data, "walker": {"id": "walker", "name": rec["walker_name"]},
                                        "guardian": {**data["guardian"], "name": rec["guardian_name"], "initials": "".join(p[0] for p in rec["guardian_name"].split()[:2]).upper()}}
         cached = (data, routes)
     asyncio.create_task(s.runtime.request(rec, gurl, cached))
-    return dict(walkId=wid, walkerToken=token, guardianUrl=gurl, walkPath=f"/walk?walk={wid}", sharing=True,
+    return dict(walkId=wid, walkerToken=token, guardianUrl=gurl, walkPath=f"/walk?walk={wid}", sharing=True, travelMode=req.travelMode,
                 sms=settings.sms_enabled and req.notifyConsent and bool(req.guardianPhone or req.backupPhone))
 
 
 def _public(rec: dict) -> dict:
     return {k: rec[k] for k in ("id", "status", "walker_name", "guardian_name", "origin", "destination", "depart_day", "depart_minute", "choice", "replay",
-                                "time_scale", "created_at", "started_at", "ended_at", "outcome", "summary", "sharing")}
+                                "time_scale", "created_at", "started_at", "ended_at", "outcome", "summary", "sharing", "travel_mode", "travel_options")}
 
 
 def walk_role(rec: dict, request: Request) -> str | None:
@@ -412,10 +450,13 @@ async def declare(place_id: str, req: Declaration, request: Request):
 class AskReq(BaseModel):
     text: str = Field(min_length=1, max_length=1000); session: str | None = Field(None, max_length=40)
     allowChecks: bool = False            # paid checks run only after the walker approves them (POST /api/head/approve)
+    travelMode: Literal["walk", "cycle", "wheelchair"] | None = None
+    travelOptions: TravelOptions = Field(default_factory=TravelOptions)
 
 
 def _store_plan(s, req: dict, data: dict, routes: dict) -> str:
-    return s.plans.put(plan_key(req["origin"], req["destination"], req["day"], req["minute"]), data, routes)
+    route = routes["best"]
+    return s.plans.put(plan_key(req["origin"], req["destination"], req["day"], req["minute"], routes.get("_limits"), route.get("travelMode", "walk"), route.get("travelOptions")), data, routes)
 
 
 def _with_plan(s, res: dict) -> dict:
@@ -432,7 +473,10 @@ async def head_ask(body: AskReq, request: Request):
     limit(request, "head"); s = request.app.state
     # allowChecks lets Claude run a paid check without the approval card: only the control room may ask for that
     crew = bool(settings.admin_token) and secrets.compare_digest(request.headers.get("x-admin-token", ""), settings.admin_token)
-    return _with_plan(s, await s.head.ask(body.text, body.session, body.allowChecks and crew))
+    try:
+        return _with_plan(s, await s.head.ask(body.text, body.session, body.allowChecks and crew, travel_mode=body.travelMode,
+                                            travel_options=body.travelOptions.model_dump(exclude_none=True)))
+    except ValueError as e: raise HTTPException(422, str(e)) from e
 
 
 class ApproveReq(BaseModel):
@@ -474,7 +518,7 @@ async def check_route(body: CheckReq, request: Request):
 async def check_unknowns(body: CheckReq, request: Request):
     """Checker, no network: named places on the route whose hours are unknown (they earn no credit in the score)."""
     s = request.app.state; _, key, data, routes = _plan_by_id(s, body.planId); rk = _route_key(routes, body.route)
-    places = await run_in_threadpool(hours_check.unknowns, s.engine, routes[rk]["coords"], key[4], key[5], 6)
+    places = await run_in_threadpool(hours_check.unknowns, s.engine, routes[rk]["coords"], key[4], key[5], 6, gap_range=routes[rk]["gap"]["range"], speed=routes[rk].get("speedMps", 1.35))
     return {"places": places, "total": routes[rk].get("unknown_hours_nearby"), "apify": bool(settings.apify_token) or hours_check.mock_mode()}
 
 
@@ -484,14 +528,16 @@ async def check_hours(body: CheckReq, request: Request):
     Requires confirm=true (the walker pressed the button). Places checked recently are reused, not re-billed."""
     if not body.confirm: raise HTTPException(428, "A listing check costs money. Send confirm: true once the walker has approved it.")
     limit(request, "check"); s = request.app.state; _, key, data, routes = _plan_by_id(s, body.planId); rk = _route_key(routes, body.route)
-    places = await run_in_threadpool(hours_check.unknowns, s.engine, routes[rk]["coords"], key[4], key[5], 40 if body.placeIds else 6)
+    places = await run_in_threadpool(hours_check.unknowns, s.engine, routes[rk]["coords"], key[4], key[5], 10000 if body.placeIds else 6,
+                                    gap_range=routes[rk]["gap"]["range"], speed=routes[rk].get("speedMps", 1.35))
     if body.placeIds: places = [p for p in places if p["id"] in set(body.placeIds)]       # only unknown-hours places on this route, never arbitrary ids
     res = await hours_check.investigate(s.engine, places[:6], s.budget)
     o = {"lat": key[0], "lon": key[1], "name": data["start"]["name"]}; d = {"lat": key[2], "lon": key[3], "name": data["end"]["name"]}
     new, new_routes = (data, routes)
     if res["changed"]:
         avoid = [tuple(a) for a in routes.get("_avoid") or []] or None
-        new, new_routes = await s.port.plan(o, d, key[4], key[5], "Walker", "Guardian", avoid=avoid)
+        new, new_routes = await s.port.plan(o, d, key[4], key[5], "Walker", "Guardian", avoid=avoid, limits=routes.get("_limits"),
+                                           travel_mode=routes[rk].get("travelMode", "walk"), travel_options=routes[rk].get("travelOptions"))
         if avoid: new_routes = {**new_routes, "_avoid": routes["_avoid"]}
     pid = _store_plan(s, {"origin": o, "destination": d, "day": key[4], "minute": key[5]}, new, new_routes)
     return {**res, "before": data["stats"], "after": new["stats"], "routeChanged": new_routes["best"]["coords"] != routes["best"]["coords"], "planId": pid, "plan": {"planId": pid, **new}}
@@ -501,7 +547,8 @@ async def check_hours(body: CheckReq, request: Request):
 async def plan_evidence(plan_id: str, request: Request, route: str = "best"):
     """Evidence Explorer: every named place along the route, its hours, whether it is listed open when you pass, and where that came from."""
     s = request.app.state; _, key, data, routes = _plan_by_id(s, plan_id); rk = _route_key(routes, route)
-    return await run_in_threadpool(evidence_mod.route_evidence, s.engine, routes[rk]["coords"], key[4], key[5], rk)
+    return await run_in_threadpool(evidence_mod.route_evidence, s.engine, routes[rk]["coords"], key[4], key[5], rk,
+                                  travel_mode=routes[rk].get("travelMode", "walk"), travel_options=routes[rk].get("travelOptions"))
 
 
 # ---------- city layers ----------

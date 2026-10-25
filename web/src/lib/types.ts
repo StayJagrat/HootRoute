@@ -6,6 +6,10 @@
 export type LngLat = [number, number];
 export type AgentName = 'head' | 'guide' | 'checker' | 'rescuer';
 export type MascotState = 'idle' | 'talking' | 'thinking' | 'done';
+export type TravelMode = 'walk' | 'cycle' | 'wheelchair';
+export interface TravelOptions { speedKmh?: number; preferCycleways?: boolean; avoidRoughSurfaces?: boolean; requireKnownAccess?: boolean; maxInclinePct?: number }
+export interface TravelSettings { mode: TravelMode; options: TravelOptions }
+export interface ModeConditions { cyclewayPct: number; wheelchairTagsPct: number; unknownSurfacePct: number; unknownInclinePct: number }
 
 export interface Place {
   id: string;
@@ -63,9 +67,14 @@ export interface RouteOption {
   turnsPerKm?: number;
   mainPct?: number;
   avoidsReport?: boolean;
+  modeConditions?: ModeConditions;
 }
 
 export interface DemoData {
+  travelMode?: TravelMode;
+  travelOptions?: TravelOptions;
+  travelProfile?: { mode: TravelMode; label: string; speedMps: number; options: TravelOptions };
+  modeConditions?: ModeConditions;
   scenario: { label: string; area: string; segmentsScored: number; departureMinute: number; day?: number };
   walker: { id: string; name: string };
   guardian: { name: string; initials: string; channel: string };

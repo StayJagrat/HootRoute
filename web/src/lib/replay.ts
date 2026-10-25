@@ -25,6 +25,7 @@ export class GpsReplay {
     private timeScale: number,
     private maxHoldMs: number,
     leadInM?: number,   // stage demos: start this far before the stop instead of at the origin (the tape still says REPLAY)
+    private speedMps = WALK_MS,
   ) {
     this.cum = cumulative(line);
     this.total = lineLength(line);
@@ -60,9 +61,9 @@ export class GpsReplay {
       this.holdUntil = now + this.maxHoldMs;
     }
     const holding = this.held && now < this.holdUntil;
-    if (!holding) this.meters = Math.min(this.total, this.meters + WALK_MS * this.timeScale * (TICK / 1000));
+    if (!holding) this.meters = Math.min(this.total, this.meters + this.speedMps * this.timeScale * (TICK / 1000));
     const p = along(this.line, this.meters, this.cum);
-    this.send({ type: 'walk.position', lngLat: p.lngLat, heading: p.heading, speed: holding ? 0 : WALK_MS, progress: this.meters / this.total, replay: true });
+    this.send({ type: 'walk.position', lngLat: p.lngLat, heading: p.heading, speed: holding ? 0 : this.speedMps, progress: this.meters / this.total, replay: true });
     if (this.meters >= this.total) this.stop();
   }
 }

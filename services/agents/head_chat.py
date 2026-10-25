@@ -84,7 +84,8 @@ def build_head():
         if ap: ctx.storage.set(f"approval:{sender}", ap["id"])
         ctx.storage.set(f"session:{sender}", res["session"])
         if res.get("req") and res.get("planId"):
-            q = res["req"]; ctx.storage.set(f"plan:{sender}", {"planId": res["planId"], "origin": q["origin"], "destination": q["destination"], "day": q["day"], "minute": q["minute"]})
+            q = res["req"]; ctx.storage.set(f"plan:{sender}", {"planId": res["planId"], "origin": q["origin"], "destination": q["destination"], "day": q["day"], "minute": q["minute"],
+                                                           "travelMode": q.get("travelMode", "walk"), "travelOptions": q.get("travelOptions") or {}})
         if ap and ap["provider"] != "unavailable":
             names = ", ".join(p["name"] for p in ap["places"])
             tail = f"\n\nI'd like Sherlock to check the published listings of {names} (up to ${ap['maxUsd']:.2f}). Reply **approve** or **skip**."

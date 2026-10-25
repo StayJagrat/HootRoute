@@ -284,3 +284,74 @@ def test_stale_recovery_choice_is_closed(gw):
         assert (await c.wait("recovery.closed", 10))["recoveryId"] == "old"
         await c.ws.close()
     asyncio.run(run())
+
+
+def test_backend_route_limits_and_reviewed_walk(gw):
+    """Optional API limits apply without changing the frontend or the reviewed-plan handoff."""
+    request = {"origin": MOSCONE, "destination": CITY_HALL, "day": 4, "minute": 1410, "maxExtraMinutes": 0}
+    response = httpx.post(gw + "/api/plans", json=request, timeout=120)
+    assert response.status_code == 200, response.text
+    plan = response.json()
+    assert plan["recommended"] == "fast" and plan["routingLimits"] == {"maxExtraMinutes": 0}
+    assert plan["evidenceCoverage"]["confirmedStaffing"] is False
+    bad = httpx.post(gw + "/api/plans", json={**request, "maxGapM": 0}, timeout=120)
+    assert bad.status_code == 422 and "No candidate" in bad.json()["detail"]
+
+    async def run():
+        async with httpx.AsyncClient(base_url=gw, timeout=120) as client:
+            response = await client.post("/api/walks", json={**request, "planId": plan["planId"], "guardian": "Contact", "replay": True})
+            assert response.status_code == 201
+            walk = response.json()
+        walker = await Client.open(gw, walk["walkId"], "walker", walk["walkerToken"])
+        try:
+            reviewed = (await walker.wait("walk.plan", 30))["plan"]["data"]
+            assert reviewed["route"] == plan["route"] and reviewed["routingLimits"] == plan["routingLimits"]
+            await walker.send({"type": "walk.end", "outcome": "ended", "summary": "Test complete."}, walk["walkId"])
+        finally: await walker.ws.close()
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize("mode", ["cycle", "wheelchair"])
+def test_travel_profile_plan_evidence_and_live_recovery(gw, mode):
+    request = {"origin": MOSCONE, "destination": CITY_HALL, "day": 4, "minute": 1410, "travelMode": mode}
+    response = httpx.post(gw + "/api/plans", json=request, timeout=120)
+    assert response.status_code == 200, response.text
+    plan = response.json()
+    assert plan["travelMode"] == mode and plan["travelProfile"]["speedMps"] != 1.35
+    assert all(o["modeConditions"] is not None for o in plan["options"])
+    assert httpx.post(gw + "/api/check/route", json={"planId": plan["planId"]}, timeout=60).status_code == 200
+    evidence = httpx.get(gw + f"/api/plans/{plan['planId']}/evidence", timeout=60).json()
+    assert "places" in evidence
+
+    async def run():
+        async with httpx.AsyncClient(base_url=gw, timeout=120) as http:
+            response = await http.post("/api/walks", json={**request, "planId": plan["planId"], "guardian": "Contact", "replay": True, "timeScale": 60})
+            assert response.status_code == 201, response.text
+            journey = response.json()
+            saved = (await http.get(f"/api/walks/{journey['walkId']}", headers={"X-Walker-Token": journey["walkerToken"]})).json()
+            assert saved["travel_mode"] == mode
+        walker = await Client.open(gw, journey["walkId"], "walker", journey["walkerToken"])
+        try:
+            data = (await walker.wait("walk.plan", 30))["plan"]["data"]
+            assert data["travelMode"] == mode and data["route"] == plan["route"]
+            await walker.send({"type": "walk.accept", "choice": "hootroute"}, journey["walkId"])
+            await walker.send({"type": "walk.start", "replay": True}, journey["walkId"])
+            await walker.send({"type": "walk.position", "lngLat": data["route"][1], "heading": 0, "speed": data["travelProfile"]["speedMps"], "progress": 0, "replay": True}, journey["walkId"])
+            await walker.send({"type": "obstacle.report", "kind": "construction"}, journey["walkId"])
+            recovery = await walker.wait("recovery.options", 45)
+            option = recovery["options"][0]["id"]
+            await walker.send({"type": "recovery.choose", "recoveryId": recovery["recoveryId"], "optionId": option}, journey["walkId"])
+            updated = (await walker.wait("walk.plan", 20, where=lambda m: "Switched after" in m["plan"]["reason"]))["plan"]["data"]
+            assert updated["travelMode"] == mode and updated["travelProfile"]["speedMps"] == data["travelProfile"]["speedMps"]
+            await walker.send({"type": "walk.end", "outcome": "ended", "summary": "Test complete."}, journey["walkId"])
+        finally: await walker.ws.close()
+    asyncio.run(run())
+
+
+def test_head_preserves_selected_profile_and_pace(gw):
+    response = httpx.post(gw + "/api/head/ask", json={"text": "from Moscone Center to City Hall Friday at 11:30 PM", "travelMode": "cycle", "travelOptions": {"speedKmh": 20}}, timeout=120)
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert result["plan"]["travelMode"] == "cycle" and result["plan"]["travelOptions"]["speedKmh"] == 20
+    followup = httpx.post(gw + "/api/head/ask", json={"text": "fewer turns", "session": result["session"], "travelMode": "wheelchair"}, timeout=120).json()
+    assert followup["plan"]["travelMode"] == "wheelchair"

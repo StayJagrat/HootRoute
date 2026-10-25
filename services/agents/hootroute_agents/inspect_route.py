@@ -46,7 +46,7 @@ def densify(W, coords: list, step: float = 10.0) -> tuple[np.ndarray, np.ndarray
 
 @lru_cache(maxsize=1)
 def _closures(mtime: float) -> dict:
-    return json.loads(CLOSURES.read_text())
+    return json.loads(CLOSURES.read_text(encoding="utf-8"))
 
 
 def closures_on(W, P: np.ndarray, A: np.ndarray, when: date) -> tuple[list[dict] | None, str | None]:
@@ -66,7 +66,8 @@ def closures_on(W, P: np.ndarray, A: np.ndarray, when: date) -> tuple[list[dict]
 
 
 def inspect(engine, data: dict, routes: dict, key: str, day: int, minute: int) -> dict:
-    W = engine.W; route = routes[key]; stats = data["stats"]["hootroute" if key == "best" else "shortest"]
+    W = engine.W; route = routes[key]
+    stats = next((o["stats"] for o in data.get("options", []) if o["id"] == key), data["stats"]["hootroute" if key == "best" else "shortest"])
     P, A = densify(W, route["coords"]); items: list[dict] = []; missing: list[str] = []
     arrive = minute + round(stats["minutes"])
     add = lambda level, title, detail, source: items.append({"level": level, "title": title, "detail": detail, "source": source})
@@ -84,7 +85,8 @@ def inspect(engine, data: dict, routes: dict, key: str, day: int, minute: int) -
                 f"{h.get('name') or 'Permitted closure'}, {h['start']} to {h['end']}. About {h['atM']} m into your walk. Sidewalks may still be open; expect detours.",
                 f"SFMTA temporary street closures, data as of {fetched or 'unknown'}")
     else:
-        add("ok", "No permitted street closures on the route", f"Checked for {walk_date(day).strftime('%a %b %-d')}.", f"SFMTA temporary street closures, data as of {fetched or 'unknown'}")
+        date_label = walk_date(day)
+        add("ok", "No permitted street closures on the route", f"Checked for {date_label.strftime('%a %b')} {date_label.day}.", f"SFMTA temporary street closures, data as of {fetched or 'unknown'}")
 
     # 2. the longest stretch with nothing listed open
     gap = stats["longestEmptyM"]; stretch = next((d for d in data.get("dimStretches", []) if d["onRoute"] == (key == "best")), None)
@@ -122,11 +124,24 @@ def inspect(engine, data: dict, routes: dict, key: str, day: int, minute: int) -
     near = [(float(np.hypot(*(b["p"] - end))), b) for b in W.bart]; near = [x for x in near if x[0] <= 500]
     if near:
         dist, b = min(near, key=lambda x: x[0])
-        if W.bart_running(b, day % 7, arrive % 1440): add("ok", f"{b['name']} BART is running when you arrive", f"Arrive about {clock(arrive)}.", "BART GTFS schedule (scheduled, not live)")
+        if W.bart_running(b, day % 7, arrive): add("ok", f"{b['name']} BART is running when you arrive", f"Arrive about {clock(arrive)}.", "BART GTFS schedule (scheduled, not live)")
         else: add("warn", f"No BART service at {b['name']} when you arrive", f"Arrive about {clock(arrive)}. Plan another way home from there.", "BART GTFS schedule (scheduled, not live)")
 
     warns = [i for i in items if i["level"] == "warn"]
+    if route.get("help_access_unknown"):
+        missing.append(f"Public entrance access is unverified for {route['help_access_unknown']} nearby help locations; they receive no help-access credit.")
+    mode = route.get("travelMode", "walk"); conditions = route.get("modeConditions") or {}
+    if mode == "cycle":
+        add("note", f"Mapped bike lanes or cycleways on {conditions.get('cyclewayPct', 0)}% of this route",
+            "Mapped bicycle access and one-way restrictions are applied. The estimate uses your selected cycling pace.", "OpenStreetMap bicycle and cycleway tags")
+    if mode == "wheelchair":
+        add("note", "Mapped step-free restrictions applied", "Mapped stairs, restricted wheelchair access and barriers outside your selected limits are excluded.", "OpenStreetMap access, surface, incline, width and kerb tags")
+        if conditions.get("wheelchairTagsPct", 0) < 100:
+            missing.append(f"Wheelchair access is not explicitly tagged on {100 - conditions.get('wheelchairTagsPct', 0)}% of the route. Untagged does not establish access.")
+        missing.append(f"Surface unknown on {conditions.get('unknownSurfacePct', 100)}%; measured incline unknown on {conditions.get('unknownInclinePct', 100)}%. Kerb and sidewalk data may also be missing. Check access before travelling.")
+    warns = [i for i in items if i["level"] == "warn"]
     verdict = "Good to go" if not warns else f"Heads up: {len(warns)} thing{'s' if len(warns) != 1 else ''} to know"
+    if mode == "wheelchair" and missing and not warns: verdict = "Heads up: access details are missing"
     order = {"warn": 0, "note": 1, "ok": 2}
-    return {"verdict": verdict, "good": not warns, "score": stats["score"], "minutes": stats["minutes"], "arrive": clock(arrive), "route": key,
+    return {"verdict": verdict, "good": not warns and not (mode == "wheelchair" and missing), "score": stats["score"], "minutes": stats["minutes"], "arrive": clock(arrive), "route": key,
             "items": sorted(items, key=lambda i: order[i["level"]]), "missing": missing, "note": "Conditions, not a safety rating. No crime data is used."}

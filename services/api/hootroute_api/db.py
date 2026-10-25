@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS routes (walk_id TEXT PRIMARY KEY, body TEXT NOT NULL,
 """
 
 WALK_COLUMNS = ("id", "created_at", "status", "walker_token", "walker_name", "guardian_name", "guardian_phone", "origin", "destination", "depart_day",
-                "depart_minute", "choice", "thresholds", "replay", "time_scale", "started_at", "ended_at", "outcome", "summary", "backup_name", "backup_phone", "guardian_token", "notify_consent", "sharing")
-JSON_COLUMNS = {"origin", "destination", "thresholds"}
+                "depart_minute", "choice", "thresholds", "replay", "time_scale", "started_at", "ended_at", "outcome", "summary", "backup_name", "backup_phone", "guardian_token", "notify_consent", "sharing", "travel_mode", "travel_options")
+JSON_COLUMNS = {"origin", "destination", "thresholds", "travel_options"}
 
 
 class DB:
@@ -46,7 +46,8 @@ class DB:
             self.conn.execute("PRAGMA journal_mode=WAL"); self.conn.execute("PRAGMA synchronous=NORMAL"); self.conn.executescript(SCHEMA)
             cols = {r[1] for r in self.conn.execute("PRAGMA table_info(walks)")}
             for c, kind in (("backup_name", "TEXT"), ("backup_phone", "TEXT"),          # older databases get newer columns here
-                            ("guardian_token", "TEXT"), ("notify_consent", "INTEGER NOT NULL DEFAULT 0"), ("sharing", "INTEGER NOT NULL DEFAULT 1")):
+                            ("guardian_token", "TEXT"), ("notify_consent", "INTEGER NOT NULL DEFAULT 0"), ("sharing", "INTEGER NOT NULL DEFAULT 1"),
+                            ("travel_mode", "TEXT NOT NULL DEFAULT 'walk'"), ("travel_options", "TEXT NOT NULL DEFAULT '{}'")):
                 if c not in cols: self.conn.execute(f"ALTER TABLE walks ADD COLUMN {c} {kind}")
 
     def _exec(self, sql: str, args=()):
@@ -57,6 +58,7 @@ class DB:
 
     # ---------- walks ----------
     def create_walk(self, walk: dict):
+        walk = {"travel_mode": "walk", "travel_options": {}, **walk}
         row = {k: (json.dumps(walk[k]) if k in JSON_COLUMNS else walk.get(k)) for k in WALK_COLUMNS}
         self._exec(f"INSERT INTO walks ({','.join(WALK_COLUMNS)}) VALUES ({','.join('?' * len(WALK_COLUMNS))})", tuple(row[k] for k in WALK_COLUMNS))
 

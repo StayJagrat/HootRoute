@@ -56,7 +56,7 @@ def secs(w: Walk, v: float) -> str:
 
 
 def wall_clock(ts: float) -> str:
-    return time.strftime("%-I:%M %p", time.localtime(ts))
+    return time.strftime("%I:%M %p", time.localtime(ts)).lstrip("0")
 
 
 def promote(data: dict, routes: dict, key: str) -> tuple[dict, dict]:
@@ -64,7 +64,8 @@ def promote(data: dict, routes: dict, key: str) -> tuple[dict, dict]:
     if key == "best" or key not in routes: return data, routes
     r = routes[key]; opt = next((o for o in data.get("options") or [] if o["id"] == key), None)
     stats = opt["stats"] if opt else {"score": r["score"], "longestEmptyM": r["gap"]["m"], "minutes": r["minutes"]}
-    data = {**data, "route": r["coords"], "stats": {**data["stats"], "hootroute": stats}, "routeSteps": {**data["routeSteps"], "hootroute": r["steps"]}, "activeOption": key}
+    data = {**data, "route": r["coords"], "stats": {**data["stats"], "hootroute": stats}, "routeSteps": {**data["routeSteps"], "hootroute": r["steps"]}, "activeOption": key,
+            "modeConditions": r.get("modeConditions", data.get("modeConditions"))}
     return data, {**routes, "best": r}
 
 
@@ -104,7 +105,8 @@ class Guide(Agent):
         await self.log(w, f"Planning {w.origin.get('name', 'Start')} → {w.dest.get('name', 'Destination')}, {self.eng.day_name(w.day)} {clock(w.minute)}.",
                        f"{w.walker} asked for a walk. Scoring every candidate route at the minute each block is passed.")
         try:
-            data, routes = cached or await self.eng.plan(w.origin, w.dest, w.day, w.minute, w.walker, w.guardian)
+            data, routes = cached or await self.eng.plan(w.origin, w.dest, w.day, w.minute, w.walker, w.guardian,
+                                                       travel_mode=w.travel_mode, travel_options=w.travel_options)
         except ValueError as e:
             await self.log(w, f"Could not plan this walk: {e}", "The start or destination is outside the mapped part of San Francisco.")
             await self.rt.send(w, {"type": "walk.end", "outcome": "ended", "summary": f"Guide could not plan this walk: {e}"}); w.status = "ended"; return
@@ -128,8 +130,9 @@ class Guide(Agent):
     async def first_instruction(self, w: Walk):
         steps = [s for s in w.steps() if s["street"] != "the path"]
         turn = next((s for s in w.steps()[1:] if "left" in s["maneuver"] or "right" in s["maneuver"]), None)
-        head = steps[0]["street"] if steps else "the walking path"
-        await self.say(w, f"Okay, I'm walking with you. Head along {head}" + (f", then {turn['maneuver']} on {turn['street']}." if turn else "."))
+        head = steps[0]["street"] if steps else ("the walking path" if w.travel_mode == "walk" else "the mapped path")
+        intro = {"walk": "Okay, I'm walking with you.", "cycle": "Okay, I'm following your ride.", "wheelchair": "Okay, I'm following your step-free journey."}[w.travel_mode]
+        await self.say(w, f"{intro} Head along {head}" + (f", then {turn['maneuver']} on {turn['street']}." if turn else "."))
 
     async def turns(self, w: Walk):
         for s in w.steps()[1:]:
@@ -138,7 +141,7 @@ class Guide(Agent):
             if key in w.said: continue
             ahead = s["at_m"] - w.meters
             if 0 < ahead <= TURN_AHEAD_M:
-                w.said.add(key); street = "the walking path" if s["street"] == "the path" else s["street"]
+                w.said.add(key); street = ("the walking path" if w.travel_mode == "walk" else "the mapped path") if s["street"] == "the path" else s["street"]
                 await self.say(w, f"{s['maneuver'].capitalize()} on {street} in about {max(10, round(ahead / 10) * 10)} metres."); return True
         return False
 
@@ -148,7 +151,8 @@ class Guide(Agent):
         await self.log(w, f"Re-planning from {where} to {w.dest.get('name')}.", f"{w.walker} has been more than {OFF_ROUTE_M} m from the route for {OFF_ROUTE_FIXES} fixes.", "Checker")
         elapsed = (time.time() - (w.started or time.time())) / 60 * (w.time_scale if w.replay else 1)
         try:
-            data, routes = await self.eng.plan({"lat": at[1], "lon": at[0], "name": where}, w.dest, w.day, int(w.minute + elapsed) % 1440, w.walker, w.guardian)
+            data, routes = await self.eng.plan({"lat": at[1], "lon": at[0], "name": where}, w.dest, w.day, int(w.minute + elapsed), w.walker, w.guardian,
+                                               limits=(w.routes or {}).get("_limits"), travel_mode=w.travel_mode, travel_options=w.travel_options)
         except ValueError as e:
             await self.log(w, f"Re-plan failed: {e}", "Staying on the original route."); return
         w.set_plan(data, routes); w.set_choice("hootroute"); w.meters = 0.0; w.said = {k for k in w.said if not k.startswith(("turn:", "place:", "dim:"))}
@@ -158,13 +162,14 @@ class Guide(Agent):
     async def alternatives(self, w: Walk, at: list[float], avoid: list[tuple[float, float, float]], minute: int) -> tuple[dict, dict, str]:
         """Mission Recovery: candidate routes from where the walker is, around the reported spot, at the current minute."""
         where = await self.eng.where(at)
-        data, routes = await self.eng.plan({"lat": at[1], "lon": at[0], "name": where}, w.dest, w.day, minute, w.walker, w.guardian, avoid=avoid)
+        data, routes = await self.eng.plan({"lat": at[1], "lon": at[0], "name": where}, w.dest, w.day, minute, w.walker, w.guardian, avoid=avoid,
+                                           limits=(w.routes or {}).get("_limits"), travel_mode=w.travel_mode, travel_options=w.travel_options)
         return data, routes, where
 
     async def switch(self, w: Walk, option_id: str):
         """Apply the recovery option the walker chose (Wally stored it on the walk; only the option id travels between agents)."""
         rec = w.chosen_recovery; w.chosen_recovery = None
-        if not rec or option_id not in rec["routes"]: return
+        if not rec or option_id not in rec["routes"] or not rec["routes"][option_id].get("meets_limits", True): return
         data, routes = promote(rec["data"], rec["routes"], option_id)
         w.set_plan(data, routes); w.set_choice("hootroute")
         w.meters = 0.0; w.offroute = 0; w.said = {k for k in w.said if not k.startswith(("turn:", "place:", "dim:"))}
@@ -182,7 +187,8 @@ class Guide(Agent):
         if not w.data: return
         if w.status in ("planning", "planned"):
             before = w.data["stats"]
-            try: data, routes = await self.eng.plan(w.origin, w.dest, w.day, w.minute, w.walker, w.guardian)
+            try: data, routes = await self.eng.plan(w.origin, w.dest, w.day, w.minute, w.walker, w.guardian, limits=(w.routes or {}).get("_limits"),
+                                                   travel_mode=w.travel_mode, travel_options=w.travel_options)
             except ValueError: return
             w.set_plan(data, routes)
             self._merge_place(w, place_id, info, decl)
@@ -440,7 +446,7 @@ class Head(Agent):
         hours evidence already gathered; Hoot explains the trade-off; the walker chooses. Nothing switches automatically."""
         w.recovery = {"busy": True, "expires": time.time() + 60, "id": ""}
         elapsed = (time.time() - (w.started or time.time())) / 60 * (w.time_scale if w.replay else 1)
-        minute = int(w.minute + elapsed) % 1440
+        minute = int(w.minute + elapsed)
         await self.log(w, f"Asking Scoot McRoute for routes from here that avoid {RECOVERY_RADIUS_M} m around the report.",
                        "Recovery reuses the hours evidence already gathered; no paid check runs during a walk.", "Guide")
         try:
@@ -451,11 +457,11 @@ class Head(Agent):
         remaining = max(0.0, w.total() - w.meters)
         cur = w.stats()
         current = {"id": "keep", "label": "Keep current route", "coords": w.line(), "km": round(remaining / 1000, 2), "turnsPerKm": None, "avoidsReport": False, "liveEvidence": None,
-                   "stats": {"score": cur["score"], "minutes": round(remaining / 1.35 / 60, 1), "longestEmptyM": cur["longestEmptyM"]}, "remainingOnly": True}
+                   "stats": {"score": cur["score"], "minutes": round(remaining / w.profile.speed / 60, 1), "longestEmptyM": cur["longestEmptyM"]}, "remainingOnly": True}
         live = lambda r: sum(1 for sh in r.get("shops", []) if (self.eng.place(sh["id"]) or {}).get("hours_source") == "apify-live")
         options = [{"id": o["id"], "label": o["label"], "coords": o["coords"], "stats": o["stats"], "km": o["km"], "turnsPerKm": o.get("turnsPerKm"),
                     "avoidsReport": bool(o.get("avoidsReport", True)), "liveEvidence": live(routes[o["id"]]) if o["id"] in routes else 0}
-                   for o in data.get("options") or [] if o["id"] in routes]
+                   for o in data.get("options") or [] if o["id"] in routes and o.get("meetsLimits", True)]
         label = OBSTACLE_LABEL.get(report.get("kind"), "a problem")
         explanation, by = await explain_recovery({"report": label, "note": report.get("note") or None, "from": where, "to": w.dest.get("name"),
                                                   "current_remaining": current["stats"], "options": [{k: o[k] for k in ("id", "label", "stats", "km", "avoidsReport")} for o in options]})

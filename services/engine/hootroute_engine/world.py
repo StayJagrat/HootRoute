@@ -6,11 +6,25 @@ import networkx as nx
 import numpy as np
 
 from .config import BBOX, CACHE
+from .mobility import TravelProfile, allows, directions
 
 DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
 GTFS_COLS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 HELP_AMENITY = {"police", "fire_station", "hospital"}
 LATE_OK = {"cafe", "restaurant", "bar", "pub", "fast_food", "convenience", "pharmacy", "nightclub"}
+
+
+def day_minute(day: int, minute: float) -> tuple[int, int]:
+    """Resolve an arrival minute relative to the departure weekday, including week rollover."""
+    offset, local = divmod(math.floor(minute), 1440)
+    return (day + offset) % 7, local
+
+
+def public_entrance(place: dict) -> bool:
+    """Only explicit public entrance evidence qualifies for help-point access credit."""
+    denied = {"no", "private", "customers", "permit"}
+    return (place.get("entrance") in {"yes", "main"}
+            and place.get("access") not in denied and place.get("foot") not in denied)
 
 
 class Proj:
@@ -59,22 +73,47 @@ class World:
 
     # ---------- graph ----------
     def _load_graph(self):
-        ways = json.loads((CACHE / "osm_ways.json").read_text()); G = nx.Graph(); P = self.proj
+        ways = json.loads((CACHE / "osm_ways.json").read_text(encoding="utf-8")); G = nx.Graph(); P = self.proj
+        self._raw_nodes = {}; self._raw_edges = []; self._profile_views = {}; self.profile = TravelProfile()
         for wy in ways:
             if wy.get("type") != "way" or "geometry" not in wy: continue
             nodes, geom, tags = wy["nodes"], wy["geometry"], wy.get("tags", {})
+            walk_allowed = tags.get("foot") not in {"no", "private"} and tags.get("access") not in {"no", "private"}
             for i in range(len(nodes) - 1):
                 a, b = nodes[i], nodes[i + 1]; pa, pb = P.xy(geom[i]["lat"], geom[i]["lon"]), P.xy(geom[i + 1]["lat"], geom[i + 1]["lon"])
                 L = float(np.hypot(*(pa - pb)))
                 if L < 1: continue
-                G.add_node(a, p=pa, ll=[geom[i]["lon"], geom[i]["lat"]]); G.add_node(b, p=pb, ll=[geom[i + 1]["lon"], geom[i + 1]["lat"]])
-                G.add_edge(a, b, length=L, mid=(pa + pb) / 2, name=tags.get("name", ""), lit=tags.get("lit"), hw=tags.get("highway"), way=wy["id"])
+                na = dict(p=pa, ll=[geom[i]["lon"], geom[i]["lat"]]); nb = dict(p=pb, ll=[geom[i + 1]["lon"], geom[i + 1]["lat"]])
+                ed = dict(length=L, mid=(pa + pb) / 2, name=tags.get("name", ""), lit=tags.get("lit"), hw=tags.get("highway"), way=wy["id"], mode_tags=tags)
+                self._raw_nodes[a] = na; self._raw_nodes[b] = nb; self._raw_edges.append((a, b, ed))
+                if walk_allowed:
+                    G.add_node(a, **na); G.add_node(b, **nb); G.add_edge(a, b, **ed)
         self.G = G.subgraph(max(nx.connected_components(G), key=len)).copy()
         self.nodes = list(self.G.nodes); self.node_p = np.array([self.G.nodes[n]["p"] for n in self.nodes])
 
+    def for_profile(self, profile):
+        if profile.mode == "walk": return self
+        if profile.key in self._profile_views: return self._profile_views[profile.key]
+        graph = nx.DiGraph() if profile.mode == "cycle" else nx.Graph()
+        for a, b, ed in self._raw_edges:
+            if not allows(ed["mode_tags"], profile): continue
+            graph.add_node(a, **self._raw_nodes[a]); graph.add_node(b, **self._raw_nodes[b])
+            for direction in directions(ed["mode_tags"], profile):
+                graph.add_edge(a if direction == 1 else b, b if direction == 1 else a, **ed)
+        if not graph.number_of_edges(): raise ValueError("No mapped network matches these travel options. Adjust the access or surface options.")
+        components = nx.weakly_connected_components(graph) if graph.is_directed() else nx.connected_components(graph)
+        graph = graph.subgraph(max(components, key=len)).copy()
+        view = object.__new__(World); view.__dict__ = self.__dict__.copy()
+        view.__dict__.pop("_avoid_segments", None)  # a walking obstacle cache contains different edges
+        view.G = graph; view.profile = profile; view._help_access = {}
+        view.nodes = list(graph); view.node_p = np.array([graph.nodes[n]["p"] for n in view.nodes]); view._edge_static()
+        if len(self._profile_views) >= 4: self._profile_views.pop(next(iter(self._profile_views)))
+        self._profile_views[profile.key] = view
+        return view
+
     # ---------- OSM points ----------
     def _load_points(self):
-        pts = json.loads((CACHE / "osm_points.json").read_text()); P = self.proj
+        pts = json.loads((CACHE / "osm_points.json").read_text(encoding="utf-8")); P = self.proj
         self.places, lamps, cams, bus = [], [], [], []
         for el in pts:
             lat = el.get("lat") or el.get("center", {}).get("lat"); lon = el.get("lon") or el.get("center", {}).get("lon")
@@ -86,7 +125,8 @@ class World:
             elif t.get("shop") or t.get("amenity"):
                 am = t.get("amenity", "")
                 self.places.append(dict(id=f"{el['type'][0]}{el['id']}", p=p, ll=[round(lon, 6), round(lat, 6)], name=t.get("name"), cat=am or t.get("shop", "shop"),
-                                        hours=t.get("opening_hours"), help=am in HELP_AMENITY, pharm=am == "pharmacy"))
+                                        hours=t.get("opening_hours"), help=am in HELP_AMENITY, pharm=am == "pharmacy",
+                                        entrance=t.get("entrance"), access=t.get("access"), foot=t.get("foot")))
         self.lamps_osm = np.array(lamps) if lamps else np.zeros((0, 2)); self.cams = np.array(cams) if cams else np.zeros((0, 2)); self.bus = np.array(bus) if bus else np.zeros((0, 2))
         self._apply_hours_evidence()
         self.place_p = np.array([pl["p"] for pl in self.places]); self.place_index = {pl["id"]: i for i, pl in enumerate(self.places)}
@@ -96,7 +136,7 @@ class World:
         f = CACHE / "hours_evidence.json"; self.hours_filled = 0
         for pl in self.places: pl["hours_source"] = "osm" if pl["hours"] else None
         if not f.exists(): return
-        ev = json.loads(f.read_text())
+        ev = json.loads(f.read_text(encoding="utf-8"))
         for pl in self.places:
             e = ev.get(pl["id"])
             if pl["hours"] is None and e and e.get("opening_hours") and e.get("confidence", 0) >= min_conf:
@@ -104,9 +144,9 @@ class World:
 
     # ---------- SF 311 ----------
     def _load_311(self):
-        rows = json.loads((CACHE / "sf311_history.json").read_text()); P = self.proj; seen, lamps, out = set(), [], []; self.outage_cases = []
+        rows = json.loads((CACHE / "sf311_history.json").read_text(encoding="utf-8")); P = self.proj; seen, lamps, out = set(), [], []; self.outage_cases = []
         from datetime import datetime, timedelta
-        recent = (datetime(2026, 10, 24) - timedelta(days=180)).strftime("%Y-%m-%d")
+        recent = (datetime.now() - timedelta(days=180)).strftime("%Y-%m-%d")
         for r in rows:
             if not r.get("lat") or float(r["lat"]) == 0: continue          # ~27% of cases arrive without coordinates
             p = P.xy(float(r["lat"]), float(r["long"])); k = (int(p[0] // 12), int(p[1] // 12))
@@ -140,8 +180,36 @@ class World:
         self.bart_p = np.array([b["p"] for b in self.bart]) if self.bart else np.zeros((0, 2))
 
     def bart_running(self, b, day_idx, minute, window=20):
-        d = b["deps"][GTFS_COLS[day_idx]]
-        return bool(len(d) and np.any(np.abs(d - minute) <= window))
+        day_idx, minute = day_minute(day_idx, minute)
+        # GTFS permits Friday departures such as 24:10. They belong to Friday's
+        # service calendar even though the clock now reads Saturday 00:10.
+        return any(bool(len(d) and np.any(np.abs(d + offset * 1440 - minute) <= window))
+                   for offset in (-1, 0, 1)
+                   for d in (b["deps"][GTFS_COLS[(day_idx + offset) % 7]],))
+
+    def help_route_distances(self, place, path, distances):
+        """Walking-graph distance to an explicitly mapped public entrance, never air distance alone.
+
+        The map still does not establish staffing or that an entrance is open tonight.
+        An entrance over 30 m from the walking graph gets no access credit.
+        """
+        if not public_entrance(place): return np.full(len(distances), np.inf)
+        cache = getattr(self, "_help_access", None)
+        if cache is None: self._help_access = cache = {}
+        key = (place["id"], tuple(place["p"]))
+        if key not in cache:
+            delta = np.hypot(self.node_p[:, 0] - place["p"][0], self.node_p[:, 1] - place["p"][1])
+            i = int(delta.argmin()); snap = float(delta[i])
+            graph = self.G.reverse(copy=False) if self.G.is_directed() else self.G
+            lengths = nx.single_source_dijkstra_path_length(graph, self.nodes[i], cutoff=200, weight="length") if snap <= 30 else {}
+            cache[key] = (snap, lengths)
+        snap, lengths = cache[key]
+        points = np.array([self.G.nodes[n]["p"] for n in path])
+        along = np.r_[0.0, np.cumsum(np.hypot(*np.diff(points, axis=0).T))]
+        edge = np.clip(np.searchsorted(along, distances, side="right") - 1, 0, len(path) - 2)
+        left = np.array([lengths.get(path[i], np.inf) for i in edge]) + distances - along[edge]
+        right = np.array([lengths.get(path[i + 1], np.inf) for i in edge]) + along[edge + 1] - distances
+        return np.minimum(left, right) + snap
 
     # ---------- per-edge static features (do not depend on the time of day) ----------
     def _edge_static(self):

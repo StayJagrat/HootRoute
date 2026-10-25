@@ -14,6 +14,9 @@ import type { AgentName } from '../lib/types';
 import { Link } from 'react-router-dom';
 import { Avatar } from '../Avatar';
 import { Brand, Icon, Spinner, Toggle } from '../ui';
+import { TravelControls, TravelNotice } from '../TravelControls';
+import { loadTravel, saveTravel } from '../lib/travel';
+import type { TravelSettings } from '../lib/types';
 
 type When = { day: number; minute: number } | null;
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -62,6 +65,7 @@ export default function Plan() {
   const [to, setTo] = useState<Spot | null>(null);
   const [when, setWhen] = useState<When>(null);
   const [prefs, setPrefs] = useState<Preferences>(loadPrefs());
+  const [travel, setTravel] = useState<TravelSettings>(loadTravel);
   const [text, setText] = useState('');
   const [session, setSession] = useState<string | null>(null);
   const [answer, setAnswer] = useState<HeadAnswer | null>(null);
@@ -90,6 +94,7 @@ export default function Plan() {
 
   useEffect(() => { void health().then(setHp).catch(() => setHp(null)); }, []);
   useEffect(() => { savePrefs(prefs); }, [prefs]);
+  useEffect(() => { saveTravel(travel); }, [travel]);
   const planId = plan?.planId ?? null;
   useEffect(() => {
     if (!planId) { setEv(null); return; }
@@ -99,6 +104,7 @@ export default function Plan() {
 
   const adopt = (p: LivePlan, req: { from: Spot; to: Spot; when: { day: number; minute: number } }) => {
     setPlan(p); setPlanReq(req);
+    setTravel({ mode: p.travelMode ?? 'walk', options: p.travelOptions ?? {} });
     const ids = (p.options ?? []).map((o) => o.id);
     const want = (p.preferenceChoice?.optionId ?? p.recommended ?? 'best') as RouteKey;
     setPick(ids.includes(want) ? want : (ids[0] as RouteKey) ?? 'best');
@@ -110,7 +116,7 @@ export default function Plan() {
     setBusy('Scoot McRoute is scoring every candidate route…'); setErr(null); setAnswer(null); setCheck(null);
     const w = when ?? { day: today(), minute: nowMinute() };
     try {
-      const p = await createPlan(from, to, w, ac.current.signal, prefs);
+      const p = await createPlan(from, to, w, ac.current.signal, prefs, travel);
       adopt(p, { from, to, when: w }); setTab('routes');
     } catch (e) { if ((e as Error).name !== 'AbortError') setErr(errorText(e, 'Could not plan this journey.')); }
     finally { setBusy(null); }
@@ -131,7 +137,7 @@ export default function Plan() {
     const q = text.trim();
     if (!q) return;
     setBusy('Professor Hoot is choosing tools and delegating…'); setErr(null);
-    try { take(await askHead(q, session)); setText(''); }
+    try { take(await askHead(q, session, false, undefined, travel)); setText(''); }
     catch (e) { setErr(errorText(e, 'Professor Hoot could not answer.')); }
     finally { setBusy(null); }
   };
@@ -195,6 +201,8 @@ export default function Plan() {
                 <h1 className="h1">Where to tonight?</h1>
                 <p className="p">Routes compared by what is listed open, lit and running at the minute you pass each block. Conditions, not a safety rating.</p>
               </div>
+
+              <TravelControls value={travel} onChange={setTravel} disabled={!!busy} />
 
               <div className="stack--tight">
                 <label className="field" style={{ alignItems: 'flex-start' }}>
@@ -267,6 +275,7 @@ export default function Plan() {
               {answer && !replaying && <HootAnswer a={answer} />}
               {pending && <ApprovalCard ap={pending} busy={!!busy} onAnswer={(y) => void answerApproval(y)} />}
               {check && <CheckResult r={check} route={pick} />}
+              <TravelNotice mode={plan.travelMode} options={plan.travelOptions} conditions={options.find((o) => o.id === pick)?.modeConditions ?? plan.modeConditions} />
 
               <div className="tabs" role="tablist">
                 {(['routes', 'evidence', 'agents'] as const).map((t) => (
@@ -275,7 +284,7 @@ export default function Plan() {
                   </button>
                 ))}
               </div>
-              {tab === 'routes' && <RouteList options={options} pick={pick} onPick={setPick} depart={depart} recommended={plan.recommended} choiceReason={plan.preferenceChoice?.reason} />}
+              {tab === 'routes' && <RouteList options={options} pick={pick} onPick={setPick} depart={depart} recommended={plan.recommended} choiceReason={plan.preferenceChoice?.reason} travelMode={plan.travelMode} />}
               {tab === 'evidence' && <EvidenceList ev={ev} busy={!!busy} onInvestigate={() => setConfirm(true)} />}
               {tab === 'agents' && <TraceList events={trace} shown={shown} />}
 
@@ -317,6 +326,7 @@ export default function Plan() {
       )}
       {starting && plan && planReq && <StartDialog onClose={() => setStarting(false)} onStart={async (o) => {
         const w = await createWalk({ planId: plan.planId, from: planReq.from, to: planReq.to, when: planReq.when, choice: CHOICE[pick], notifyConsent: false,
+          travel: { mode: plan.travelMode ?? 'walk', options: plan.travelOptions ?? {} },
           walker: o.name, guardian: o.contact, thresholds: { stopSeconds: 90, replySeconds: 45, escalateSeconds: 90 }, replay: o.replay, timeScale: o.replay ? 6 : 1 });
         nav(`/walk?walk=${encodeURIComponent(w.walkId)}${o.replay ? '&gps=replay' : ''}`);
       }} />}
