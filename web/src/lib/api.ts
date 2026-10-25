@@ -217,6 +217,23 @@ export interface PlanEvidence { route: RouteKey; places: EvidencePlace[]; counts
 export const planEvidence = (planId: string, route: RouteKey = 'best') =>
   call<PlanEvidence>(`/api/plans/${encodeURIComponent(planId)}/evidence?route=${route}`);
 
+export type PlaceState = 'open' | 'closed' | 'unknown';
+export interface AreaPlace { id: string; name: string; cat: string; ll: LngLat; d: number; state: PlaceState; hours: string | null; src?: string | null }
+export interface AreaView {
+  center: LngLat;
+  radius: number;
+  /** [lon, lat, 0..1] per street segment: the engine's per-segment conditions value (steers the search; not the route score). */
+  heat: [number, number, number][];
+  places: AreaPlace[];
+  counts: Record<PlaceState, number>;
+  categories: ({ cat: string } & Record<PlaceState, number>)[];
+  evening: { minute: number; open: number }[];
+  conditions: number | null;
+  segments: number;
+}
+export const areaAround = ([lon, lat]: LngLat, when: { day: number; minute: number }, signal?: AbortSignal) =>
+  call<AreaView>(`/api/area?lat=${lat}&lon=${lon}&day=${when.day}&minute=${when.minute}`, { signal });
+
 export interface AgentInfo { id: AgentName; persona: string; job: string; runsOn: string; live: boolean }
 export const agents = () => call<AgentInfo[]>('/api/agents');
 export const health = () => call<Health>('/api/health');

@@ -17,14 +17,34 @@ export function inCity([lon, lat]: LngLat) {
 /** Kept for older callers. The whole city is routable now. */
 export const inPilotArea = inCity;
 
-export const LOCAL_DESTINATIONS: DestinationResult[] = [
-  { name: 'City Hall', detail: 'Civic Center · BART', lngLat: [-122.4193, 37.7793], covered: true },
-  { name: 'Civic Center BART', detail: 'Civic Center', lngLat: [-122.4139, 37.7796], covered: true },
-  { name: 'Ferry Building', detail: 'Embarcadero', lngLat: [-122.3937, 37.7955], covered: true },
-  { name: 'Transamerica Pyramid', detail: 'Financial District', lngLat: [-122.4028, 37.7952], covered: true },
-  { name: 'Golden Gate Park', detail: 'Richmond', lngLat: [-122.4862, 37.7694], covered: true },
-  { name: 'Mission Dolores Park', detail: 'Mission', lngLat: [-122.4271, 37.7596], covered: true },
+interface DemoSpot extends DestinationResult {
+  /** OSM street name, so the city-wide street midpoint from /api/search can be dropped in favour of this pin. */
+  street?: string;
+}
+
+/**
+ * Demo spots pinned where data/cache/hours_evidence.json has checked hours (downtown / Union Square).
+ * The API pins a street at the middle of its whole length, which for Geary or Market lands far from any cached hours.
+ */
+export const DEMO_SPOTS: DemoSpot[] = [
+  { name: 'Moscone Center', detail: 'SoMa · stage demo start', lngLat: [-122.4016, 37.7842], covered: true },
+  { name: 'City Hall', detail: 'Civic Center · stage demo end', lngLat: [-122.4193, 37.7793], covered: true },
+  { name: '562 Sutter St', detail: 'Union Square · 32 places with checked hours', lngLat: [-122.40974, 37.78921], covered: true, street: 'Sutter Street' },
+  { name: '798 Bush St', detail: 'Nob Hill · 26 places with checked hours', lngLat: [-122.41032, 37.79008], covered: true, street: 'Bush Street' },
+  { name: '312 Kearny St', detail: 'Financial District · 23 places with checked hours', lngLat: [-122.40398, 37.79104], covered: true, street: 'Kearny Street' },
+  { name: '555 Geary St', detail: 'Tenderloin · 22 places with checked hours', lngLat: [-122.4124, 37.78673], covered: true, street: 'Geary Street' },
+  { name: "336 O'Farrell St", detail: "Union Square · 22 places with checked hours", lngLat: [-122.41043, 37.78626], covered: true, street: "O'Farrell Street" },
+  { name: '599 Post St', detail: 'Union Square · 20 places with checked hours', lngLat: [-122.41155, 37.78779], covered: true, street: 'Post Street' },
+  { name: '685 Market St', detail: 'Downtown · 14 places with checked hours', lngLat: [-122.40284, 37.78787], covered: true, street: 'Market Street' },
+  { name: '601 Grant Ave', detail: 'Chinatown · 12 places with checked hours', lngLat: [-122.40609, 37.79259], covered: true, street: 'Grant Avenue' },
+  { name: '299 Ellis St', detail: 'Tenderloin · 12 places with checked hours', lngLat: [-122.411, 37.78499], covered: true, street: 'Ellis Street' },
+  { name: '450 Powell St', detail: 'Union Square · 8 places with checked hours', lngLat: [-122.40831, 37.78896], covered: true, street: 'Powell Street' },
 ];
+
+function demoMatches(q: string): DemoSpot[] {
+  const low = q.toLowerCase();
+  return DEMO_SPOTS.filter((d) => d.name.toLowerCase().includes(low) || d.street?.toLowerCase().includes(low) || d.detail.toLowerCase().includes(low));
+}
 
 interface PhotonFeature {
   geometry?: { coordinates?: number[] };
@@ -60,8 +80,10 @@ export async function searchPlaces(query: string, signal: AbortSignal): Promise<
     });
   })().catch(() => [] as DestinationResult[]);
   const [a, b] = await Promise.all([local, online]);
+  const demo = demoMatches(q);
+  const pinned = new Set(demo.flatMap((d) => (d.street ? [d.street.toLowerCase()] : [])));
   const seen = new Set<string>();
-  return [...a, ...b].filter((d) => {
+  return [...demo, ...a.filter((d) => !(d.detail === 'Street' && pinned.has(d.name.toLowerCase()))), ...b].filter((d) => {
     const key = `${d.name.toLowerCase()}:${d.lngLat[0].toFixed(3)},${d.lngLat[1].toFixed(3)}`;
     if (seen.has(key)) return false;
     seen.add(key);

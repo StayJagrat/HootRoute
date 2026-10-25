@@ -1,0 +1,89 @@
+/* Nocturne motion layer: feedback and depth on top of theme.css. Colour meanings are unchanged
+   (moon = your route, mint = listed open); effects use those two lights only. Reduced motion turns it all off. */
+
+/* ---------------------------------------------------------------- buttons: press feedback and a click ripple, no glow */
+.btn {
+  position: relative; overflow: hidden; isolation: isolate;
+  transition: background 0.18s var(--ease), border-color 0.18s var(--ease), opacity 0.18s, transform 0.18s var(--ease), box-shadow 0.2s var(--ease);
+}
+.btn:active:not(:disabled) { transform: translateY(1px) scale(0.98); transition-duration: 0.08s; }
+.btn--primary { box-shadow: 0 -2px 0 rgba(6, 8, 12, 0.14) inset; }
+.btn--ghost:hover:not(:disabled) { border-color: var(--line-2); }
+
+.ripple { position: absolute; border-radius: 50%; pointer-events: none; z-index: -1; background: radial-gradient(circle, rgba(255, 255, 255, 0.16), transparent 60%); transform: scale(0); animation: ripple 0.6s var(--ease) forwards; }
+.btn--primary .ripple { background: radial-gradient(circle, rgba(6, 8, 12, 0.14), transparent 60%); }
+@keyframes ripple { to { transform: scale(1); opacity: 0; } }
+
+/* chips + tabs + toggle: spring and glow */
+.chip { position: relative; overflow: hidden; }
+.chip:hover { background: radial-gradient(80px circle at var(--mx, 50%) var(--my, 50%), rgba(169, 193, 255, 0.12), transparent 70%); transform: translateY(-1px); }
+.chip:active { transform: scale(0.96); }
+.chip[aria-pressed='true'] { box-shadow: 0 0 0 1px rgba(169, 193, 255, 0.25), 0 6px 18px -8px rgba(169, 193, 255, 0.5); }
+.tab { transition: background 0.25s var(--ease), color 0.25s, box-shadow 0.25s, transform 0.15s; }
+.tab:active { transform: scale(0.97); }
+.tab[aria-selected='true'] { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 4px 14px -6px rgba(0, 0, 0, 0.6); }
+.toggle::after { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s; }
+.toggle[aria-checked='true'] { box-shadow: 0 0 14px -2px rgba(99, 226, 180, 0.55); }
+.field { transition: border-color 0.2s, background 0.2s, box-shadow 0.25s var(--ease); }
+.field:focus-within { box-shadow: 0 0 0 4px rgba(169, 193, 255, 0.08), 0 10px 28px -14px rgba(169, 193, 255, 0.5); }
+
+/* ---------------------------------------------------------------- 3D tilt cards with glare (driven by lib/fx.ts) */
+.agent-card, .flow > div, .route, .kpi, .footer-cta {
+  position: relative; transform-style: preserve-3d; will-change: transform;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+  transition: transform 0.5s var(--ease), border-color 0.3s, box-shadow 0.4s var(--ease), background 0.3s;
+}
+.is-tilting { transition: transform 0.08s linear, border-color 0.3s, box-shadow 0.4s var(--ease), background 0.3s; --lift: -3px; }
+.agent-card::after, .flow > div::after, .route::after, .kpi::after, .footer-cta::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity 0.35s var(--ease);
+  background: radial-gradient(220px circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.09), transparent 60%);
+}
+.is-tilting::after { opacity: 1; }
+.agent-card:hover, .flow > div:hover, .kpi:hover { border-color: var(--line-2); box-shadow: 0 22px 44px -22px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(169, 193, 255, 0.08); }
+.agent-card:hover { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-4px); }
+.agent-card > * { transform: translateZ(18px); }
+.route:hover { box-shadow: 0 16px 34px -20px rgba(0, 0, 0, 0.9); }
+.route[aria-pressed='true'] { box-shadow: 0 0 0 1px rgba(169, 193, 255, 0.25), 0 18px 40px -20px rgba(169, 193, 255, 0.55); animation: route-glow 3.2s ease-in-out infinite; }
+@keyframes route-glow { 50% { box-shadow: 0 0 0 1px rgba(169, 193, 255, 0.4), 0 18px 46px -18px rgba(169, 193, 255, 0.75); } }
+.route[aria-pressed='true'] .route__min { text-shadow: 0 0 18px rgba(169, 193, 255, 0.55); }
+
+/* ---------------------------------------------------------------- panels and banners arrive in depth */
+.panel { animation: panel-in 0.75s var(--ease) both; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.05) inset; }
+@keyframes panel-in { from { opacity: 0; transform: perspective(1200px) translateX(-24px) rotateY(9deg) scale(0.98); } to { opacity: 1; transform: none; } }
+@media (max-width: 760px) { .panel { animation-name: sheet-in; } }
+@keyframes sheet-in { from { opacity: 0; transform: perspective(1200px) translateY(40px) rotateX(-8deg); } to { opacity: 1; transform: none; } }
+.banner { animation: banner-in 0.6s var(--ease) both; }
+@keyframes banner-in { from { opacity: 0; transform: translateX(-50%) translateY(-14px) scale(0.97); } to { opacity: 1; transform: translateX(-50%); } }
+.dialog { animation: dialog-in 0.45s var(--ease) both; box-shadow: 0 40px 90px -20px rgba(0, 0, 0, 0.8); }
+@keyframes dialog-in { from { opacity: 0; transform: perspective(1000px) translateY(16px) rotateX(10deg) scale(0.96); } to { opacity: 1; transform: none; } }
+.overlay { animation: fade 0.3s var(--ease) both; }
+/* backwards fill only: a held final keyframe would pin transform and block the tilt */
+.agent-card.reveal { animation-fill-mode: backwards; }
+.panel__body > * { animation: reveal 0.5s var(--ease) backwards; }
+.panel__body > *:nth-child(2) { animation-delay: 60ms; }
+.panel__body > *:nth-child(3) { animation-delay: 120ms; }
+.panel__body > *:nth-child(4) { animation-delay: 180ms; }
+.panel__body > *:nth-child(n + 5) { animation-delay: 240ms; }
+
+/* ---------------------------------------------------------------- landing: a plain fade-up, nothing else */
+.lp-hero__copy > *, .ticket { animation: lp-up 0.7s var(--ease) backwards; }
+.lp-hero__copy > :nth-child(2) { animation-delay: 60ms; }
+.lp-hero__copy > :nth-child(3) { animation-delay: 120ms; }
+.lp-hero__copy > :nth-child(4) { animation-delay: 180ms; }
+.ticket { animation-delay: 260ms; }
+@keyframes lp-up { from { opacity: 0; transform: translateY(14px); } }
+.fx-reveal .section { opacity: 0; transform: translateY(20px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.fx-reveal .section.is-in { opacity: 1; transform: none; }
+
+/* ---------------------------------------------------------------- live journey + map markers */
+.banner__icon { box-shadow: 0 0 0 1px var(--line) inset, 0 8px 18px -8px rgba(169, 193, 255, 0.5); }
+.puck { animation: puck 2.2s ease-out infinite; }
+@keyframes puck { 0% { box-shadow: 0 0 0 0 rgba(169, 193, 255, 0.45), 0 0 24px rgba(169, 193, 255, 0.6); } 100% { box-shadow: 0 0 0 18px rgba(169, 193, 255, 0), 0 0 24px rgba(169, 193, 255, 0.6); } }
+.pin--end { animation: pin-glow 2.4s ease-in-out infinite; }
+@keyframes pin-glow { 50% { box-shadow: 0 0 0 1.5px var(--moon), 0 0 28px rgba(169, 193, 255, 0.95); } }
+.big-num { text-shadow: 0 0 26px rgba(169, 193, 255, 0.3); }
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-card, .flow > div, .route, .kpi, .footer-cta, .btn { transform: none !important; }
+  .fx-reveal .section { opacity: 1; transform: none; }
+}

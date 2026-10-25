@@ -559,6 +559,12 @@ async def why(request: Request, lat: float, lon: float, day: int = 4, minute: in
     return res
 
 
+@app.get("/api/area")
+async def area(request: Request, lat: float, lon: float, day: int = 4, minute: int = 22 * 60 + 50, radius: float = 450.0):
+    """Area dashboard: street-condition heat, listed state of every named place and the evening open curve around one point."""
+    return await run_in_threadpool(request.app.state.engine.area, "area", lat, lon, day, minute, max(100.0, min(radius, 900.0)))
+
+
 @app.get("/api/where")
 async def where(request: Request, lat: float, lon: float):
     return await run_in_threadpool(request.app.state.engine.where, lat, lon)

@@ -273,6 +273,28 @@ class Engine:
         return out
 
     # ---------- why this street ----------
+    def area(self, session, lat, lon, day, minute, radius=450.0):
+        """Everything around one point for the area dashboard: street-condition heat (the same per-segment value that steers the
+        search, never the route score), every named place with its listed state at `minute`, and how many are listed open 6 PM-3 AM."""
+        with self.lock:
+            W = self.W; ctx = self.ctx(session, day, minute); q = self.quick(ctx); p = W.proj.xy(lat, lon)
+            d = np.hypot(W.e_mid[:, 0] - p[0], W.e_mid[:, 1] - p[1]); ks = np.flatnonzero(d <= radius)
+            heat = [[*W.proj.ll(W.e_mid[k]), round(float(q[k]), 3)] for k in ks]
+            near = [(float(np.hypot(*(pl["p"] - p))), pl) for pl in W.places if pl["name"]]
+            near = sorted([(dd, pl) for dd, pl in near if dd <= radius], key=lambda t: t[0])
+            places, cats = [], {}
+            for dd, pl in near:
+                unknown = pl["hours"] is None and not pl["help"] and pl["id"] not in ctx.overrides
+                state = "unknown" if unknown else "open" if place_open(W, pl, minute, ctx) else "closed"
+                places.append(dict(id=pl["id"], name=pl["name"], cat=pl["cat"].replace("_", " "), ll=pl["ll"], d=round(dd), state=state, hours=pl["hours"], src=pl.get("hours_source")))
+                c = cats.setdefault(places[-1]["cat"], dict(open=0, closed=0, unknown=0)); c[state] += 1
+            known = [pl for _, pl in near if not (pl["hours"] is None and not pl["help"] and pl["id"] not in ctx.overrides)]
+            evening = [dict(minute=m, open=sum(1 for pl in known if place_open(W, pl, m, ctx))) for m in range(18 * 60, 27 * 60 + 1, 30)]
+            counts = {s: sum(1 for x in places if x["state"] == s) for s in ("open", "closed", "unknown")}
+            top = sorted(cats.items(), key=lambda kv: -sum(kv[1].values()))[:6]
+            return dict(center=[lon, lat], radius=radius, heat=heat, places=places, counts=counts, categories=[dict(cat=k, **v) for k, v in top],
+                        evening=evening, conditions=round(100 * float(q[ks].mean())) if len(ks) else None, segments=int(len(ks)))
+
     def why(self, session, lat, lon, day, minute, profile=None):
         with self.lock:
             ctx = self.ctx(session, day, minute, profile); W = self.world(ctx.profile)

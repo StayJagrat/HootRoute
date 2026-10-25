@@ -24,6 +24,12 @@ function loadStyle(): Promise<StyleSpecification> {
 
 const fc = (features: GeoJSON.Feature[]): GeoJSON.FeatureCollection => ({ type: 'FeatureCollection', features });
 const line = (c: LngLat[], props: Record<string, unknown> = {}): GeoJSON.Feature => ({ type: 'Feature', properties: props, geometry: { type: 'LineString', coordinates: c } });
+/** A ground circle as a 64-gon (metres, small-area approximation). */
+const circle = ([lon, lat]: LngLat, r: number): GeoJSON.Feature => {
+  const dLat = r / 111_320, dLon = r / (111_320 * Math.cos((lat * Math.PI) / 180));
+  const ring = Array.from({ length: 65 }, (_, i) => { const a = (i / 64) * 2 * Math.PI; return [lon + dLon * Math.cos(a), lat + dLat * Math.sin(a)]; });
+  return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } };
+};
 const MOON = '#a9c1ff';
 const GLOW = 'rgba(169,193,255,0.22)';
 const CLEAR = 'rgba(0,0,0,0)';
@@ -34,6 +40,10 @@ const flat = (c: string) => ['interpolate', ['linear'], ['line-progress'], 0, c,
 export function MapCanvas(p: {
   routes: MapRoute[];
   places?: MapPlace[];
+  /** [lon, lat, 0..1] street-condition points, drawn as a heat layer under the routes */
+  heat?: [number, number, number][];
+  /** the area the dashboard describes, drawn as a faint ring */
+  ring?: { center: LngLat; radius: number } | null;
   start?: LngLat | null;
   end?: LngLat | null;
   puck?: LngLat | null;
@@ -71,6 +81,18 @@ export function MapCanvas(p: {
               'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], ['get', 'min_height'], 0],
               'fill-extrusion-opacity': 0.88 } });
         }
+        // street conditions: one hue, ink -> moonlight, under everything route-coloured
+        m.addSource('heat', { type: 'geojson', data: fc([]) });
+        m.addSource('ring', { type: 'geojson', data: fc([]) });
+        m.addLayer({ id: 'heat', type: 'heatmap', source: 'heat', maxzoom: 18,
+          paint: { 'heatmap-weight': ['get', 'w'],
+            'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 13, 0.35, 16, 0.9],
+            'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 13, 8, 15, 18, 17, 34],
+            'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 13, 0.75, 17.5, 0.45],
+            'heatmap-color': ['interpolate', ['linear'], ['heatmap-density'],
+              0, 'rgba(126,157,255,0)', 0.15, 'rgba(56,72,140,0.35)', 0.4, 'rgba(90,118,214,0.55)', 0.7, 'rgba(140,168,255,0.72)', 1, 'rgba(214,226,255,0.85)'] } });
+        m.addLayer({ id: 'ring-fill', type: 'fill', source: 'ring', paint: { 'fill-color': '#a9c1ff', 'fill-opacity': 0.03 } });
+        m.addLayer({ id: 'ring', type: 'line', source: 'ring', paint: { 'line-color': '#a9c1ff', 'line-opacity': 0.45, 'line-width': 1.2, 'line-dasharray': [2, 3] } });
         m.addSource('alts', { type: 'geojson', data: fc([]) });
         m.addSource('active', { type: 'geojson', data: fc([]), lineMetrics: true });
         m.addSource('walked', { type: 'geojson', data: fc([]) });
@@ -136,6 +158,13 @@ export function MapCanvas(p: {
     (m.getSource('walked') as GeoJSONSource).setData(fc(done.length > 1 ? [line(done)] : []));
     (m.getSource('places') as GeoJSONSource).setData(fc((p.places ?? []).map((pl) => ({ type: 'Feature', properties: { state: pl.state }, geometry: { type: 'Point', coordinates: pl.lngLat } }))));
   }, [ready, p.routes, p.places, p.progressM, active]);
+
+  useEffect(() => {
+    const m = map.current;
+    if (!m || !ready || !m.getSource('heat')) return;
+    (m.getSource('heat') as GeoJSONSource).setData(fc((p.heat ?? []).map(([lon, lat, w]) => ({ type: 'Feature', properties: { w }, geometry: { type: 'Point', coordinates: [lon, lat] } }))));
+    (m.getSource('ring') as GeoJSONSource).setData(fc(p.ring ? [circle(p.ring.center, p.ring.radius)] : []));
+  }, [ready, p.heat, p.ring]);
 
   useEffect(() => {
     const m = map.current;

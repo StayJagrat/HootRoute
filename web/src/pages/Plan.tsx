@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  approveHead, askHead, checkHours, createPlan, createWalk, errorText, gpsMode, health, planEvidence,
-  type HeadAnswer, type Health, type Plan as LivePlan, type PlanEvidence, type RouteKey, type Spot, type TraceEvent,
+  approveHead, areaAround, askHead, checkHours, createPlan, createWalk, errorText, gpsMode, health, planEvidence,
+  type AreaView, type HeadAnswer, type Health, type Plan as LivePlan, type PlanEvidence, type RouteKey, type Spot, type TraceEvent,
 } from '../lib/api';
 import { loadPrefs, PREF_LABEL, savePrefs } from '../lib/prefs';
-import { nameForPin, searchPlaces, type DestinationResult } from '../lib/search';
+import { DEMO_SPOTS, nameForPin, searchPlaces, type DestinationResult } from '../lib/search';
 import type { Preferences } from '../lib/api';
 import type { LngLat } from '../lib/types';
 import { MapCanvas, type MapPlace } from '../Map';
@@ -13,7 +13,8 @@ import { ApprovalCard, CheckResult, type CheckView, Crew, EvidenceList, HootAnsw
 import type { AgentName } from '../lib/types';
 import { Link } from 'react-router-dom';
 import { Avatar } from '../Avatar';
-import { Brand, Icon, Spinner, Toggle } from '../ui';
+import { AreaSummary, Dashboard } from '../Dashboard';
+import { AutoText, Brand, Icon, Spinner, Toggle } from '../ui';
 import { TravelControls, TravelNotice } from '../TravelControls';
 import { loadTravel, saveTravel } from '../lib/travel';
 import type { TravelSettings } from '../lib/types';
@@ -31,6 +32,7 @@ function PlaceField({ label, dot, value, onPick, onLocate }: { label: string; do
   const [open, setOpen] = useState(false);
   useEffect(() => { setQ(value?.name ?? ''); }, [value]);
   useEffect(() => {
+    if (open && q.trim() === '') { setRes(DEMO_SPOTS); return; }
     if (!open || q.trim().length < 2 || q === value?.name) { setRes([]); return; }
     const ac = new AbortController();
     const t = setTimeout(() => void searchPlaces(q, ac.signal).then(setRes).catch(() => setRes([])), 220);
@@ -46,6 +48,7 @@ function PlaceField({ label, dot, value, onPick, onLocate }: { label: string; do
       </label>
       {open && res.length > 0 && (
         <div className="results">
+          {q.trim() === '' && <div className="result" style={{ cursor: 'default' }}><small>Demo spots · downtown streets with cached hours</small></div>}
           {res.map((r) => (
             <button key={`${r.name}${r.lngLat.join()}`} type="button" className="result" disabled={!r.covered} onMouseDown={(e) => e.preventDefault()}
               onClick={() => { onPick({ name: r.name, lngLat: r.lngLat }); setOpen(false); }}>
@@ -73,8 +76,11 @@ export default function Plan() {
   const [plan, setPlan] = useState<LivePlan | null>(null);
   const [planReq, setPlanReq] = useState<{ from: Spot; to: Spot; when: { day: number; minute: number } } | null>(null);
   const [pick, setPick] = useState<RouteKey>('best');
-  const [tab, setTab] = useState<'routes' | 'evidence' | 'agents'>('routes');
+  const [tab, setTab] = useState<'routes' | 'dashboard' | 'evidence' | 'agents'>('routes');
   const [ev, setEv] = useState<PlanEvidence | null>(null);
+  const [area, setArea] = useState<AreaView | null>(null);
+  const [areaBusy, setAreaBusy] = useState(false);
+  const [focus, setFocus] = useState<'from' | 'to'>('to');
   const [check, setCheck] = useState<CheckView | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -101,6 +107,20 @@ export default function Plan() {
     setEv(null);
     void planEvidence(planId, pick).then(setEv).catch(() => setEv(null));
   }, [planId, pick]);
+
+  // area dashboard + map heat: around the focused end of the planned journey, or the last spot picked on the form
+  const areaSpot = plan && planReq ? planReq[focus] : (to ?? from);
+  const areaWhen = plan && planReq ? planReq.when : (when ?? null);
+  const areaKey = areaSpot ? `${areaSpot.lngLat.join()}|${areaWhen?.day ?? ''}|${areaWhen?.minute ?? ''}` : '';
+  useEffect(() => {
+    if (!areaSpot) { setArea(null); return; }
+    const c = new AbortController();
+    setAreaBusy(true);
+    const t = setTimeout(() => void areaAround(areaSpot.lngLat, areaWhen ?? { day: today(), minute: nowMinute() }, c.signal)
+      .then(setArea).catch(() => { if (!c.signal.aborted) setArea(null); }).finally(() => { if (!c.signal.aborted) setAreaBusy(false); }), 150);
+    return () => { clearTimeout(t); c.abort(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [areaKey]);
 
   const adopt = (p: LivePlan, req: { from: Spot; to: Spot; when: { day: number; minute: number } }) => {
     setPlan(p); setPlanReq(req);
@@ -176,14 +196,18 @@ export default function Plan() {
   const depart = planReq?.when.minute ?? nowMinute();
   const options = plan?.options ?? [];
   const routes = useMemo(() => options.map((o) => ({ id: o.id, coords: o.coords, active: o.id === pick })), [options, pick]);
-  const places: MapPlace[] = useMemo(() => (ev?.places ?? []).map((p) => ({ id: p.id, lngLat: p.lngLat, state: p.openAtPass === null ? 'unknown' : p.openAtPass ? 'open' : 'closed' })), [ev]);
+  const showArea = !plan || tab === 'dashboard';
+  const places: MapPlace[] = useMemo(() => (showArea
+    ? (area?.places ?? []).map((p) => ({ id: p.id, lngLat: p.ll, state: p.state }))
+    : (ev?.places ?? []).map((p) => ({ id: p.id, lngLat: p.lngLat, state: p.openAtPass === null ? 'unknown' : p.openAtPass ? 'open' : 'closed' }))), [ev, area, showArea]);
+  const ring = useMemo(() => (area ? { center: area.center, radius: area.radius } : null), [area]);
   const narrow = typeof window !== 'undefined' && window.innerWidth <= 760;
   const pending = answer?.pendingApproval && !check ? answer.pendingApproval : null;
   const whenLabel = (w: When) => (w ? `${DAYS[w.day]} ${minuteClock(w.minute)}` : 'Leaving now');
 
   return (
     <div className="app">
-      <MapCanvas routes={routes} places={places} start={(plan ? planReq?.from : from)?.lngLat} end={(plan ? planReq?.to : to)?.lngLat}
+      <MapCanvas routes={routes} places={places} heat={area?.heat} ring={ring} start={(plan ? planReq?.from : from)?.lngLat} end={(plan ? planReq?.to : to)?.lngLat}
         fitKey={`${planId}:${from?.lngLat}:${to?.lngLat}`} pad={narrow ? { left: 0, bottom: window.innerHeight * 0.62 } : { left: 420, bottom: 0 }}
         onTap={plan ? undefined : async (ll) => { const s = { name: await nameForPin(ll), lngLat: ll }; if (!from) setFrom(s); else setTo(s); }} />
 
@@ -208,7 +232,7 @@ export default function Plan() {
                 <label className="field" style={{ alignItems: 'flex-start' }}>
                   <span style={{ paddingTop: 14, color: 'var(--moon)' }}><Icon name="spark" size={16} /></span>
                   <span className="sr">Ask Professor Hoot</span>
-                  <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Leaving the library at 11:40 PM, to Civic Center BART, fewer turns"
+                  <AutoText rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Leaving the library at 11:40 PM, to Civic Center BART, fewer turns"
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void ask(); } }} />
                   <button className="btn btn--ghost btn--sm" style={{ marginTop: 7 }} disabled={!text.trim() || !!busy} onClick={() => void ask()}>Ask</button>
                 </label>
@@ -224,6 +248,7 @@ export default function Plan() {
                 <PlaceField label="To" dot="var(--moon)" value={to} onPick={setTo} />
                 <span className="faint tiny">Or tap the map to drop a pin.</span>
               </div>
+              {area && areaSpot && <AreaSummary a={area} name={areaSpot.name} />}
 
               <div className="stack--tight">
                 <span className="eyebrow">Leaving</span>
@@ -278,13 +303,17 @@ export default function Plan() {
               <TravelNotice mode={plan.travelMode} options={plan.travelOptions} conditions={options.find((o) => o.id === pick)?.modeConditions ?? plan.modeConditions} />
 
               <div className="tabs" role="tablist">
-                {(['routes', 'evidence', 'agents'] as const).map((t) => (
+                {(['routes', 'dashboard', 'evidence', 'agents'] as const).map((t) => (
                   <button key={t} role="tab" className="tab" aria-selected={tab === t} onClick={() => setTab(t)}>
-                    {t === 'routes' ? 'Routes' : t === 'evidence' ? `Evidence${ev ? ` · ${ev.counts.unknown} unknown` : ''}` : `Agents${trace.length ? ` · ${trace.length}` : ''}`}
+                    {t === 'routes' ? 'Routes' : t === 'dashboard' ? 'Dashboard' : t === 'evidence'
+                      ? <>Evidence{ev && ev.counts.unknown > 0 && <span className="tab__n tab__n--amber" title={`${ev.counts.unknown} places with unknown hours`}>{ev.counts.unknown}<span className="sr"> unknown</span></span>}</>
+                      : <>Agents{trace.length > 0 && <span className="tab__n">{trace.length}</span>}</>}
                   </button>
                 ))}
               </div>
               {tab === 'routes' && <RouteList options={options} pick={pick} onPick={setPick} depart={depart} recommended={plan.recommended} choiceReason={plan.preferenceChoice?.reason} travelMode={plan.travelMode} />}
+              {tab === 'dashboard' && <Dashboard option={options.find((o) => o.id === pick)} options={options} pick={pick} area={area} focus={focus} onFocus={setFocus}
+                names={{ from: planReq.from.name, to: planReq.to.name }} depart={depart} loading={areaBusy} />}
               {tab === 'evidence' && <EvidenceList ev={ev} busy={!!busy} onInvestigate={() => setConfirm(true)} />}
               {tab === 'agents' && <TraceList events={trace} shown={shown} />}
 
@@ -292,7 +321,7 @@ export default function Plan() {
                 <label className="field" style={{ alignItems: 'flex-start' }}>
                   <span style={{ paddingTop: 14, color: 'var(--moon)' }}><Icon name="spark" size={16} /></span>
                   <span className="sr">Ask a follow-up</span>
-                  <textarea rows={1} value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask Hoot: check the unknown hours · avoid Market St"
+                  <AutoText rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Ask Hoot: check the unknown hours · avoid Market St"
                     onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void ask(); } }} />
                   <button className="btn btn--ghost btn--sm" style={{ marginTop: 7 }} disabled={!text.trim() || !!busy} onClick={() => void ask()}>Ask</button>
                 </label>

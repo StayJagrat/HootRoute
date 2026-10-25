@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useLayoutEffect, useRef, type ReactNode, type TextareaHTMLAttributes } from 'react';
 import { Avatar, type AvatarState } from './Avatar';
 import { PERSONA } from './lib/personas';
 import type { AgentName } from './lib/types';
@@ -30,18 +30,28 @@ export function Icon({ name, size = 18, stroke = 1.7 }: { name: keyof typeof PAT
   );
 }
 
-/** Wordmark: a crescent moon over a path. No mascots in the product UI. */
+/** Wordmark: the HootRoute logo mark beside the name. */
 export function Brand({ sub }: { sub?: string }) {
   return (
     <div className="brand">
       <span className="brand__mark" aria-hidden>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <path d="M15.5 3.5a8.5 8.5 0 1 0 5 15.3A7 7 0 0 1 15.5 3.5Z" fill="#a9c1ff" />
-        </svg>
+        <img src="/brand/hootroute-mark.svg" alt="" width={26} height={26} />
       </span>
       <span>HootRoute {sub && <small>{sub}</small>}</span>
     </div>
   );
+}
+
+/** A textarea that grows with its text (up to the CSS max-height, then scrolls). */
+export function AutoText(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useLayoutEffect(() => {
+    const t = ref.current;
+    if (!t) return;
+    t.style.height = 'auto';
+    t.style.height = `${t.scrollHeight}px`;
+  }, [props.value]);
+  return <textarea ref={ref} {...props} />;
 }
 
 export function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
