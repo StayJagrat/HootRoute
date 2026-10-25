@@ -35,10 +35,10 @@ _STORE_LOCK = threading.RLock()
 
 
 # ---------------------------------------------------------------------------------------------------- unknowns
-def unknowns(engine, coords: list[list[float]], day: int, minute: int, limit: int = 5, radius: float = 50.0, gap_range=None) -> list[dict]:
+def unknowns(engine, coords: list[list[float]], day: int, minute: int, limit: int = 5, radius: float = 50.0, gap_range=None, speed=1.35) -> list[dict]:
     """Named places within `radius` m of the route whose hours are unknown, most useful first (shops people can walk into,
     near the longest empty stretch). Pure engine data, no network."""
-    W = engine.W; WALK = 1.35
+    W = engine.W; WALK = speed
     pts = np.array([W.proj.xy(lat, lon) for lon, lat in coords])
     seg = np.r_[0.0, np.cumsum(np.hypot(*np.diff(pts, axis=0).T))]
     dense, along = [], []

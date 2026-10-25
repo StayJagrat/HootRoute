@@ -5,6 +5,7 @@ import time
 from dataclasses import dataclass, field
 
 from hootroute_engine import geo
+from hootroute_engine.mobility import travel_profile
 
 DEFAULT_THRESHOLDS = {"stopSeconds": 90, "replySeconds": 45, "escalateSeconds": 90}
 LIMITS = {"stopSeconds": (20, 600), "replySeconds": (10, 300), "escalateSeconds": (20, 900)}
@@ -31,6 +32,8 @@ class Walk:
     dest: dict
     day: int
     minute: int
+    travel_mode: str = "walk"
+    travel_options: dict = field(default_factory=dict)
     choice: str = "hootroute"
     replay: bool = False
     time_scale: float = 1.0
@@ -100,6 +103,11 @@ class Walk:
 
     def set_plan(self, data: dict, routes: dict):
         self.data, self.routes, self._line, self._cum = data, routes, None, None
+        self.travel_mode = data.get("travelMode", self.travel_mode)
+        self.travel_options = data.get("travelOptions", self.travel_options)
+
+    @property
+    def profile(self): return travel_profile(self.travel_mode, self.travel_options)
 
     def set_choice(self, choice: str):
         key = {"usual": "fast", "balanced": "balanced"}.get(choice, "best")

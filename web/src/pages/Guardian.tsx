@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useWalk } from '../lib/store';
 import { MapCanvas } from '../Map';
 import { Brand, Icon } from '../ui';
+import { TRAVEL_LABEL } from '../lib/travel';
 
 /** The trusted contact's view: opened from the walker's link (?g=<token>). Read-only except "I'm on it". */
 export default function Guardian() {
@@ -31,9 +32,10 @@ export default function Guardian() {
           ) : (
             <>
               <div className="stack--tight" style={{ marginTop: 8 }}>
-                <span className="eyebrow">{state.phase === 'arrived' ? 'Arrived' : state.phase === 'preview' ? 'Not started yet' : 'Walking now'}</span>
+                <span className="eyebrow">{state.phase === 'arrived' ? 'Arrived' : state.phase === 'preview' ? 'Not started yet' : data.travelMode === 'cycle' ? 'Riding now' : data.travelMode === 'wheelchair' ? 'Travelling now' : 'Walking now'}</span>
+                <span className="faint tiny">{TRAVEL_LABEL[data.travelMode ?? 'walk']}</span>
                 <h1 className="h1">{walker} → {data.end.name}</h1>
-                <p className="p small">From {data.start.name}. Live position appears on the map while they walk.</p>
+                <p className="p small">From {data.start.name}. Live position appears on the map while they {data.travelMode === 'cycle' ? 'ride' : data.travelMode === 'wheelchair' ? 'travel' : 'walk'}.</p>
               </div>
               {state.alert && (
                 <div className="card card--red stack fade" role="alert">

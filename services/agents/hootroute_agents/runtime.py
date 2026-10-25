@@ -111,6 +111,7 @@ class Runtime:
     def make_walk(record: dict, guardian_url: str) -> Walk:
         return Walk(id=record["id"], walker=record["walker_name"], guardian=record["guardian_name"], guardian_phone=record.get("guardian_phone"),
                     guardian_url=guardian_url or "", origin=record["origin"], dest=record["destination"], day=record["depart_day"], minute=record["depart_minute"],
+                    travel_mode=record.get("travel_mode", "walk"), travel_options=record.get("travel_options") or {},
                     choice=record["choice"], replay=record["replay"], time_scale=record["time_scale"],
                     backup_name=record.get("backup_name"), backup_phone=record.get("backup_phone"),
                     notify_consent=bool(record.get("notify_consent")), sharing=bool(record.get("sharing", True)),

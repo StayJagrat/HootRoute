@@ -11,6 +11,7 @@ import numpy as np
 from .config import BBOX, STEP, WALK_SPEED, WEIGHTS
 from .scoring import Ctx, Norm, metrics, place_open, score
 from .world import DAYS, LATE_OK, World, day_minute, public_entrance
+from .mobility import cycle_lane, travel_profile
 
 Emit = Optional[Callable[[str, str, str, dict], None]]    # (agent, kind, message, data)
 LANDMARKS = [  # approximate coordinates, used for search and snapping only
@@ -38,8 +39,12 @@ class Engine:
         self.boot_seconds = round(time.time() - t0, 1)
 
     # ---------- context ----------
-    def ctx(self, session: str, day: int, minute: int) -> Ctx:
-        base = self.sessions.setdefault(session, Ctx(day, minute)); return Ctx(day, minute, {**self.declared.get(day, {}), **base.overrides})
+    def ctx(self, session: str, day: int, minute: int, profile=None) -> Ctx:
+        base = self.sessions.setdefault(session, Ctx(day, minute, profile=profile or travel_profile()))
+        return Ctx(day, minute, {**self.declared.get(day, {}), **base.overrides}, profile or base.profile)
+
+    def world(self, profile):
+        return self.W if profile.mode == "walk" else self.W.for_profile(profile)
 
     def set_declarations(self, declared: dict[int, dict[str, int]]):
         """Replace the city-wide shopkeeper declarations (loaded from the database). Every later ctx() sees them."""
@@ -49,8 +54,8 @@ class Engine:
         """Reference distribution for the neighbourhood of `near` (projected x, y in metres, or a (lon, lat) list via center_of)."""
         cell = Norm.cell_of(near if near is not None else self.W.proj.xy(37.7890, -122.4080))
         day, minute = day_minute(ctx.day, ctx.minute)
-        k = (cell, day, minute // 30)
-        if k not in self._norms: self._norms[k] = Norm.build(self.W, ctx, cell)
+        k = (cell, day, minute // 30) if ctx.profile.mode == "walk" else (cell, day, minute // 30, ctx.profile.key)
+        if k not in self._norms: self._norms[k] = Norm.build(self.world(ctx.profile), ctx, cell)
         return self._norms[k]
 
     def center_of(self, coords):
@@ -59,63 +64,72 @@ class Engine:
 
     # ---------- quick per-edge quality (used to steer the search, never shown as the score) ----------
     def quick(self, ctx: Ctx):
-        k = (ctx.day, ctx.minute // 15, tuple(sorted(ctx.overrides.items())))
+        k = (ctx.day, ctx.minute // 15, tuple(sorted(ctx.overrides.items())), ctx.profile.key)
         if k in self._quick: return self._quick[k]
-        W = self.W; m = (ctx.minute // 15) * 15
+        W = self.world(ctx.profile); m = (ctx.minute // 15) * 15
         open_p = np.array([pl["p"] for pl in W.places if not pl["help"] and place_open(W, pl, m, ctx)]) if W.places else np.zeros((0, 2))
         help_p = [pl["p"] for pl in W.places if (pl["help"] or pl["pharm"]) and public_entrance(pl) and place_open(W, pl, m, ctx)]
         n_open = W.count_edges_near(open_p, 0.5, 50); n_help = W.count_edges_near(np.array(help_p) if help_p else np.zeros((0, 2)), 0.5, 120)
         q = 0.45 * W.e_light + 0.35 * np.minimum(1.0, n_open / 3.0) + 0.20 * np.minimum(1.0, n_help)
+        if ctx.profile.mode == "cycle" and ctx.profile.prefer_cycleways:
+            q = .75 * q + .25 * np.array([cycle_lane(d.get("mode_tags", {})) for _, _, d in W.edges])
         self._quick[k] = q; return q
 
     # ---------- routing ----------
-    def _astar(self, a, b, weight):
-        G = self.W.G; h = lambda u, v: float(np.hypot(*(G.nodes[u]["p"] - G.nodes[v]["p"])))
-        return nx.astar_path(G, a, b, heuristic=h, weight=weight)
+    def _astar(self, a, b, weight, world=None):
+        G = (world or self.W).G; h = lambda u, v: float(np.hypot(*(G.nodes[u]["p"] - G.nodes[v]["p"])))
+        try: return nx.astar_path(G, a, b, heuristic=h, weight=weight)
+        except (nx.NetworkXNoPath, nx.NodeNotFound) as e:
+            raise ValueError("No connected route matches this travel mode and its mapped access restrictions. Try other points or options.") from e
 
-    def blocked_edges(self, avoid) -> set:
+    def blocked_edges(self, avoid, world=None) -> set:
         """Street segments passing within r metres of any (lat, lon, r) the walker reported as blocked."""
-        W = self.W
-        if not hasattr(self, "_seg"):
-            E = list(W.G.edges()); self._seg = (E, np.array([W.G.nodes[u]["p"] for u, _ in E]), np.array([W.G.nodes[v]["p"] for _, v in E]))
-        E, A, B = self._seg; AB = B - A; L2 = np.maximum((AB * AB).sum(1), 1e-9); out = set()
+        W = world or self.W
+        if not hasattr(W, "_avoid_segments"):
+            E = list(W.G.edges()); W._avoid_segments = (E, np.array([W.G.nodes[u]["p"] for u, _ in E]), np.array([W.G.nodes[v]["p"] for _, v in E]))
+        E, A, B = W._avoid_segments; AB = B - A; L2 = np.maximum((AB * AB).sum(1), 1e-9); out = set()
         for lat, lon, r in avoid or ():
             p = np.array(W.proj.xy(lat, lon)); t = np.clip(((p - A) * AB).sum(1) / L2, 0, 1)
             d = np.hypot(*(A + AB * t[:, None] - p).T); out |= {frozenset(E[i]) for i in np.where(d <= r)[0]}
         return out
 
     def route(self, session, origin, dest, day, minute, emit: Emit = None, max_extra=0.25, avoid=None,
-              max_extra_minutes=None, max_gap_m=None):
+              max_extra_minutes=None, max_gap_m=None, travel_mode="walk", travel_options=None):
         """Candidate routes scored at the minute each block is passed. `avoid` = [(lat, lon, radius_m)]: segments there cost
         10,000x (a detour unless there is no other way). The score itself never sees `avoid`."""
         with self.lock:
             for label, value in (("Extra walking time", max_extra_minutes), ("Longest gap", max_gap_m), ("Extra walking fraction", max_extra)):
                 if value is not None and (not math.isfinite(value) or value < 0): raise ValueError(f"{label} must be a finite nonnegative number.")
             day, minute = day_minute(day, minute)
-            t0 = time.time(); W = self.W; ctx = self.ctx(session, day, minute); say = emit or (lambda *a, **k: None)
+            profile = travel_profile(travel_mode, travel_options)
+            t0 = time.time(); W = self.world(profile); ctx = self.ctx(session, day, minute, profile); say = emit or (lambda *a, **k: None)
             a, da = W.nearest_node(*origin); b, db = W.nearest_node(*dest)
+            snap_limit = 50 if profile.require_known_access else 250
+            if profile.mode != "walk" and max(da, db) > snap_limit:
+                raise ValueError(f"A start or destination is more than {snap_limit} m from a mapped connection for this mode. Choose a closer point or relax the access options.")
+            astar = (lambda a, b, weight: self._astar(a, b, weight)) if profile.mode == "walk" else (lambda a, b, weight: self._astar(a, b, weight, W))
             say("guide", "start", f"Planning {DAYS[day]} {minute // 60 % 24}:{minute % 60:02d}. Snapped to the street graph ({da:.0f} m and {db:.0f} m from your points).", {})
             q = self.quick(ctx); eidx = W.e_index
-            blocked = self.blocked_edges(avoid) if avoid else set()
+            blocked = self.blocked_edges(avoid, W) if avoid else set()
             pen = (lambda u, v: 1e4 if frozenset((u, v)) in blocked else 1.0) if blocked else (lambda u, v: 1.0)
             paths = {}
             if blocked:
-                nx.set_edge_attributes(W.G, {(u, v): d["length"] * pen(u, v) for u, v, d in W.G.edges(data=True)}, "len_av"); paths["fast"] = self._astar(a, b, "len_av")
+                nx.set_edge_attributes(W.G, {(u, v): d["length"] * pen(u, v) for u, v, d in W.G.edges(data=True)}, "len_av"); paths["fast"] = astar(a, b, "len_av")
             else:
-                paths["fast"] = self._astar(a, b, "length")
+                paths["fast"] = astar(a, b, "length")
             for lam in (1, 2, 4, 8):
                 w = {(u, v): d["length"] * (1 + lam * (1 - q[eidx[frozenset((u, v))]])) * pen(u, v) for u, v, d in W.G.edges(data=True)}
-                nx.set_edge_attributes(W.G, w, f"w{lam}"); paths[f"l{lam}"] = self._astar(a, b, f"w{lam}")
+                nx.set_edge_attributes(W.G, w, f"w{lam}"); paths[f"l{lam}"] = astar(a, b, f"w{lam}")
             for seed in range(6):                      # seeded perturbations of the quality-weighted cost give genuinely different alternatives
                 rng = np.random.default_rng(seed)
                 # Edge costs stay at least geometric length, so the A* heuristic remains admissible.
                 jit = rng.uniform(1.0, 1.9, len(W.edges))
                 w = {(u, v): d["length"] * (1 + 3 * (1 - q[eidx[frozenset((u, v))]])) * jit[eidx[frozenset((u, v))]] * pen(u, v) for u, v, d in W.G.edges(data=True)}
-                nx.set_edge_attributes(W.G, w, "wj"); paths[f"j{seed}"] = self._astar(a, b, "wj")
+                nx.set_edge_attributes(W.G, w, "wj"); paths[f"j{seed}"] = astar(a, b, "wj")
             # Bounded alternatives also consider conditions at expected arrival
             # and penalize reused edges, rather than relying only on departure-time jitter.
-            travel = sum(W.G.edges[u, v]["length"] for u, v in zip(paths["fast"], paths["fast"][1:])) / WALK_SPEED / 60
-            arrival_q = self.quick(Ctx(day, minute + travel, ctx.overrides))
+            travel = sum(W.G.edges[u, v]["length"] for u, v in zip(paths["fast"], paths["fast"][1:])) / profile.speed / 60
+            arrival_q = self.quick(Ctx(day, minute + travel, ctx.overrides, profile))
             quality = (q + arrival_q) / 2; reused = {}
             previous = paths["fast"]
             for iteration in range(3):
@@ -123,7 +137,7 @@ class Engine:
                     key = frozenset((u, v)); reused[key] = reused.get(key, 0) + 1
                 w = {(u, v): d["length"] * (1 + 3 * (1 - quality[eidx[frozenset((u, v))]]))
                      * (1 + 0.6 * reused.get(frozenset((u, v)), 0)) * pen(u, v) for u, v, d in W.G.edges(data=True)}
-                nx.set_edge_attributes(W.G, w, "wd"); previous = self._astar(a, b, "wd"); paths[f"d{iteration}"] = previous
+                nx.set_edge_attributes(W.G, w, "wd"); previous = astar(a, b, "wd"); paths[f"d{iteration}"] = previous
             uniq = {}; [uniq.setdefault(tuple(p), k) for k, p in paths.items()]
             say("guide", "step", f"Found {len(uniq)} distinct candidate routes. Scoring each at the minute you pass every block.", {"n": len(uniq), "why": "alternatives come from the quality-weighted search plus seeded perturbations"})
             N = self.norm(ctx, (W.G.nodes[a]["p"] + W.G.nodes[b]["p"]) / 2); ev = []
@@ -133,15 +147,15 @@ class Engine:
             limit = fast["m"]["minutes"] + max_extra_minutes if max_extra_minutes is not None else fast["m"]["minutes"] * (1 + max_extra)
             ok = [e for e in ev if e["m"]["minutes"] <= limit + 1e-9 and (max_gap_m is None or e["m"]["gap_m"] <= max_gap_m + 1e-9)]
             if not ok: raise ValueError("No candidate route meets the requested walking-time and gap limits. Relax a limit and plan again.")
-            rank = lambda e: (e["score"], -e["m"]["gap_m"], -e["m"]["minutes"])
+            rank = lambda e: ((e["m"]["cycleway_pct"],) if profile.mode == "cycle" and profile.prefer_cycleways else ()) + (e["score"], -e["m"]["gap_m"], -e["m"]["minutes"])
             best = max(ok, key=rank)
             near = [e for e in ok if e["m"]["minutes"] <= fast["m"]["minutes"] * 1.08]
             balanced = max(near, key=rank) if near else best
             say("guide", "done", f"Best route scores {best['score']} against {fast['score']} for the fastest, {best['m']['minutes'] - fast['m']['minutes']:+.1f} min. Longest empty stretch {fast['m']['gap_m']:.0f} m to {best['m']['gap_m']:.0f} m.",
                 {"best": best["score"], "fast": fast["score"], "why": "highest-scoring searched candidate within the requested walking-time and gap limits"})
-            options = [self._pack("fast", "Fastest", fast, ctx)]
-            if balanced["path"] not in (fast["path"], best["path"]): options.append(self._pack("balanced", "Balanced", balanced, ctx))
-            if best["path"] != fast["path"]: options.append(self._pack("best", "HootRoute", best, ctx))
+            options = [self._pack("fast", "Fastest", fast, ctx, W)]
+            if balanced["path"] not in (fast["path"], best["path"]): options.append(self._pack("balanced", "Balanced", balanced, ctx, W))
+            if best["path"] != fast["path"]: options.append(self._pack("best", "HootRoute", best, ctx, W))
             for o in options:
                 path = {"fast": fast, "balanced": balanced, "best": best}[o["id"]]["path"]
                 o["avoids"] = not blocked or not any(frozenset((u, v)) in blocked for u, v in zip(path, path[1:]))
@@ -149,18 +163,21 @@ class Engine:
                 o["meets_limits"] = any(e is candidate for candidate in ok)
             out = dict(depart=dict(day=DAYS[day], minute=minute), recommended="best" if best is not fast else "fast", norm=dict(lo=N.lo, hi=N.hi),
                        routes=options, candidates=len(uniq), ms=round((time.time() - t0) * 1000), avoided=len(blocked),
-                       limits={"maxExtraMinutes": max_extra_minutes, "maxGapM": max_gap_m, "maxExtraFraction": max_extra})
+                       limits={"maxExtraMinutes": max_extra_minutes, "maxGapM": max_gap_m, "maxExtraFraction": max_extra}, travelProfile=profile.summary())
             return out
 
-    def _pack(self, rid, label, e, ctx):
-        W, m = self.W, e["m"]; shops = []
+    def _pack(self, rid, label, e, ctx, world=None):
+        W, m = world or self.W, e["m"]; shops = []
         for idx, (d, off) in sorted(m["open_idx"].items(), key=lambda kv: kv[1][0]):
             pl = W.places[idx]; shops.append(dict(id=pl["id"], d=d, off=off, name=pl["name"], cat=pl["cat"], ll=pl["ll"], hours=pl["hours"]))
         return dict(id=rid, label=label, score=e["score"], points=e["pts"], weights=WEIGHTS, minutes=round(m["minutes"], 1), km=round(m["length"] / 1000, 2), places_open=m["n_open"],
                     gap=dict(m=round(m["gap_m"]), range=[round(x) for x in m["gap_range"]] if m["gap_range"] else None), light_pct=round(100 * m["light"]), main_pct=round(100 * m["main"]),
                     turns_per_km=round(m["tpk"], 1), outages_near=m["outages_near"], light_known_pct=round(100 * m["light_known"]), unknown_hours_nearby=m["unknown_hours"],
                     help_access_unknown=m["help_unverified"],
-                    coords=[W.G.nodes[n]["ll"] for n in e["path"]], shops=shops, covered=[bool(x) for x in m["covered"][::3]], steps=self.steps(e["path"]))
+                    travelMode=ctx.profile.mode, travelOptions=ctx.profile.options, speedMps=ctx.profile.speed,
+                    modeConditions={"cyclewayPct": round(m["cycleway_pct"]), "wheelchairTagsPct": round(m["access_known_pct"]),
+                                    "unknownSurfacePct": round(m["surface_unknown_pct"]), "unknownInclinePct": round(m["incline_unknown_pct"])},
+                    coords=[W.G.nodes[n]["ll"] for n in e["path"]], shops=shops, covered=[bool(x) for x in m["covered"][::3]], steps=self.steps(e["path"], W))
 
     # ---------- map layers ----------
     def heat(self, session, day, minute, cell=90.0):
@@ -223,22 +240,23 @@ class Engine:
     def suggest_declarations(self, session, route, day, minute, limit=6):
         """Places inside a route's empty stretch that are currently closed and plausible late-night businesses. Used by the demo what-if."""
         with self.lock:
-            W = self.W; ctx = self.ctx(session, day, minute); g = route["gap"]["range"]; out = []
+            profile = travel_profile(route.get("travelMode", "walk"), route.get("travelOptions"))
+            W = self.world(profile); ctx = self.ctx(session, day, minute, profile); g = route["gap"]["range"]; out = []
             if not g: return out
             coords = route["coords"]; P = np.array([W.proj.xy(c[1], c[0]) for c in coords]); cum = np.r_[0, np.cumsum(np.hypot(*np.diff(P, axis=0).T))]
             for pl in W.places:
                 if not pl["name"] or pl["cat"] not in LATE_OK or pl["help"] or pl["id"] in ctx.overrides: continue
                 d = np.hypot(P[:, 0] - pl["p"][0], P[:, 1] - pl["p"][1]); j = int(d.argmin())
                 if d[j] > 50 or not (g[0] - 30 <= cum[j] <= g[1] + 30): continue
-                if place_open(W, pl, minute + cum[j] / WALK_SPEED / 60, ctx): continue
+                if place_open(W, pl, minute + cum[j] / ctx.profile.speed / 60, ctx): continue
                 out.append(dict(id=pl["id"], name=pl["name"], cat=pl["cat"], hours=pl["hours"], at=round(float(cum[j])), ll=pl["ll"]))
             return out[:limit]
 
 
     # ---------- turn-by-turn ----------
-    def steps(self, path):
+    def steps(self, path, world=None):
         """Group consecutive edges by street name and describe each maneuver. Distances are along the route in metres."""
-        G = self.W.G; legs = []; cum = 0.0
+        G = (world or self.W).G; legs = []; cum = 0.0
         for i in range(len(path) - 1):
             d = G.edges[path[i], path[i + 1]]; name = d["name"] or "the path"
             if legs and legs[-1]["street"] == name: legs[-1]["len"] += d["length"]; legs[-1]["last"] = i
@@ -255,9 +273,10 @@ class Engine:
         return out
 
     # ---------- why this street ----------
-    def why(self, session, lat, lon, day, minute):
+    def why(self, session, lat, lon, day, minute, profile=None):
         with self.lock:
-            W = self.W; ctx = self.ctx(session, day, minute); p = W.proj.xy(lat, lon); d = np.hypot(W.e_mid[:, 0] - p[0], W.e_mid[:, 1] - p[1]); k = int(d.argmin())
+            ctx = self.ctx(session, day, minute, profile); W = self.world(ctx.profile)
+            p = W.proj.xy(lat, lon); d = np.hypot(W.e_mid[:, 0] - p[0], W.e_mid[:, 1] - p[1]); k = int(d.argmin())
             if d[k] > 80: return None
             a, b, ed = W.edges[k]; q = self.quick(ctx)[k]
             near = [pl for pl in W.places if np.hypot(*(pl["p"] - W.e_mid[k])) <= 60 + W.e_len[k] / 2]

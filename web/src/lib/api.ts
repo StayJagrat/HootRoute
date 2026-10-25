@@ -1,4 +1,4 @@
-import type { AgentName, DemoData, LngLat, RouteStats, Thresholds } from './types';
+import type { AgentName, DemoData, LngLat, RouteStats, Thresholds, TravelSettings } from './types';
 import { BRAND } from './brand';
 
 // Every screen talks to the live gateway agents. One switch for indoor demos:
@@ -111,8 +111,8 @@ export interface PreferenceChoice { optionId: 'fast' | 'balanced' | 'best'; reas
 export type Plan = DemoData & { planId: string; preferenceChoice?: PreferenceChoice | null };
 export type WalkChoice = 'hootroute' | 'usual' | 'balanced';
 
-export function createPlan(from: Spot, to: Spot, when: { day: number; minute: number } | null, signal?: AbortSignal, preferences?: Partial<Preferences>) {
-  return call<Plan>('/api/plans', { method: 'POST', signal, body: JSON.stringify({ origin: point(from), destination: point(to), day: when?.day ?? null, minute: when?.minute ?? null, ...(preferences ? { preferences } : {}) }) });
+export function createPlan(from: Spot, to: Spot, when: { day: number; minute: number } | null, signal?: AbortSignal, preferences?: Partial<Preferences>, travel?: TravelSettings) {
+  return call<Plan>('/api/plans', { method: 'POST', signal, body: JSON.stringify({ origin: point(from), destination: point(to), day: when?.day ?? null, minute: when?.minute ?? null, ...(preferences ? { preferences } : {}), travelMode: travel?.mode ?? 'walk', travelOptions: travel?.options ?? {} }) });
 }
 
 export interface NewWalk { walkId: string; walkerToken: string; guardianUrl: string; walkPath: string; sms: boolean }
@@ -120,6 +120,7 @@ export interface NewWalk { walkId: string; walkerToken: string; guardianUrl: str
 export async function createWalk(p: {
   planId?: string; from: Spot; to: Spot; when: { day: number; minute: number } | null; choice: WalkChoice; notifyConsent?: boolean;
   walker: string; guardian: string; guardianPhone?: string; backupName?: string; backupPhone?: string; thresholds: Thresholds; replay: boolean; timeScale: number;
+  travel?: TravelSettings;
 }): Promise<NewWalk> {
   const w = await call<NewWalk>('/api/walks', {
     method: 'POST',
@@ -127,6 +128,7 @@ export async function createWalk(p: {
       planId: p.planId, origin: point(p.from), destination: point(p.to), day: p.when?.day ?? null, minute: p.when?.minute ?? null, choice: p.choice,
       walker: p.walker || 'Walker', guardian: p.guardian || 'Guardian', guardianPhone: p.guardianPhone || null, backupName: p.backupName || null, backupPhone: p.backupPhone || null, thresholds: p.thresholds, replay: p.replay, timeScale: p.timeScale,
       notifyConsent: !!p.notifyConsent,
+      travelMode: p.travel?.mode ?? 'walk', travelOptions: p.travel?.options ?? {},
     }),
   });
   saveWalkCreds(w.walkId, { token: w.walkerToken, guardianUrl: w.guardianUrl, created: Date.now(), choice: p.choice, sharing: true });
@@ -188,8 +190,8 @@ export interface HeadAnswer {
   preferences?: Preferences; preferenceChoice?: PreferenceChoice | null; pendingApproval?: Approval | null; evidence?: Evidence[];
   numbersCheck?: { ok: boolean; unverified: string[] };
 }
-export const askHead = (text: string, session?: string | null, allowChecks = false, signal?: AbortSignal) =>
-  call<HeadAnswer>('/api/head/ask', { method: 'POST', signal, body: JSON.stringify({ text, session: session ?? null, allowChecks }) });
+export const askHead = (text: string, session?: string | null, allowChecks = false, signal?: AbortSignal, travel?: TravelSettings) =>
+  call<HeadAnswer>('/api/head/ask', { method: 'POST', signal, body: JSON.stringify({ text, session: session ?? null, allowChecks, ...(travel ? { travelMode: travel.mode, travelOptions: travel.options } : {}) }) });
 export const approveHead = (session: string, approvalId: string, approve: boolean) =>
   call<HeadAnswer>('/api/head/approve', { method: 'POST', body: JSON.stringify({ session, approvalId, approve }) });
 export interface Inspection {

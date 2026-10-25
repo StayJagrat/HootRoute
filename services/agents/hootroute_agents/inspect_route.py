@@ -130,7 +130,18 @@ def inspect(engine, data: dict, routes: dict, key: str, day: int, minute: int) -
     warns = [i for i in items if i["level"] == "warn"]
     if route.get("help_access_unknown"):
         missing.append(f"Public entrance access is unverified for {route['help_access_unknown']} nearby help locations; they receive no help-access credit.")
+    mode = route.get("travelMode", "walk"); conditions = route.get("modeConditions") or {}
+    if mode == "cycle":
+        add("note", f"Mapped bike lanes or cycleways on {conditions.get('cyclewayPct', 0)}% of this route",
+            "Mapped bicycle access and one-way restrictions are applied. The estimate uses your selected cycling pace.", "OpenStreetMap bicycle and cycleway tags")
+    if mode == "wheelchair":
+        add("note", "Mapped step-free restrictions applied", "Mapped stairs, restricted wheelchair access and barriers outside your selected limits are excluded.", "OpenStreetMap access, surface, incline, width and kerb tags")
+        if conditions.get("wheelchairTagsPct", 0) < 100:
+            missing.append(f"Wheelchair access is not explicitly tagged on {100 - conditions.get('wheelchairTagsPct', 0)}% of the route. Untagged does not establish access.")
+        missing.append(f"Surface unknown on {conditions.get('unknownSurfacePct', 100)}%; measured incline unknown on {conditions.get('unknownInclinePct', 100)}%. Kerb and sidewalk data may also be missing. Check access before travelling.")
+    warns = [i for i in items if i["level"] == "warn"]
     verdict = "Good to go" if not warns else f"Heads up: {len(warns)} thing{'s' if len(warns) != 1 else ''} to know"
+    if mode == "wheelchair" and missing and not warns: verdict = "Heads up: access details are missing"
     order = {"warn": 0, "note": 1, "ok": 2}
-    return {"verdict": verdict, "good": not warns, "score": stats["score"], "minutes": stats["minutes"], "arrive": clock(arrive), "route": key,
+    return {"verdict": verdict, "good": not warns and not (mode == "wheelchair" and missing), "score": stats["score"], "minutes": stats["minutes"], "arrive": clock(arrive), "route": key,
             "items": sorted(items, key=lambda i: order[i["level"]]), "missing": missing, "note": "Conditions, not a safety rating. No crime data is used."}

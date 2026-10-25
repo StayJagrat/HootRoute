@@ -11,6 +11,7 @@ import { isMuted, setMuted, speak } from '../lib/voice';
 import { MapCanvas } from '../Map';
 import { minuteClock } from '../parts';
 import { Agent, Brand, Icon, Toggle } from '../ui';
+import { TravelNotice } from '../TravelControls';
 
 const KINDS: [ObstacleKind, string][] = [['blocked', 'Path blocked'], ['construction', 'Construction'], ['place_closed', 'Place closed'], ['want_detour', 'Different way'], ['other', 'Other']];
 const nowMin = () => new Date().getHours() * 60 + new Date().getMinutes();
@@ -26,6 +27,7 @@ export default function Walk() {
   const creds = walkCreds(walkId);
   const { state, send, status, refused } = useWalk(walkId, 'walker');
   const data = state.plan?.data;
+  const speed = data?.travelProfile?.speedMps ?? 1.35;
   const usual = creds?.choice === 'usual' && !state.switchedAt;
   const line: LngLat[] = useMemo(() => (data ? (usual ? data.shortest : data.route) : []), [data, usual]);
   const steps = data ? (usual ? data.routeSteps.shortest : data.routeSteps.hootroute) : [];
@@ -58,7 +60,7 @@ export default function Walk() {
     if (replaying) {
       const ts = state.plan?.timeScale ?? 6; const t = state.plan?.thresholds;
       replay.current?.stop();
-      replay.current = new GpsReplay(send, line, state.switchedAt ? null : data?.stopAt ?? null, ts, t ? (t.stopSeconds + t.replySeconds + t.escalateSeconds * 4) * 1000 / ts + 15000 : 60000);
+      replay.current = new GpsReplay(send, line, state.switchedAt ? null : data?.stopAt ?? null, ts, t ? (t.stopSeconds + t.replySeconds + t.escalateSeconds * 4) * 1000 / ts + 15000 : 60000, undefined, speed);
       replay.current.start();
       return () => replay.current?.stop();
     }
@@ -68,7 +70,7 @@ export default function Walk() {
       send({ type: 'walk.position', lngLat: f.lngLat, heading: f.heading, speed: f.speed, progress: pr.meters / cum[cum.length - 1], replay: false, accuracy: f.accuracy });
     }, setGpsErr);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lineKey, replaying]);
+  }, [lineKey, replaying, speed]);
   useEffect(() => { if (state.lastReply?.reply === 'fine') replay.current?.resume(); }, [state.lastReply]);
   useEffect(() => { if (state.phase === 'arrived') replay.current?.stop(); }, [state.phase]);
 
@@ -81,7 +83,7 @@ export default function Walk() {
   const pos = state.position?.lngLat ?? null;
   const meters = useMemo(() => (pos && line.length > 1 ? project(line, pos).meters : 0), [pos, line]);
   const total = useMemo(() => (line.length > 1 ? cumulative(line).at(-1) ?? 0 : 0), [line]);
-  const remainMin = total ? Math.max(0, (total - meters) / 1.35 / 60) : stats?.minutes ?? 0;
+  const remainMin = total ? Math.max(0, (total - meters) / speed / 60) : stats?.minutes ?? 0;
   const turn = nextTurn(steps, meters);
   const rec = state.recovery && !state.recovery.chosen ? state.recovery : null;
   const link = sharing ? walkCreds(walkId)?.guardianUrl ?? null : null;
@@ -144,6 +146,7 @@ export default function Walk() {
                 <button role="tab" className="tab" aria-selected={tab === 'journey'} onClick={() => setTab('journey')}>Journey</button>
                 <button role="tab" className="tab" aria-selected={tab === 'activity'} onClick={() => setTab('activity')}>Agent activity · {state.log.length}</button>
               </div>
+              <TravelNotice mode={data.travelMode} options={data.travelOptions} conditions={usual ? data.options?.find((o) => o.id === 'fast')?.modeConditions : data.modeConditions} />
               {tab === 'journey' && (
                 <>
                   {state.say && <div key={state.say.ts} className="card reveal stack--tight"><Agent id={state.say.agent} state={Date.now() - state.say.ts < 6000 ? 'talking' : 'idle'} /><p style={{ margin: 0 }}>{state.say.text}</p></div>}

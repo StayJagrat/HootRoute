@@ -42,7 +42,7 @@ export default function Landing() {
         <section className="hero">
           <span className="hero__kicker fade"><i /> {hp ? `${hp.engine?.segments?.toLocaleString() ?? ''} San Francisco street segments, scored live` : 'Agentic navigation for the journey after dark'}</span>
           <h1 className="fade">Your night shift<br />has a <em>wingman.</em></h1>
-          <p className="fade">HootRoute plans the walk after a late class or a late shift by what is listed open, lit and running at the minute you pass each block. It checks what it doesn't know, asks before it spends, and stays with you when the plan changes.</p>
+          <p className="fade">Walk, cycle, or plan a wheelchair / step-free journey after a late class or shift. HootRoute compares what is listed open, lit and running when you pass, shows missing access details, and stays with you when the plan changes.</p>
           <div className="hero__cta fade">
             <Link className="btn btn--primary btn--lg" to="/plan">Plan a journey <Icon name="arrow" size={17} /></Link>
             <a className="btn btn--ghost btn--lg" href="#crew">Meet the crew</a>

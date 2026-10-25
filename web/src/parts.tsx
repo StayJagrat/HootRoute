@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { ApifyRun, Approval, EvidencePlace, HeadAnswer, HoursCheck, PlanEvidence, RouteKey, Stats, TraceEvent } from './lib/api';
 import { clock } from './lib/format';
 import { PERSONA } from './lib/personas';
-import type { RouteOption } from './lib/types';
+import type { RouteOption, TravelMode } from './lib/types';
 import { Avatar } from './Avatar';
 import type { AgentName } from './lib/types';
 import { Agent, Icon } from './ui';
@@ -16,8 +16,8 @@ export function minuteClock(m: number) {
 const safeUrl = (u?: string | null) => (u && /^https?:\/\//.test(u) ? u : null);
 
 /** Candidate routes from the engine. Every number here is the engine's. */
-export function RouteList({ options, pick, onPick, depart, recommended, choiceReason }: {
-  options: RouteOption[]; pick: RouteKey; onPick: (k: RouteKey) => void; depart: number; recommended?: string; choiceReason?: string | null;
+export function RouteList({ options, pick, onPick, depart, recommended, choiceReason, travelMode = 'walk' }: {
+  options: RouteOption[]; pick: RouteKey; onPick: (k: RouteKey) => void; depart: number; recommended?: string; choiceReason?: string | null; travelMode?: TravelMode;
 }) {
   const order: RouteKey[] = ['best', 'balanced', 'fast'];
   const sorted = [...options].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
@@ -40,7 +40,7 @@ export function RouteList({ options, pick, onPick, depart, recommended, choiceRe
         </button>
       ))}
       {choiceReason && <p className="p small">{choiceReason}</p>}
-      <p className="faint tiny">Score compares this walk with typical walks nearby at the same hour. Conditions, not a safety rating. No crime data.</p>
+      <p className="faint tiny">{travelMode === 'walk' ? 'Score compares this walk with typical walks nearby at the same hour.' : 'Score compares this journey with routes nearby for this travel mode at the same hour.'} Conditions, not a safety rating. No crime data.</p>
     </div>
   );
 }

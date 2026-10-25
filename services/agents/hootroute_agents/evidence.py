@@ -19,6 +19,7 @@ import numpy as np
 
 from hootroute_engine.scoring import place_open
 from hootroute_engine.world import public_entrance
+from hootroute_engine.mobility import travel_profile
 
 from .config import env
 
@@ -82,7 +83,7 @@ def result_from_store(pid: str, e: dict) -> dict:
 
 
 # ---------------------------------------------------------------------------------------------- places along a route
-def along(engine, coords: list[list[float]], minute: int, radius: float = 50.0, named_only: bool = True) -> list[dict]:
+def along(engine, coords: list[list[float]], minute: int, radius: float = 50.0, named_only: bool = True, speed=WALK) -> list[dict]:
     """Places within `radius` m of the route with distance along it and the minute you pass them. Pure engine data."""
     W = engine.W
     pts = np.array([W.proj.xy(lat, lon) for lon, lat in coords])
@@ -101,7 +102,7 @@ def along(engine, coords: list[list[float]], minute: int, radius: float = 50.0, 
         if named_only and not pl.get("name"): continue
         d = np.hypot(D[:, 0] - pl["p"][0], D[:, 1] - pl["p"][1]); j = int(d.argmin())
         if d[j] > radius: continue
-        at = float(A[j]); out.append((pl, round(at), round(float(d[j])), int(minute + at / WALK / 60)))
+        at = float(A[j]); out.append((pl, round(at), round(float(d[j])), int(minute + at / speed / 60)))
     out.sort(key=lambda t: t[1])
     return out
 
@@ -111,13 +112,14 @@ def live_store(path) -> dict:
     except (OSError, ValueError): return {}
 
 
-def route_evidence(engine, coords, day: int, minute: int, route_key: str, limit: int = 40) -> dict:
+def route_evidence(engine, coords, day: int, minute: int, route_key: str, limit: int = 40, travel_mode="walk", travel_options=None) -> dict:
     """Evidence Explorer rows for one route: hours, listed open at your pass minute (or unknown), and provenance."""
     from .hours_check import LIVE_FILE
     store = live_store(LIVE_FILE); rows = []; help_points = []; counts = {"listed": 0, "live": 0, "shopkeeper": 0, "unknown": 0, "stale": 0}
     with engine.lock:
-        ctx = engine.ctx("_evidence", day, minute)
-        for pl, at, off, pass_min in along(engine, coords, minute):
+        profile = travel_profile(travel_mode, travel_options)
+        ctx = engine.ctx("_evidence", day, minute, profile)
+        for pl, at, off, pass_min in along(engine, coords, minute, speed=profile.speed):
             if pl["help"]:
                 help_points.append({"id": pl["id"], "name": pl["name"], "hoursKnown": pl["hours"] is not None,
                                     "mappedPublicEntrance": public_entrance(pl), "confirmedOpenNow": False,

@@ -6,6 +6,7 @@ import networkx as nx
 import numpy as np
 
 from .config import BBOX, CACHE
+from .mobility import TravelProfile, allows, directions
 
 DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
 GTFS_COLS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
@@ -73,18 +74,42 @@ class World:
     # ---------- graph ----------
     def _load_graph(self):
         ways = json.loads((CACHE / "osm_ways.json").read_text(encoding="utf-8")); G = nx.Graph(); P = self.proj
+        self._raw_nodes = {}; self._raw_edges = []; self._profile_views = {}; self.profile = TravelProfile()
         for wy in ways:
             if wy.get("type") != "way" or "geometry" not in wy: continue
             nodes, geom, tags = wy["nodes"], wy["geometry"], wy.get("tags", {})
-            if tags.get("foot") in {"no", "private"} or tags.get("access") in {"no", "private"}: continue
+            walk_allowed = tags.get("foot") not in {"no", "private"} and tags.get("access") not in {"no", "private"}
             for i in range(len(nodes) - 1):
                 a, b = nodes[i], nodes[i + 1]; pa, pb = P.xy(geom[i]["lat"], geom[i]["lon"]), P.xy(geom[i + 1]["lat"], geom[i + 1]["lon"])
                 L = float(np.hypot(*(pa - pb)))
                 if L < 1: continue
-                G.add_node(a, p=pa, ll=[geom[i]["lon"], geom[i]["lat"]]); G.add_node(b, p=pb, ll=[geom[i + 1]["lon"], geom[i + 1]["lat"]])
-                G.add_edge(a, b, length=L, mid=(pa + pb) / 2, name=tags.get("name", ""), lit=tags.get("lit"), hw=tags.get("highway"), way=wy["id"])
+                na = dict(p=pa, ll=[geom[i]["lon"], geom[i]["lat"]]); nb = dict(p=pb, ll=[geom[i + 1]["lon"], geom[i + 1]["lat"]])
+                ed = dict(length=L, mid=(pa + pb) / 2, name=tags.get("name", ""), lit=tags.get("lit"), hw=tags.get("highway"), way=wy["id"], mode_tags=tags)
+                self._raw_nodes[a] = na; self._raw_nodes[b] = nb; self._raw_edges.append((a, b, ed))
+                if walk_allowed:
+                    G.add_node(a, **na); G.add_node(b, **nb); G.add_edge(a, b, **ed)
         self.G = G.subgraph(max(nx.connected_components(G), key=len)).copy()
         self.nodes = list(self.G.nodes); self.node_p = np.array([self.G.nodes[n]["p"] for n in self.nodes])
+
+    def for_profile(self, profile):
+        if profile.mode == "walk": return self
+        if profile.key in self._profile_views: return self._profile_views[profile.key]
+        graph = nx.DiGraph() if profile.mode == "cycle" else nx.Graph()
+        for a, b, ed in self._raw_edges:
+            if not allows(ed["mode_tags"], profile): continue
+            graph.add_node(a, **self._raw_nodes[a]); graph.add_node(b, **self._raw_nodes[b])
+            for direction in directions(ed["mode_tags"], profile):
+                graph.add_edge(a if direction == 1 else b, b if direction == 1 else a, **ed)
+        if not graph.number_of_edges(): raise ValueError("No mapped network matches these travel options. Adjust the access or surface options.")
+        components = nx.weakly_connected_components(graph) if graph.is_directed() else nx.connected_components(graph)
+        graph = graph.subgraph(max(components, key=len)).copy()
+        view = object.__new__(World); view.__dict__ = self.__dict__.copy()
+        view.__dict__.pop("_avoid_segments", None)  # a walking obstacle cache contains different edges
+        view.G = graph; view.profile = profile; view._help_access = {}
+        view.nodes = list(graph); view.node_p = np.array([graph.nodes[n]["p"] for n in view.nodes]); view._edge_static()
+        if len(self._profile_views) >= 4: self._profile_views.pop(next(iter(self._profile_views)))
+        self._profile_views[profile.key] = view
+        return view
 
     # ---------- OSM points ----------
     def _load_points(self):
@@ -175,7 +200,8 @@ class World:
         if key not in cache:
             delta = np.hypot(self.node_p[:, 0] - place["p"][0], self.node_p[:, 1] - place["p"][1])
             i = int(delta.argmin()); snap = float(delta[i])
-            lengths = nx.single_source_dijkstra_path_length(self.G, self.nodes[i], cutoff=200, weight="length") if snap <= 30 else {}
+            graph = self.G.reverse(copy=False) if self.G.is_directed() else self.G
+            lengths = nx.single_source_dijkstra_path_length(graph, self.nodes[i], cutoff=200, weight="length") if snap <= 30 else {}
             cache[key] = (snap, lengths)
         snap, lengths = cache[key]
         points = np.array([self.G.nodes[n]["p"] for n in path])
