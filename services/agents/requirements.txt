@@ -1,0 +1,6 @@
+uagents>=0.25.5
+httpx
+python-dotenv
+networkx>=3.3
+numpy>=2.0
+aiohttp

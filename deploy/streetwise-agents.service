@@ -1,0 +1,15 @@
+# Only with AGENT_RUNTIME=uagents in /opt/streetwise/.env: the five agents as registered uAgents (Agentverse mailbox).
+[Unit]
+Description=Streetwise uAgents bureau (Scout, Watcher, Rescuer, Reporter, Night Auditor)
+After=network-online.target streetwise-gateway.service
+
+[Service]
+User=streetwise
+WorkingDirectory=/opt/streetwise/services/agents
+EnvironmentFile=/opt/streetwise/.env
+ExecStart=/opt/streetwise/.venv-agents/bin/python live_bureau.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

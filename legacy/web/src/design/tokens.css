@@ -1,0 +1,34 @@
+/* Streetwise design tokens. Source of truth for the web app.
+   Values marked (sampled) were read from screenshots of the Figma file, not from its variables.
+   Replace them with the exported Figma variables when Abhishek shares them; names stay the same. */
+:root {
+  color-scheme: dark;
+  /* night surfaces */
+  --sw-bg: #131a29;            /* (sampled) app background */
+  --sw-surface: #1a2232;       /* (sampled) cards */
+  --sw-raise: #222c40;         /* (sampled) raised rows, inputs */
+  --sw-line: #2b3650;
+  /* text */
+  --sw-text: #eceae3;
+  --sw-muted: #8b95a8;
+  /* brand and signals */
+  --sw-primary: #7b8cf0;       /* (sampled) indigo: the Streetwise route, primary buttons */
+  --sw-on-primary: #0f1424;
+  --sw-ok: #5fcf9d;            /* (sampled) "I'm fine", open places */
+  --sw-warn: #e8975a;          /* (sampled) orange standing-order chips */
+  --sw-danger: #ff6b5a;        /* "Hold for help", empty stretch */
+  --sw-alert: #c0392b;         /* guardian alert background */
+  /* day surfaces (guardian and shop pages) */
+  --sw-day-bg: #f4f1ea;
+  --sw-day-surface: #ffffff;
+  --sw-day-text: #1b2030;
+  --sw-day-muted: #6b7280;
+  /* type */
+  --sw-font-display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --sw-font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sw-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* shape, space, motion */
+  --sw-r-chip: 99px; --sw-r-button: 16px; --sw-r-card: 18px; --sw-r-sheet: 28px;
+  --sw-s1: 4px; --sw-s2: 8px; --sw-s3: 12px; --sw-s4: 16px; --sw-s5: 24px; --sw-s6: 32px;
+  --sw-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}

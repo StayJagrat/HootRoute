@@ -1,0 +1,4 @@
+place_id,name,address,our_hours,verified_hours,verified_by,notes
+n11051910913,Walgreens,300 Montgomery Street,Mo-Fr 07:00-20:00; Sa 09:00-17:00; Su off,,,conf=0.92; source text: Monday: 7 AM to 8 PM; Tuesday: 7 AM to 8 PM; Wednesday: 7 AM to 8 PM; Thursday: 7 AM to 8 
+n806243208,Clay Medical Pharmacy,929 Clay Street,Mo-Fr 09:30-17:00; Sa 09:30-13:30; Su off,,,conf=0.92; source text: Monday: 9:30 AM to 5 PM; Tuesday: 9:30 AM to 5 PM; Wednesday: 9:30 AM to 5 PM; Thursday: 9
+n381955914,Walgreens,459,Mo-Su 07:00-24:00,,,conf=0.94; source text: Monday: 7 AM to 12 AM; Tuesday: 7 AM to 12 AM; Wednesday: 7 AM to 12 AM; Thursday: 7 AM to

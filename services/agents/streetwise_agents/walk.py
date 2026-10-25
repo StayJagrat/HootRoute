@@ -1,0 +1,95 @@
+"""Per-walk state the four agents share inside one runtime. Rebuilt from the walk record and room history after a restart."""
+from __future__ import annotations
+
+import time
+from dataclasses import dataclass, field
+
+from streetwise_engine import geo
+
+DEFAULT_THRESHOLDS = {"stopSeconds": 90, "replySeconds": 45, "escalateSeconds": 90}
+LIMITS = {"stopSeconds": (20, 600), "replySeconds": (10, 300), "escalateSeconds": (20, 900)}
+
+
+def effective_thresholds(raw: dict | None, replay: bool, time_scale: float) -> dict:
+    """Walker's standing orders, clamped. A labelled GPS replay runs faster than real time, so its timers shrink by the same factor."""
+    out = {}
+    for k, d in DEFAULT_THRESHOLDS.items():
+        v = (raw or {}).get(k, d)
+        lo, hi = LIMITS[k]; v = min(hi, max(lo, float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else d))
+        out[k] = v / max(1.0, time_scale) if replay else v
+    return out
+
+
+@dataclass
+class Walk:
+    id: str
+    walker: str
+    guardian: str
+    guardian_phone: str | None
+    guardian_url: str
+    origin: dict                    # {lat, lon, name}
+    dest: dict
+    day: int
+    minute: int
+    choice: str = "streetwise"
+    replay: bool = False
+    time_scale: float = 1.0
+    thresholds: dict = field(default_factory=lambda: dict(DEFAULT_THRESHOLDS))
+    backup_name: str | None = None   # optional second trusted contact (ladder step 3)
+    backup_phone: str | None = None
+    status: str = "planning"        # planning | planned | walking | checkin | escalated | ended
+    data: dict | None = None        # DemoData sent in walk.plan
+    routes: dict | None = None      # engine route dicts {'best', 'fast'}
+    started: float | None = None
+    # live position, computed here from lngLat (the client's own progress value is never trusted)
+    fix: list[float] | None = None
+    fix_ts: float = 0.0
+    meters: float = 0.0
+    offset: float = 0.0
+    anchor: list[float] | None = None
+    moved_ts: float = 0.0
+    asked_here: bool = False
+    offroute: int = 0
+    last_replan: float = 0.0
+    gps_quiet_logged: bool = False
+    # check-in and escalation ladder
+    reply_deadline: float = 0.0
+    escalate_deadline: float = 0.0
+    escalated_reason: str = ""
+    acked_by: str | None = None
+    followed_up: bool = False
+    sms_sent: bool = False
+    checkins: int = 0
+    ladder: int = 0                 # rescue ladder rung reached (0 = live link + SMS)
+    last_where: str | None = None
+    said: set = field(default_factory=set)
+    _line: list | None = None
+    _cum: list | None = None
+
+    # ---------- the line the walker chose ----------
+    def route(self) -> dict:
+        return self.routes["fast" if self.choice == "usual" else "best"]
+
+    def line(self) -> list:
+        if self._line is None:
+            self._line = self.data["shortest"] if self.choice == "usual" else self.data["route"]; self._cum = geo.cumulative(self._line)
+        return self._line
+
+    def cum(self) -> list: self.line(); return self._cum
+
+    def total(self) -> float: return self.cum()[-1]
+
+    def steps(self) -> list: return self.data["routeSteps"]["shortest" if self.choice == "usual" else "streetwise"]
+
+    def set_plan(self, data: dict, routes: dict):
+        self.data, self.routes, self._line, self._cum = data, routes, None, None
+
+    def set_choice(self, choice: str):
+        self.choice = "usual" if choice == "usual" else "streetwise"; self._line = self._cum = None
+
+    @property
+    def active(self) -> bool: return self.status in ("walking", "checkin", "escalated")
+
+    def first_name(self, who: str) -> str: return (who.split() or ["your guardian"])[0]
+
+    def now(self) -> float: return time.time()

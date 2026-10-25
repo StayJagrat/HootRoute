@@ -1,0 +1,3368 @@
+{
+ "w256061659": {
+  "opening_hours": "Mo-Su 08:00-24:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 8 AM to 12 AM; Tuesday: 8 AM to 12 AM; Wednesday: 8 AM to 12 AM; Thursday: 8 AM to 12 AM; Friday: 8 AM to 12 AM; Saturday: 8 AM to 12 AM; Sunday: 8 AM to 12 AM",
+  "matched_name": "Food & Liquor World",
+  "distance_m": 0.2
+ },
+ "n2956811059": {
+  "opening_hours": "Mo-Fr 07:00-10:00,11:00-14:00,17:00-21:00; Sa 07:00-14:30,17:00-22:00; Su 07:00-14:30,17:00-21:00",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 7 to 10 AM, 11 AM to 2 PM, 5 to 9 PM; Tuesday: 7 to 10 AM, 11 AM to 2 PM, 5 to 9 PM; Wednesday: 7 to 10 AM, 11 AM to 2 PM, 5 to 9 PM; Thursday: 7 to 10 AM, 11 AM to 2 PM, 5 to 9 PM; Friday: 7 to 10 AM, 11 AM to 2 PM, 5 to 9 PM; Saturday: 7 AM to 2:30 PM, 5 to 10 PM; Sunday: 7 AM to 2:30 PM, 5 to 9 PM",
+  "matched_name": "The Big Four",
+  "distance_m": 0.3
+ },
+ "n10023428672": {
+  "opening_hours": "Mo-Su 06:00-02:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 6 AM to 2 AM; Tuesday: 6 AM to 2 AM; Wednesday: 6 AM to 2 AM; Thursday: 6 AM to 2 AM; Friday: 6 AM to 2 AM; Saturday: 6 AM to 2 AM; Sunday: 6 AM to 2 AM",
+  "matched_name": "Starlight Market",
+  "distance_m": 0.3
+ },
+ "w332372778": {
+  "opening_hours": "Mo-Sa 11:30-14:30,17:00-20:00; Su off",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11:30 AM to 2:30 PM, 5 to 8 PM; Tuesday: 11:30 AM to 2:30 PM, 5 to 8 PM; Wednesday: 11:30 AM to 2:30 PM, 5 to 8 PM; Thursday: 11:30 AM to 2:30 PM, 5 to 8 PM; Friday: 11:30 AM to 2:30 PM, 5 to 8 PM; Saturday: 11:30 AM to 2:30 PM, 5 to 8 PM; Sunday: Closed",
+  "matched_name": "Le Central",
+  "distance_m": 0.5
+ },
+ "n4259754690": {
+  "opening_hours": "Mo-Th,Su 11:00-23:00; Fr-Sa 11:00-23:30",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 11 PM; Tuesday: 11 AM to 11 PM; Wednesday: 11 AM to 11 PM; Thursday: 11 AM to 11 PM; Friday: 11 AM to 11:30 PM; Saturday: 11 AM to 11:30 PM; Sunday: 11 AM to 11 PM",
+  "matched_name": "Parrot Pizzeria & Rotisserie",
+  "distance_m": 0.5
+ },
+ "n9397915518": {
+  "opening_hours": "Mo-Sa 08:30-17:00; Su 08:30-16:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 8:30 AM to 5 PM; Tuesday: 8:30 AM to 5 PM; Wednesday: 8:30 AM to 5 PM; Thursday: 8:30 AM to 5 PM; Friday: 8:30 AM to 5 PM; Saturday: 8:30 AM to 5 PM; Sunday: 8:30 AM to 4 PM",
+  "matched_name": "Cafe Bean",
+  "distance_m": 0.6
+ },
+ "n1485992620": {
+  "opening_hours": "Mo-We 16:00-02:00; Th-Su 13:00-02:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 PM to 2 AM; Tuesday: 4 PM to 2 AM; Wednesday: 4 PM to 2 AM; Thursday: 1 PM to 2 AM; Friday: 1 PM to 2 AM; Saturday: 1 PM to 2 AM; Sunday: 1 PM to 2 AM",
+  "matched_name": "Chelsea Place",
+  "distance_m": 0.6
+ },
+ "n6488820630": {
+  "opening_hours": "Mo-Sa 07:30-14:30; Su 08:30-14:30",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7:30 AM to 2:30 PM; Tuesday: 7:30 AM to 2:30 PM; Wednesday: 7:30 AM to 2:30 PM; Thursday: 7:30 AM to 2:30 PM; Friday: 7:30 AM to 2:30 PM; Saturday: 7:30 AM to 2:30 PM; Sunday: 8:30 AM to 2:30 PM",
+  "matched_name": "Cafe La Tazita",
+  "distance_m": 0.8
+ },
+ "n4625128138": {
+  "opening_hours": "Mo-Fr 11:00-19:00; Sa-Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 7 PM; Tuesday: 11 AM to 7 PM; Wednesday: 11 AM to 7 PM; Thursday: 11 AM to 7 PM; Friday: 11 AM to 7 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Sababa",
+  "distance_m": 0.8
+ },
+ "n4364025826": {
+  "opening_hours": "Tu-Sa 17:00-22:00; Mo,Su off",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: Closed; Tuesday: 5 to 10 PM; Wednesday: 5 to 10 PM; Thursday: 5 to 10 PM; Friday: 5 to 10 PM; Saturday: 5 to 10 PM; Sunday: Closed",
+  "matched_name": "Mister Jiu's",
+  "distance_m": 0.9
+ },
+ "n4625130232": {
+  "opening_hours": "Mo-Fr 10:00-15:00; Sa-Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:06:26+00:00",
+  "raw": "Monday: 10 AM to 3 PM; Tuesday: 10 AM to 3 PM; Wednesday: 10 AM to 3 PM; Thursday: 10 AM to 3 PM; Friday: 10 AM to 3 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Ayola",
+  "distance_m": 0.9
+ },
+ "n4259754689": {
+  "opening_hours": "Mo-Fr 07:00-15:00; Sa-Su 08:00-16:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 7 AM to 3 PM; Tuesday: 7 AM to 3 PM; Wednesday: 7 AM to 3 PM; Thursday: 7 AM to 3 PM; Friday: 7 AM to 3 PM; Saturday: 8 AM to 4 PM; Sunday: 8 AM to 4 PM",
+  "matched_name": "Fresh Brew Coffee",
+  "distance_m": 0.9
+ },
+ "w332500661": {
+  "opening_hours": "We-Su 08:00-16:00; Mo-Tu off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: Closed; Tuesday: Closed; Wednesday: 8 AM to 4 PM; Thursday: 8 AM to 4 PM; Friday: 8 AM to 4 PM; Saturday: 8 AM to 4 PM; Sunday: 8 AM to 4 PM",
+  "matched_name": "b. patisserie",
+  "distance_m": 1.0
+ },
+ "n725082462": {
+  "opening_hours": "Mo-Th,Su 09:00-22:00; Fr-Sa 09:00-22:30",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 9 AM to 10 PM; Tuesday: 9 AM to 10 PM; Wednesday: 9 AM to 10 PM; Thursday: 9 AM to 10 PM; Friday: 9 AM to 10:30 PM; Saturday: 9 AM to 10:30 PM; Sunday: 9 AM to 10 PM",
+  "matched_name": "MARCELA'S TAQUERÍA",
+  "distance_m": 1.1
+ },
+ "w259942667": {
+  "opening_hours": "Mo-Sa 17:00-21:00; Su off",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 to 9 PM; Tuesday: 5 to 9 PM; Wednesday: 5 to 9 PM; Thursday: 5 to 9 PM; Friday: 5 to 9 PM; Saturday: 5 to 9 PM; Sunday: Closed",
+  "matched_name": "Liholiho Yacht Club",
+  "distance_m": 1.1
+ },
+ "n3455075366": {
+  "opening_hours": "Mo,Sa-Su 07:00-14:00; Tu-Fr 06:30-14:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 7 AM to 2 PM; Tuesday: 6:30 AM to 2 PM; Wednesday: 6:30 AM to 2 PM; Thursday: 6:30 AM to 2 PM; Friday: 6:30 AM to 2 PM; Saturday: 7 AM to 2 PM; Sunday: 7 AM to 2 PM",
+  "matched_name": "TRACE",
+  "distance_m": 1.1
+ },
+ "n1928508899": {
+  "opening_hours": "Tu-Sa 11:30-16:00; Mo,Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: Closed; Tuesday: 11:30 AM to 4 PM; Wednesday: 11:30 AM to 4 PM; Thursday: 11:30 AM to 4 PM; Friday: 11:30 AM to 4 PM; Saturday: 11:30 AM to 4 PM; Sunday: Closed",
+  "matched_name": "Scott’s Chowder House",
+  "distance_m": 1.1
+ },
+ "n1928504681": {
+  "opening_hours": "Tu-Th 11:30-21:00; Fr-Sa 12:00-21:00; Mo,Su off",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: 11:30 AM to 9 PM; Wednesday: 11:30 AM to 9 PM; Thursday: 11:30 AM to 9 PM; Friday: 12 to 9 PM; Saturday: 12 to 9 PM; Sunday: Closed",
+  "matched_name": "E&O Kitchen and Bar",
+  "distance_m": 1.1
+ },
+ "n2249505473": {
+  "opening_hours": "Mo-Fr 14:00-02:00; Sa-Su 12:00-02:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 2 PM to 2 AM; Tuesday: 2 PM to 2 AM; Wednesday: 2 PM to 2 AM; Thursday: 2 PM to 2 AM; Friday: 2 PM to 2 AM; Saturday: 12 PM to 2 AM; Sunday: 12 PM to 2 AM",
+  "matched_name": "The Summer Place",
+  "distance_m": 1.2
+ },
+ "n4628353544": {
+  "opening_hours": "Mo-Fr 08:00-16:00; Sa-Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 4 PM; Tuesday: 8 AM to 4 PM; Wednesday: 8 AM to 4 PM; Thursday: 8 AM to 4 PM; Friday: 8 AM to 4 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Working Girls' Cafe",
+  "distance_m": 1.2
+ },
+ "n9546656577": {
+  "opening_hours": "Tu-Th,Su 11:00-20:30; Fr-Sa 11:00-21:30; Mo off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: Closed; Tuesday: 11 AM to 8:30 PM; Wednesday: 11 AM to 8:30 PM; Thursday: 11 AM to 8:30 PM; Friday: 11 AM to 9:30 PM; Saturday: 11 AM to 9:30 PM; Sunday: 11 AM to 8:30 PM",
+  "matched_name": "Once Upon a Dosa",
+  "distance_m": 1.2
+ },
+ "n410845445": {
+  "opening_hours": "Mo-Su 07:00-20:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 8 PM; Tuesday: 7 AM to 8 PM; Wednesday: 7 AM to 8 PM; Thursday: 7 AM to 8 PM; Friday: 7 AM to 8 PM; Saturday: 7 AM to 8 PM; Sunday: 7 AM to 8 PM",
+  "matched_name": "Another Cafe",
+  "distance_m": 1.2
+ },
+ "n9529168618": {
+  "opening_hours": "Mo-Sa 10:00-19:00; Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 10 AM to 7 PM; Tuesday: 10 AM to 7 PM; Wednesday: 10 AM to 7 PM; Thursday: 10 AM to 7 PM; Friday: 10 AM to 7 PM; Saturday: 10 AM to 7 PM; Sunday: Closed",
+  "matched_name": "New Ming's",
+  "distance_m": 1.2
+ },
+ "n2336730289": {
+  "opening_hours": "Mo-Fr 11:00-15:00; Sa-Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 3 PM; Tuesday: 11 AM to 3 PM; Wednesday: 11 AM to 3 PM; Thursday: 11 AM to 3 PM; Friday: 11 AM to 3 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "SAJJ Mediterranean (SF FiDi)",
+  "distance_m": 1.3
+ },
+ "n2365742146": {
+  "opening_hours": "Mo-Tu 04:30-03:00; We 04:30-24:00; Th-Sa 00:00-24:00; Su 04:00-01:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 4:30 AM to 3 AM; Tuesday: 4:30 AM to 3 AM; Wednesday: 4:30 AM to 12 AM; Thursday: Open 24 hours; Friday: Open 24 hours; Saturday: Open 24 hours; Sunday: 4 AM to 1 AM",
+  "matched_name": "McDonald's",
+  "distance_m": 1.4
+ },
+ "n1073821273": {
+  "opening_hours": "Mo-Su 09:00-21:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 9 AM to 9 PM; Tuesday: 9 AM to 9 PM; Wednesday: 9 AM to 9 PM; Thursday: 9 AM to 9 PM; Friday: 9 AM to 9 PM; Saturday: 9 AM to 9 PM; Sunday: 9 AM to 9 PM",
+  "matched_name": "J & W Market",
+  "distance_m": 1.4
+ },
+ "n4168057691": {
+  "opening_hours": "Mo-Su 06:30-20:30",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 6:30 AM to 8:30 PM; Tuesday: 6:30 AM to 8:30 PM; Wednesday: 6:30 AM to 8:30 PM; Thursday: 6:30 AM to 8:30 PM; Friday: 6:30 AM to 8:30 PM; Saturday: 6:30 AM to 8:30 PM; Sunday: 6:30 AM to 8:30 PM",
+  "matched_name": "V CAFE LLC",
+  "distance_m": 1.4
+ },
+ "n1613829043": {
+  "opening_hours": "Mo-Th 08:00-21:00; Fr 08:00-22:00; Sa 09:00-21:00; Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 8 AM to 9 PM; Tuesday: 8 AM to 9 PM; Wednesday: 8 AM to 9 PM; Thursday: 8 AM to 9 PM; Friday: 8 AM to 10 PM; Saturday: 9 AM to 9 PM; Sunday: Closed",
+  "matched_name": "Sammy's on 2nd",
+  "distance_m": 1.5
+ },
+ "n335444374": {
+  "opening_hours": "Mo-Fr 05:00-17:30; Sa-Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 5 AM to 5:30 PM; Tuesday: 5 AM to 5:30 PM; Wednesday: 5 AM to 5:30 PM; Thursday: 5 AM to 5:30 PM; Friday: 5 AM to 5:30 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Peet's Coffee",
+  "distance_m": 1.5
+ },
+ "n4631891265": {
+  "opening_hours": "Mo-Su 05:00-24:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 5 AM to 12 AM; Tuesday: 5 AM to 12 AM; Wednesday: 5 AM to 12 AM; Thursday: 5 AM to 12 AM; Friday: 5 AM to 12 AM; Saturday: 5 AM to 12 AM; Sunday: 5 AM to 12 AM",
+  "matched_name": "MI REYNA MARKET",
+  "distance_m": 1.5
+ },
+ "n3190922045": {
+  "opening_hours": "Mo-Su 08:00-13:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 1 PM; Tuesday: 8 AM to 1 PM; Wednesday: 8 AM to 1 PM; Thursday: 8 AM to 1 PM; Friday: 8 AM to 1 PM; Saturday: 8 AM to 1 PM; Sunday: 8 AM to 1 PM",
+  "matched_name": "Taylor Street Coffee Shop",
+  "distance_m": 1.6
+ },
+ "n4637773278": {
+  "opening_hours": "Mo-Su 16:00-02:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 4 PM to 2 AM; Tuesday: 4 PM to 2 AM; Wednesday: 4 PM to 2 AM; Thursday: 4 PM to 2 AM; Friday: 4 PM to 2 AM; Saturday: 4 PM to 2 AM; Sunday: 4 PM to 2 AM",
+  "matched_name": "FALAFEL CITY",
+  "distance_m": 1.7
+ },
+ "n725082400": {
+  "opening_hours": "off",
+  "confidence": 0.85,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Temporarily closed",
+  "matched_name": "Halal Fried Chicken",
+  "distance_m": 1.8
+ },
+ "n4632085289": {
+  "opening_hours": "Mo-Fr 06:00-23:00; Sa 09:00-21:00; Su 09:00-18:30",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 6 AM to 11 PM; Tuesday: 6 AM to 11 PM; Wednesday: 6 AM to 11 PM; Thursday: 6 AM to 11 PM; Friday: 6 AM to 11 PM; Saturday: 9 AM to 9 PM; Sunday: 9 AM to 6:30 PM",
+  "matched_name": "Bay Food Mini Market",
+  "distance_m": 1.8
+ },
+ "n12939867830": {
+  "opening_hours": "Tu-Th 11:00-20:00; Fr-Sa 11:00-21:00; Mo,Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: Closed; Tuesday: 11 AM to 8 PM; Wednesday: 11 AM to 8 PM; Thursday: 11 AM to 8 PM; Friday: 11 AM to 9 PM; Saturday: 11 AM to 9 PM; Sunday: Closed",
+  "matched_name": "Al Pastor Papi",
+  "distance_m": 1.9
+ },
+ "n9546656576": {
+  "opening_hours": "Mo-Sa 11:00-21:00; Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 9 PM; Tuesday: 11 AM to 9 PM; Wednesday: 11 AM to 9 PM; Thursday: 11 AM to 9 PM; Friday: 11 AM to 9 PM; Saturday: 11 AM to 9 PM; Sunday: Closed",
+  "matched_name": "Poke Bowl",
+  "distance_m": 2.0
+ },
+ "n4625129274": {
+  "opening_hours": "Mo-Th 09:00-22:00; Fr 09:00-23:00; Sa 10:00-23:00; Su 10:00-17:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 9 AM to 10 PM; Tuesday: 9 AM to 10 PM; Wednesday: 9 AM to 10 PM; Thursday: 9 AM to 10 PM; Friday: 9 AM to 11 PM; Saturday: 10 AM to 11 PM; Sunday: 10 AM to 5 PM",
+  "matched_name": "Financial District Wine & Spirits",
+  "distance_m": 2.1
+ },
+ "n9341841101": {
+  "opening_hours": "Mo-Th 11:30-18:30; Fr-Sa 11:30-20:00; Su 11:30-19:30",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11:30 AM to 6:30 PM; Tuesday: 11:30 AM to 6:30 PM; Wednesday: 11:30 AM to 6:30 PM; Thursday: 11:30 AM to 6:30 PM; Friday: 11:30 AM to 8 PM; Saturday: 11:30 AM to 8 PM; Sunday: 11:30 AM to 7:30 PM",
+  "matched_name": "Sum Dim Sum",
+  "distance_m": 2.1
+ },
+ "n4628353543": {
+  "opening_hours": "Mo-We,Fr 08:30-19:30; Th 08:30-16:39; Sa 09:30-17:00; Su off",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 8:30 AM to 7:30 PM; Tuesday: 8:30 AM to 7:30 PM; Wednesday: 8:30 AM to 7:30 PM; Thursday: 8:30 AM to 4:39 PM; Friday: 8:30 AM to 7:30 PM; Saturday: 9:30 AM to 5 PM; Sunday: Closed",
+  "matched_name": "Subway",
+  "distance_m": 2.1
+ },
+ "n9408415652": {
+  "opening_hours": "Mo-Th 09:00-21:30; Fr-Sa 09:00-22:00; Su 09:00-21:00",
+  "confidence": 0.95,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 9 AM to 9:30 PM; Tuesday: 9 AM to 9:30 PM; Wednesday: 9 AM to 9:30 PM; Thursday: 9 AM to 9:30 PM; Friday: 9 AM to 10 PM; Saturday: 9 AM to 10 PM; Sunday: 9 AM to 9 PM",
+  "matched_name": "Berlin Doner & Kebab House",
+  "distance_m": 2.2
+ },
+ "n1393930504": {
+  "opening_hours": "Tu-Th 12:00-14:00; Mo,Fr-Su off",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: Closed; Tuesday: 12 to 2 PM; Wednesday: 12 to 2 PM; Thursday: 12 to 2 PM; Friday: Closed; Saturday: Closed; Sunday: Closed",
+  "matched_name": "The sentinel",
+  "distance_m": 2.4
+ },
+ "n4299448689": {
+  "opening_hours": "Mo-We,Su 17:00-24:00; Th-Sa 17:00-02:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 PM to 12 AM; Tuesday: 5 PM to 12 AM; Wednesday: 5 PM to 12 AM; Thursday: 5 PM to 2 AM; Friday: 5 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: 5 PM to 12 AM",
+  "matched_name": "The Royale",
+  "distance_m": 2.4
+ },
+ "n9194418334": {
+  "opening_hours": "Tu-Th 11:00-17:00; Fr-Su 12:00-18:00; Mo off",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: Closed; Tuesday: 11 AM to 5 PM; Wednesday: 11 AM to 5 PM; Thursday: 11 AM to 5 PM; Friday: 12 to 6 PM; Saturday: 12 to 6 PM; Sunday: 12 to 6 PM",
+  "matched_name": "Black Sugar - Boba Bar",
+  "distance_m": 2.5
+ },
+ "n2334922788": {
+  "opening_hours": "Mo-Fr 06:30-10:30,16:00-23:00; Sa 07:00-12:00,16:00-23:00; Su 07:00-12:00,16:00-22:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 6:30 to 10:30 AM, 4 to 11 PM; Tuesday: 6:30 to 10:30 AM, 4 to 11 PM; Wednesday: 6:30 to 10:30 AM, 4 to 11 PM; Thursday: 6:30 to 10:30 AM, 4 to 11 PM; Friday: 6:30 to 10:30 AM, 4 to 11 PM; Saturday: 7 AM to 12 PM, 4 to 11 PM; Sunday: 7 AM to 12 PM, 4 to 10 PM",
+  "matched_name": "Monte’s Bar",
+  "distance_m": 2.5
+ },
+ "n479491671": {
+  "opening_hours": "Mo,Sa 17:00-02:00; Tu-Fr 14:00-02:00; Su 17:00-24:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 PM to 2 AM; Tuesday: 2 PM to 2 AM; Wednesday: 2 PM to 2 AM; Thursday: 2 PM to 2 AM; Friday: 2 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: 5 PM to 12 AM",
+  "matched_name": "The House Of Shields",
+  "distance_m": 2.5
+ },
+ "w247757127": {
+  "opening_hours": "Mo-Th 11:30-24:00; Fr-Sa 11:30-01:00; Su 17:00-23:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11:30 AM to 12 AM; Tuesday: 11:30 AM to 12 AM; Wednesday: 11:30 AM to 12 AM; Thursday: 11:30 AM to 12 AM; Friday: 11:30 AM to 1 AM; Saturday: 11:30 AM to 1 AM; Sunday: 5 to 11 PM",
+  "matched_name": "707 Sutter",
+  "distance_m": 2.5
+ },
+ "n4625129273": {
+  "opening_hours": "Mo-Fr 11:00-24:00; Sa-Su 12:00-24:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 12 AM; Tuesday: 11 AM to 12 AM; Wednesday: 11 AM to 12 AM; Thursday: 11 AM to 12 AM; Friday: 11 AM to 12 AM; Saturday: 12 PM to 12 AM; Sunday: 12 PM to 12 AM",
+  "matched_name": "Insomnia Cookies",
+  "distance_m": 2.6
+ },
+ "n5468101421": {
+  "opening_hours": "Mo,We-Th 07:30-15:00; Tu 07:30-14:00; Fr-Su 07:30-16:30",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7:30 AM to 3 PM; Tuesday: 7:30 AM to 2 PM; Wednesday: 7:30 AM to 3 PM; Thursday: 7:30 AM to 3 PM; Friday: 7:30 AM to 4:30 PM; Saturday: 7:30 AM to 4:30 PM; Sunday: 7:30 AM to 4:30 PM",
+  "matched_name": "BeanStalk Cafe",
+  "distance_m": 2.6
+ },
+ "n1485975789": {
+  "opening_hours": "Mo-Su 10:00-23:30",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 10 AM to 11:30 PM; Tuesday: 10 AM to 11:30 PM; Wednesday: 10 AM to 11:30 PM; Thursday: 10 AM to 11:30 PM; Friday: 10 AM to 11:30 PM; Saturday: 10 AM to 11:30 PM; Sunday: 10 AM to 11:30 PM",
+  "matched_name": "Grant Mini Market - grocery store",
+  "distance_m": 2.6
+ },
+ "n1823804078": {
+  "opening_hours": "Mo-Th 08:00-16:00; Fr 08:00-15:00; Sa-Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 8 AM to 4 PM; Tuesday: 8 AM to 4 PM; Wednesday: 8 AM to 4 PM; Thursday: 8 AM to 4 PM; Friday: 8 AM to 3 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Caffe Bianco",
+  "distance_m": 2.6
+ },
+ "n1428535776": {
+  "opening_hours": "Mo-We 10:00-21:00; Th-Fr 10:00-21:30; Sa 11:00-21:30; Su 11:00-21:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 10 AM to 9 PM; Tuesday: 10 AM to 9 PM; Wednesday: 10 AM to 9 PM; Thursday: 10 AM to 9:30 PM; Friday: 10 AM to 9:30 PM; Saturday: 11 AM to 9:30 PM; Sunday: 11 AM to 9 PM",
+  "matched_name": "The Bird",
+  "distance_m": 2.6
+ },
+ "n4616141254": {
+  "opening_hours": "Mo,We-Su 08:30-20:00; Tu off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 8:30 AM to 8 PM; Tuesday: Closed; Wednesday: 8:30 AM to 8 PM; Thursday: 8:30 AM to 8 PM; Friday: 8:30 AM to 8 PM; Saturday: 8:30 AM to 8 PM; Sunday: 8:30 AM to 8 PM",
+  "matched_name": "Today Food",
+  "distance_m": 2.6
+ },
+ "n9426889455": {
+  "opening_hours": "Mo-Th,Su 09:00-21:00; Fr-Sa 09:00-22:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 9 AM to 9 PM; Tuesday: 9 AM to 9 PM; Wednesday: 9 AM to 9 PM; Thursday: 9 AM to 9 PM; Friday: 9 AM to 10 PM; Saturday: 9 AM to 10 PM; Sunday: 9 AM to 9 PM",
+  "matched_name": "Market Mayflower & Deli",
+  "distance_m": 2.7
+ },
+ "n621793529": {
+  "opening_hours": "Mo,Su 18:00-02:00; Tu-Th 16:00-02:00; Fr-Sa 15:00-02:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 6 PM to 2 AM; Tuesday: 4 PM to 2 AM; Wednesday: 4 PM to 2 AM; Thursday: 4 PM to 2 AM; Friday: 3 PM to 2 AM; Saturday: 3 PM to 2 AM; Sunday: 6 PM to 2 AM",
+  "matched_name": "Owl Tree",
+  "distance_m": 2.7
+ },
+ "n9301912409": {
+  "opening_hours": "Mo-Fr 08:30-13:30; Sa-Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8:30 AM to 1:30 PM; Tuesday: 8:30 AM to 1:30 PM; Wednesday: 8:30 AM to 1:30 PM; Thursday: 8:30 AM to 1:30 PM; Friday: 8:30 AM to 1:30 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Cafe Dolci",
+  "distance_m": 2.8
+ },
+ "n11097302278": {
+  "opening_hours": "Mo-Su 11:00-22:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 10 PM; Tuesday: 11 AM to 10 PM; Wednesday: 11 AM to 10 PM; Thursday: 11 AM to 10 PM; Friday: 11 AM to 10 PM; Saturday: 11 AM to 10 PM; Sunday: 11 AM to 10 PM",
+  "matched_name": "Ararat Kebab & Gyros",
+  "distance_m": 2.8
+ },
+ "n9181748926": {
+  "opening_hours": "Mo,We-Su 17:00-02:00; Tu 18:00-24:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 PM to 2 AM; Tuesday: 6 PM to 12 AM; Wednesday: 5 PM to 2 AM; Thursday: 5 PM to 2 AM; Friday: 5 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: 5 PM to 2 AM",
+  "matched_name": "Stookey's Club Moderne",
+  "distance_m": 2.9
+ },
+ "n1486009911": {
+  "opening_hours": "Mo-Sa 11:30-21:30; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11:30 AM to 9:30 PM; Tuesday: 11:30 AM to 9:30 PM; Wednesday: 11:30 AM to 9:30 PM; Thursday: 11:30 AM to 9:30 PM; Friday: 11:30 AM to 9:30 PM; Saturday: 11:30 AM to 9:30 PM; Sunday: Closed",
+  "matched_name": "Jasmin's",
+  "distance_m": 2.9
+ },
+ "n10682058859": {
+  "opening_hours": "Mo-Sa 07:00-14:00; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 7 AM to 2 PM; Tuesday: 7 AM to 2 PM; Wednesday: 7 AM to 2 PM; Thursday: 7 AM to 2 PM; Friday: 7 AM to 2 PM; Saturday: 7 AM to 2 PM; Sunday: Closed",
+  "matched_name": "Cozy Cafe",
+  "distance_m": 3.0
+ },
+ "n4625128135": {
+  "opening_hours": "Mo-Fr 10:00-19:00; Sa 11:00-18:00; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 7 PM; Tuesday: 10 AM to 7 PM; Wednesday: 10 AM to 7 PM; Thursday: 10 AM to 7 PM; Friday: 10 AM to 7 PM; Saturday: 11 AM to 6 PM; Sunday: Closed",
+  "matched_name": "L&L Hawaiian Barbecue",
+  "distance_m": 3.0
+ },
+ "n9988959954": {
+  "opening_hours": "Mo-Tu,Th 12:00-15:00,17:00-22:30; Fr 12:00-15:00,17:00-23:00; Sa 12:00-15:00,16:00-24:00; Su 12:00-15:00,16:00-22:30; We off",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 12 to 3 PM, 5 to 10:30 PM; Tuesday: 12 to 3 PM, 5 to 10:30 PM; Wednesday: Closed; Thursday: 12 to 3 PM, 5 to 10:30 PM; Friday: 12 to 3 PM, 5 to 11 PM; Saturday: 12 to 3 PM, 4 PM to 12 AM; Sunday: 12 to 3 PM, 4 to 10:30 PM",
+  "matched_name": "Louder Restaurant",
+  "distance_m": 3.0
+ },
+ "n10016602471": {
+  "opening_hours": "Mo-Su 07:00-19:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 7 PM; Tuesday: 7 AM to 7 PM; Wednesday: 7 AM to 7 PM; Thursday: 7 AM to 7 PM; Friday: 7 AM to 7 PM; Saturday: 7 AM to 7 PM; Sunday: 7 AM to 7 PM",
+  "matched_name": "Caffe Central",
+  "distance_m": 3.1
+ },
+ "n808930729": {
+  "opening_hours": "We-Th 15:00-24:00; Fr 15:00-01:30; Sa 11:00-01:30; Su 11:00-24:00; Mo-Tu off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: Closed; Wednesday: 3 PM to 12 AM; Thursday: 3 PM to 12 AM; Friday: 3 PM to 1:30 AM; Saturday: 11 AM to 1:30 AM; Sunday: 11 AM to 12 AM",
+  "matched_name": "Johnny Foley's Irish House",
+  "distance_m": 3.2
+ },
+ "n1617280513": {
+  "opening_hours": "Mo-Fr 06:00-19:00; Sa 07:00-19:00; Su 09:00-15:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6 AM to 7 PM; Tuesday: 6 AM to 7 PM; Wednesday: 6 AM to 7 PM; Thursday: 6 AM to 7 PM; Friday: 6 AM to 7 PM; Saturday: 7 AM to 7 PM; Sunday: 9 AM to 3 PM",
+  "matched_name": "Paris Baguette",
+  "distance_m": 3.3
+ },
+ "n4632000803": {
+  "opening_hours": "Mo-Fr 10:00-18:30; Sa 10:30-18:30; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 6:30 PM; Tuesday: 10 AM to 6:30 PM; Wednesday: 10 AM to 6:30 PM; Thursday: 10 AM to 6:30 PM; Friday: 10 AM to 6:30 PM; Saturday: 10:30 AM to 6:30 PM; Sunday: Closed",
+  "matched_name": "Asha Tea House",
+  "distance_m": 3.3
+ },
+ "n808884854": {
+  "opening_hours": "Mo-Th,Su 07:00-15:00,17:00-21:00; Fr-Sa 07:00-15:00,17:00-22:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 7 AM to 3 PM, 5 to 9 PM; Tuesday: 7 AM to 3 PM, 5 to 9 PM; Wednesday: 7 AM to 3 PM, 5 to 9 PM; Thursday: 7 AM to 3 PM, 5 to 9 PM; Friday: 7 AM to 3 PM, 5 to 10 PM; Saturday: 7 AM to 3 PM, 5 to 10 PM; Sunday: 7 AM to 3 PM, 5 to 9 PM",
+  "matched_name": "Magnin Street Cafe & Bistro",
+  "distance_m": 3.4
+ },
+ "n6242778291": {
+  "opening_hours": "Mo-Th 11:00-15:00,17:00-22:00; Fr-Sa 11:00-23:00; Su 11:00-22:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 3 PM, 5 to 10 PM; Tuesday: 11 AM to 3 PM, 5 to 10 PM; Wednesday: 11 AM to 3 PM, 5 to 10 PM; Thursday: 11 AM to 3 PM, 5 to 10 PM; Friday: 11 AM to 11 PM; Saturday: 11 AM to 11 PM; Sunday: 11 AM to 10 PM",
+  "matched_name": "The Parthenon",
+  "distance_m": 3.5
+ },
+ "n2074608534": {
+  "opening_hours": "Mo-Su 11:00-16:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 4 PM; Tuesday: 11 AM to 4 PM; Wednesday: 11 AM to 4 PM; Thursday: 11 AM to 4 PM; Friday: 11 AM to 4 PM; Saturday: 11 AM to 4 PM; Sunday: 11 AM to 4 PM",
+  "matched_name": "Eastern Bakery - coffee crunch cake",
+  "distance_m": 3.5
+ },
+ "n4637773279": {
+  "opening_hours": "Mo-Su 08:00-24:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 12 AM; Tuesday: 8 AM to 12 AM; Wednesday: 8 AM to 12 AM; Thursday: 8 AM to 12 AM; Friday: 8 AM to 12 AM; Saturday: 8 AM to 12 AM; Sunday: 8 AM to 12 AM",
+  "matched_name": "Town Country Market - Sake, Fruits, Beer, Pharmacy, Bakery, Wine, Alcohol, Spirits",
+  "distance_m": 1.3
+ },
+ "n11328248117": {
+  "opening_hours": "Mo-Sa 12:00-20:00; Su 12:00-17:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 12 to 8 PM; Tuesday: 12 to 8 PM; Wednesday: 12 to 8 PM; Thursday: 12 to 8 PM; Friday: 12 to 8 PM; Saturday: 12 to 8 PM; Sunday: 12 to 5 PM",
+  "matched_name": "Cask",
+  "distance_m": 3.6
+ },
+ "n1701772830": {
+  "opening_hours": "Mo-Th 17:00-21:30; Fr 17:00-22:30; Sa 09:00-14:00,17:00-22:30; Su 09:00-14:00,17:00-21:30",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 5 to 9:30 PM; Tuesday: 5 to 9:30 PM; Wednesday: 5 to 9:30 PM; Thursday: 5 to 9:30 PM; Friday: 5 to 10:30 PM; Saturday: 9 AM to 2 PM, 5 to 10:30 PM; Sunday: 9 AM to 2 PM, 5 to 9:30 PM",
+  "matched_name": "Bouche",
+  "distance_m": 3.6
+ },
+ "n1486016637": {
+  "opening_hours": "Mo-Su 08:00-22:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 8 AM to 10 PM; Tuesday: 8 AM to 10 PM; Wednesday: 8 AM to 10 PM; Thursday: 8 AM to 10 PM; Friday: 8 AM to 10 PM; Saturday: 8 AM to 10 PM; Sunday: 8 AM to 10 PM",
+  "matched_name": "Bush Market",
+  "distance_m": 3.7
+ },
+ "n5595106442": {
+  "opening_hours": "Mo-Th,Su 11:30-21:00; Fr-Sa 11:30-22:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11:30 AM to 9 PM; Tuesday: 11:30 AM to 9 PM; Wednesday: 11:30 AM to 9 PM; Thursday: 11:30 AM to 9 PM; Friday: 11:30 AM to 10 PM; Saturday: 11:30 AM to 10 PM; Sunday: 11:30 AM to 9 PM",
+  "matched_name": "Sanraku",
+  "distance_m": 3.7
+ },
+ "n4433282589": {
+  "opening_hours": "Mo-Su 11:00-14:00,17:00-21:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 2 PM, 5 to 9 PM; Tuesday: 11 AM to 2 PM, 5 to 9 PM; Wednesday: 11 AM to 2 PM, 5 to 9 PM; Thursday: 11 AM to 2 PM, 5 to 9 PM; Friday: 11 AM to 2 PM, 5 to 9 PM; Saturday: 11 AM to 2 PM, 5 to 9 PM; Sunday: 11 AM to 2 PM, 5 to 9 PM",
+  "matched_name": "hed verythai",
+  "distance_m": 3.7
+ },
+ "n8719392251": {
+  "opening_hours": "Mo-We 12:00-23:00; Th-Sa 12:00-24:00; Su 12:00-22:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 12 to 11 PM; Tuesday: 12 to 11 PM; Wednesday: 12 to 11 PM; Thursday: 12 PM to 12 AM; Friday: 12 PM to 12 AM; Saturday: 12 PM to 12 AM; Sunday: 12 to 10 PM",
+  "matched_name": "Sam's Cable Car Lounge",
+  "distance_m": 3.8
+ },
+ "n9446437511": {
+  "opening_hours": "Mo-Th,Su 09:00-22:00; Fr-Sa 09:00-24:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 9 AM to 10 PM; Tuesday: 9 AM to 10 PM; Wednesday: 9 AM to 10 PM; Thursday: 9 AM to 10 PM; Friday: 9 AM to 12 AM; Saturday: 9 AM to 12 AM; Sunday: 9 AM to 10 PM",
+  "matched_name": "Pine & Jones Market",
+  "distance_m": 3.9
+ },
+ "n12939867831": {
+  "opening_hours": "Mo-Th 11:30-21:00; Fr 11:30-22:00; Sa 11:00-22:00; Su 11:00-21:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11:30 AM to 9 PM; Tuesday: 11:30 AM to 9 PM; Wednesday: 11:30 AM to 9 PM; Thursday: 11:30 AM to 9 PM; Friday: 11:30 AM to 10 PM; Saturday: 11 AM to 10 PM; Sunday: 11 AM to 9 PM",
+  "matched_name": "Corzetti",
+  "distance_m": 3.9
+ },
+ "n621818322": {
+  "opening_hours": "Mo-Su 11:00-14:45,16:15-22:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 2:45 PM, 4:15 to 10 PM; Tuesday: 11 AM to 2:45 PM, 4:15 to 10 PM; Wednesday: 11 AM to 2:45 PM, 4:15 to 10 PM; Thursday: 11 AM to 2:45 PM, 4:15 to 10 PM; Friday: 11 AM to 2:45 PM, 4:15 to 10 PM; Saturday: 11 AM to 2:45 PM, 4:15 to 10 PM; Sunday: 11 AM to 2:45 PM, 4:15 to 10 PM",
+  "matched_name": "Akiko's Sushi Bar",
+  "distance_m": 4.0
+ },
+ "n13594408375": {
+  "opening_hours": "Mo-Th,Su 17:00-22:00; Fr-Sa 17:00-24:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 to 10 PM; Tuesday: 5 to 10 PM; Wednesday: 5 to 10 PM; Thursday: 5 to 10 PM; Friday: 5 PM to 12 AM; Saturday: 5 PM to 12 AM; Sunday: 5 to 10 PM",
+  "matched_name": "Silk Road Bar",
+  "distance_m": 4.0
+ },
+ "w1035252218": {
+  "opening_hours": "Mo-We 11:00-20:00; Th-Fr 11:00-21:00; Sa 11:30-21:00; Su 11:30-14:30,15:30-19:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 8 PM; Tuesday: 11 AM to 8 PM; Wednesday: 11 AM to 8 PM; Thursday: 11 AM to 9 PM; Friday: 11 AM to 9 PM; Saturday: 11:30 AM to 9 PM; Sunday: 11:30 AM to 2:30 PM, 3:30 to 7 PM",
+  "matched_name": "Ramen Hiroshi San Francisco",
+  "distance_m": 4.0
+ },
+ "n1246390510": {
+  "opening_hours": "Mo-Su 06:30-18:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6:30 AM to 6 PM; Tuesday: 6:30 AM to 6 PM; Wednesday: 6:30 AM to 6 PM; Thursday: 6:30 AM to 6 PM; Friday: 6:30 AM to 6 PM; Saturday: 6:30 AM to 6 PM; Sunday: 6:30 AM to 6 PM",
+  "matched_name": "Blue Bottle Coffee",
+  "distance_m": 4.0
+ },
+ "n13960254577": {
+  "opening_hours": "Mo-Sa 11:00-16:00; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 4 PM; Tuesday: 11 AM to 4 PM; Wednesday: 11 AM to 4 PM; Thursday: 11 AM to 4 PM; Friday: 11 AM to 4 PM; Saturday: 11 AM to 4 PM; Sunday: Closed",
+  "matched_name": "AJI KIJI",
+  "distance_m": 4.1
+ },
+ "n4632000742": {
+  "opening_hours": "Mo-Fr 11:00-20:00; Sa 11:00-18:00; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 8 PM; Tuesday: 11 AM to 8 PM; Wednesday: 11 AM to 8 PM; Thursday: 11 AM to 8 PM; Friday: 11 AM to 8 PM; Saturday: 11 AM to 6 PM; Sunday: Closed",
+  "matched_name": "Rooster & Rice",
+  "distance_m": 4.1
+ },
+ "n1485988190": {
+  "opening_hours": "Mo-Sa 08:00-22:00; Su 09:00-21:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 8 AM to 10 PM; Tuesday: 8 AM to 10 PM; Wednesday: 8 AM to 10 PM; Thursday: 8 AM to 10 PM; Friday: 8 AM to 10 PM; Saturday: 8 AM to 10 PM; Sunday: 9 AM to 9 PM",
+  "matched_name": "Food Fair Market Liquors",
+  "distance_m": 4.1
+ },
+ "n4259746991": {
+  "opening_hours": "Mo-Fr 11:00-20:30; Sa 11:00-20:15; Su 12:00-20:30",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 8:30 PM; Tuesday: 11 AM to 8:30 PM; Wednesday: 11 AM to 8:30 PM; Thursday: 11 AM to 8:30 PM; Friday: 11 AM to 8:30 PM; Saturday: 11 AM to 8:15 PM; Sunday: 12 to 8:30 PM",
+  "matched_name": "City Chopsticks",
+  "distance_m": 4.2
+ },
+ "n1454070929": {
+  "opening_hours": "Mo-Sa 10:00-19:00; Su 11:00-18:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 7 PM; Tuesday: 10 AM to 7 PM; Wednesday: 10 AM to 7 PM; Thursday: 10 AM to 7 PM; Friday: 10 AM to 7 PM; Saturday: 10 AM to 7 PM; Sunday: 11 AM to 6 PM",
+  "matched_name": "See's Candies",
+  "distance_m": 4.3
+ },
+ "n3393361804": {
+  "opening_hours": "Mo-Th 08:00-18:00; Fr 08:00-16:00; Sa 09:00-16:00; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 8 AM to 6 PM; Tuesday: 8 AM to 6 PM; Wednesday: 8 AM to 6 PM; Thursday: 8 AM to 6 PM; Friday: 8 AM to 4 PM; Saturday: 9 AM to 4 PM; Sunday: Closed",
+  "matched_name": "Taqueria Mana",
+  "distance_m": 4.3
+ },
+ "n4637572298": {
+  "opening_hours": "Mo-Su 09:00-21:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 9 AM to 9 PM; Tuesday: 9 AM to 9 PM; Wednesday: 9 AM to 9 PM; Thursday: 9 AM to 9 PM; Friday: 9 AM to 9 PM; Saturday: 9 AM to 9 PM; Sunday: 9 AM to 9 PM",
+  "matched_name": "Salama Halal Meat",
+  "distance_m": 4.4
+ },
+ "n1640211004": {
+  "opening_hours": "Mo-We 10:00-19:00; Th 10:00-01:00; Fr 10:00-02:00; Sa 17:00-02:00; Su 17:00-01:30",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 10 AM to 7 PM; Tuesday: 10 AM to 7 PM; Wednesday: 10 AM to 7 PM; Thursday: 10 AM to 1 AM; Friday: 10 AM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: 5 PM to 1:30 AM",
+  "matched_name": "Escape From New York Pizza",
+  "distance_m": 4.4
+ },
+ "n9546656574": {
+  "opening_hours": "Mo,We-Su 11:00-19:00; Tu off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 11 AM to 7 PM; Tuesday: Closed; Wednesday: 11 AM to 7 PM; Thursday: 11 AM to 7 PM; Friday: 11 AM to 7 PM; Saturday: 11 AM to 7 PM; Sunday: 11 AM to 7 PM",
+  "matched_name": "Angelic Pretty San Francisco",
+  "distance_m": 4.5
+ },
+ "n927572195": {
+  "opening_hours": "Mo-Su 11:30-23:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11:30 AM to 11 PM; Tuesday: 11:30 AM to 11 PM; Wednesday: 11:30 AM to 11 PM; Thursday: 11:30 AM to 11 PM; Friday: 11:30 AM to 11 PM; Saturday: 11:30 AM to 11 PM; Sunday: 11:30 AM to 11 PM",
+  "matched_name": "Shalimar Restaurant",
+  "distance_m": 4.5
+ },
+ "n14279637301": {
+  "opening_hours": "Mo,Su 12:00-24:00; Tu-Sa 12:00-01:30",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 12 PM to 12 AM; Tuesday: 12 PM to 1:30 AM; Wednesday: 12 PM to 1:30 AM; Thursday: 12 PM to 1:30 AM; Friday: 12 PM to 1:30 AM; Saturday: 12 PM to 1:30 AM; Sunday: 12 PM to 12 AM",
+  "matched_name": "Harlan Records",
+  "distance_m": 4.5
+ },
+ "n5836829985": {
+  "opening_hours": "Tu-Th,Su 10:00-23:00; Fr-Sa 10:00-03:00; Mo off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: Closed; Tuesday: 10 AM to 11 PM; Wednesday: 10 AM to 11 PM; Thursday: 10 AM to 11 PM; Friday: 10 AM to 3 AM; Saturday: 10 AM to 3 AM; Sunday: 10 AM to 11 PM",
+  "matched_name": "Suavecito Birria & Tacos SF",
+  "distance_m": 4.5
+ },
+ "n731946793": {
+  "opening_hours": "Mo-Su 16:00-02:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 PM to 2 AM; Tuesday: 4 PM to 2 AM; Wednesday: 4 PM to 2 AM; Thursday: 4 PM to 2 AM; Friday: 4 PM to 2 AM; Saturday: 4 PM to 2 AM; Sunday: 4 PM to 2 AM",
+  "matched_name": "The Geary Club",
+  "distance_m": 4.6
+ },
+ "n14095395201": {
+  "opening_hours": "Mo-Th,Su 07:00-20:00; Fr-Sa 07:00-21:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 7 AM to 8 PM; Tuesday: 7 AM to 8 PM; Wednesday: 7 AM to 8 PM; Thursday: 7 AM to 8 PM; Friday: 7 AM to 9 PM; Saturday: 7 AM to 9 PM; Sunday: 7 AM to 8 PM",
+  "matched_name": "ADAN CAFE",
+  "distance_m": 4.6
+ },
+ "n317081452": {
+  "opening_hours": "Mo-Fr 09:00-18:00; Sa-Su 09:30-18:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 9 AM to 6 PM; Tuesday: 9 AM to 6 PM; Wednesday: 9 AM to 6 PM; Thursday: 9 AM to 6 PM; Friday: 9 AM to 6 PM; Saturday: 9:30 AM to 6 PM; Sunday: 9:30 AM to 6 PM",
+  "matched_name": "Cole Fox Hardware",
+  "distance_m": 4.6
+ },
+ "n9593474648": {
+  "opening_hours": "Mo,Su 17:00-21:30; Fr-Sa 17:00-22:30; Tu-Th off",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 5 to 9:30 PM; Tuesday: Closed; Wednesday: Closed; Thursday: Closed; Friday: 5 to 10:30 PM; Saturday: 5 to 10:30 PM; Sunday: 5 to 9:30 PM",
+  "matched_name": "Ox & Tiger",
+  "distance_m": 4.6
+ },
+ "n4631982687": {
+  "opening_hours": "Mo-We,Su 10:30-20:00; Th 10:30-21:30; Fr-Sa 10:30-22:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10:30 AM to 8 PM; Tuesday: 10:30 AM to 8 PM; Wednesday: 10:30 AM to 8 PM; Thursday: 10:30 AM to 9:30 PM; Friday: 10:30 AM to 10 PM; Saturday: 10:30 AM to 10 PM; Sunday: 10:30 AM to 8 PM",
+  "matched_name": "Hang Ah Tea Room",
+  "distance_m": 4.7
+ },
+ "n9417077145": {
+  "opening_hours": "Mo-Fr,Su 11:00-20:00; Sa 11:00-21:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 8 PM; Tuesday: 11 AM to 8 PM; Wednesday: 11 AM to 8 PM; Thursday: 11 AM to 8 PM; Friday: 11 AM to 8 PM; Saturday: 11 AM to 9 PM; Sunday: 11 AM to 8 PM",
+  "matched_name": "Sharetea",
+  "distance_m": 4.7
+ },
+ "n4625203723": {
+  "opening_hours": "Mo-Sa 10:00-20:00; Su 11:00-19:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 10 AM to 8 PM; Tuesday: 10 AM to 8 PM; Wednesday: 10 AM to 8 PM; Thursday: 10 AM to 8 PM; Friday: 10 AM to 8 PM; Saturday: 10 AM to 8 PM; Sunday: 11 AM to 7 PM",
+  "matched_name": "ZARA",
+  "distance_m": 4.7
+ },
+ "n2838844729": {
+  "opening_hours": "Mo-Sa 10:00-20:00; Su 11:00-19:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 8 PM; Tuesday: 10 AM to 8 PM; Wednesday: 10 AM to 8 PM; Thursday: 10 AM to 8 PM; Friday: 10 AM to 8 PM; Saturday: 10 AM to 8 PM; Sunday: 11 AM to 7 PM",
+  "matched_name": "Nike San Francisco",
+  "distance_m": 4.8
+ },
+ "n621818430": {
+  "opening_hours": "Mo-Th 08:00-15:00; Fr-Su 07:30-15:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 3 PM; Tuesday: 8 AM to 3 PM; Wednesday: 8 AM to 3 PM; Thursday: 8 AM to 3 PM; Friday: 7:30 AM to 3 PM; Saturday: 7:30 AM to 3 PM; Sunday: 7:30 AM to 3 PM",
+  "matched_name": "Honey Honey Cafe & Crepery",
+  "distance_m": 4.8
+ },
+ "n1629213217": {
+  "opening_hours": "Mo-Fr 10:30-14:30; Sa-Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 10:30 AM to 2:30 PM; Tuesday: 10:30 AM to 2:30 PM; Wednesday: 10:30 AM to 2:30 PM; Thursday: 10:30 AM to 2:30 PM; Friday: 10:30 AM to 2:30 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Bini's Kitchen LLC",
+  "distance_m": 4.9
+ },
+ "n4631708919": {
+  "opening_hours": "Mo-Su 10:30-21:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:06:26+00:00",
+  "raw": "Monday: 10:30 AM to 9 PM; Tuesday: 10:30 AM to 9 PM; Wednesday: 10:30 AM to 9 PM; Thursday: 10:30 AM to 9 PM; Friday: 10:30 AM to 9 PM; Saturday: 10:30 AM to 9 PM; Sunday: 10:30 AM to 9 PM",
+  "matched_name": "Bombay Buzzing",
+  "distance_m": 4.9
+ },
+ "n9536199118": {
+  "opening_hours": "Mo-Fr 11:30-15:00,16:00-21:00; Sa 17:00-21:00; Su off",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11:30 AM to 3 PM, 4 to 9 PM; Tuesday: 11:30 AM to 3 PM, 4 to 9 PM; Wednesday: 11:30 AM to 3 PM, 4 to 9 PM; Thursday: 11:30 AM to 3 PM, 4 to 9 PM; Friday: 11:30 AM to 3 PM, 4 to 9 PM; Saturday: 5 to 9 PM; Sunday: Closed",
+  "matched_name": "Toy Soldier",
+  "distance_m": 5.0
+ },
+ "n12101566691": {
+  "opening_hours": "Mo-Fr 10:00-20:00; Sa 11:00-19:00; Su 11:00-18:30",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 8 PM; Tuesday: 10 AM to 8 PM; Wednesday: 10 AM to 8 PM; Thursday: 10 AM to 8 PM; Friday: 10 AM to 8 PM; Saturday: 11 AM to 7 PM; Sunday: 11 AM to 6:30 PM",
+  "matched_name": "Little Sweet",
+  "distance_m": 5.0
+ },
+ "n10937805743": {
+  "opening_hours": "Mo-Fr 08:00-15:00; Sa-Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 8 AM to 3 PM; Tuesday: 8 AM to 3 PM; Wednesday: 8 AM to 3 PM; Thursday: 8 AM to 3 PM; Friday: 8 AM to 3 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Superfine Kitchen",
+  "distance_m": 5.1
+ },
+ "w71515257": {
+  "opening_hours": "Mo-Fr 15:00-02:00; Sa-Su 13:00-02:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 3 PM to 2 AM; Tuesday: 3 PM to 2 AM; Wednesday: 3 PM to 2 AM; Thursday: 3 PM to 2 AM; Friday: 3 PM to 2 AM; Saturday: 1 PM to 2 AM; Sunday: 1 PM to 2 AM",
+  "matched_name": "Peacekeeper",
+  "distance_m": 5.1
+ },
+ "n4129615924": {
+  "opening_hours": "Mo-Fr 11:00-19:00; Sa-Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 7 PM; Tuesday: 11 AM to 7 PM; Wednesday: 11 AM to 7 PM; Thursday: 11 AM to 7 PM; Friday: 11 AM to 7 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Muracci's Japanese Curry & Grill",
+  "distance_m": 5.1
+ },
+ "n725066755": {
+  "opening_hours": "Mo-Su 12:00-03:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 12 PM to 3 AM; Tuesday: 12 PM to 3 AM; Wednesday: 12 PM to 3 AM; Thursday: 12 PM to 3 AM; Friday: 12 PM to 3 AM; Saturday: 12 PM to 3 AM; Sunday: 12 PM to 3 AM",
+  "matched_name": "Milan Pizza",
+  "distance_m": 5.1
+ },
+ "n3637499305": {
+  "opening_hours": "Mo,Th 16:00-24:00; Tu-We 12:00-24:00; Fr 12:00-02:00; Sa 11:00-02:00; Su 09:00-24:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 PM to 12 AM; Tuesday: 12 PM to 12 AM; Wednesday: 12 PM to 12 AM; Thursday: 4 PM to 12 AM; Friday: 12 PM to 2 AM; Saturday: 11 AM to 2 AM; Sunday: 9 AM to 12 AM",
+  "matched_name": "Golden Gate Tap Room",
+  "distance_m": 5.1
+ },
+ "n5246338648": {
+  "opening_hours": "Th-Su 11:30-18:30; Mo-We off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: Closed; Tuesday: Closed; Wednesday: Closed; Thursday: 11:30 AM to 6:30 PM; Friday: 11:30 AM to 6:30 PM; Saturday: 11:30 AM to 6:30 PM; Sunday: 11:30 AM to 6:30 PM",
+  "matched_name": "Snow Garden",
+  "distance_m": 5.2
+ },
+ "n2956812337": {
+  "opening_hours": "Mo-Fr 07:00-24:00; Sa 08:00-24:00; Su 08:00-23:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 7 AM to 12 AM; Tuesday: 7 AM to 12 AM; Wednesday: 7 AM to 12 AM; Thursday: 7 AM to 12 AM; Friday: 7 AM to 12 AM; Saturday: 8 AM to 12 AM; Sunday: 8 AM to 11 PM",
+  "matched_name": "Pine & Taylor Market",
+  "distance_m": 5.3
+ },
+ "n4637773274": {
+  "opening_hours": "Mo-Su 06:00-17:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6 AM to 5 PM; Tuesday: 6 AM to 5 PM; Wednesday: 6 AM to 5 PM; Thursday: 6 AM to 5 PM; Friday: 6 AM to 5 PM; Saturday: 6 AM to 5 PM; Sunday: 6 AM to 5 PM",
+  "matched_name": "Happy Donuts",
+  "distance_m": 1.6
+ },
+ "n10538306969": {
+  "opening_hours": "Mo-Fr 06:00-16:00; Sa 06:00-14:00; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6 AM to 4 PM; Tuesday: 6 AM to 4 PM; Wednesday: 6 AM to 4 PM; Thursday: 6 AM to 4 PM; Friday: 6 AM to 4 PM; Saturday: 6 AM to 2 PM; Sunday: Closed",
+  "matched_name": "Il Canto Cafe",
+  "distance_m": 5.3
+ },
+ "n9593474641": {
+  "opening_hours": "Mo-Sa 09:00-19:00; Su 10:00-18:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 9 AM to 7 PM; Tuesday: 9 AM to 7 PM; Wednesday: 9 AM to 7 PM; Thursday: 9 AM to 7 PM; Friday: 9 AM to 7 PM; Saturday: 9 AM to 7 PM; Sunday: 10 AM to 6 PM",
+  "matched_name": "Glow Day Spa",
+  "distance_m": 5.3
+ },
+ "n10315499183": {
+  "opening_hours": "Mo,Th,Su 12:00-22:00; Fr-Sa 12:00-23:00; Tu-We off",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 12 to 10 PM; Tuesday: Closed; Wednesday: Closed; Thursday: 12 to 10 PM; Friday: 12 to 11 PM; Saturday: 12 to 11 PM; Sunday: 12 to 10 PM",
+  "matched_name": "Cantoo Latin Asian Rotisserie",
+  "distance_m": 5.4
+ },
+ "n2941409392": {
+  "opening_hours": "Mo-We 15:00-24:00; Th-Fr 15:00-02:00; Sa 18:00-02:00; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 3 PM to 12 AM; Tuesday: 3 PM to 12 AM; Wednesday: 3 PM to 12 AM; Thursday: 3 PM to 2 AM; Friday: 3 PM to 2 AM; Saturday: 6 PM to 2 AM; Sunday: Closed",
+  "matched_name": "Rickhouse",
+  "distance_m": 5.4
+ },
+ "n9328898384": {
+  "opening_hours": "Tu-Th 15:30-22:00; Fr-Sa 15:30-24:00; Mo,Su off",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: Closed; Tuesday: 3:30 to 10 PM; Wednesday: 3:30 to 10 PM; Thursday: 3:30 to 10 PM; Friday: 3:30 PM to 12 AM; Saturday: 3:30 PM to 12 AM; Sunday: Closed",
+  "matched_name": "Elements Bar & Lounge",
+  "distance_m": 5.4
+ },
+ "n4343748158": {
+  "opening_hours": "Mo-Su 11:00-23:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 11 PM; Tuesday: 11 AM to 11 PM; Wednesday: 11 AM to 11 PM; Thursday: 11 AM to 11 PM; Friday: 11 AM to 11 PM; Saturday: 11 AM to 11 PM; Sunday: 11 AM to 11 PM",
+  "matched_name": "Plentea",
+  "distance_m": 5.4
+ },
+ "n418540495": {
+  "opening_hours": "We-Su 17:00-02:00; Mo-Tu off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: Closed; Wednesday: 5 PM to 2 AM; Thursday: 5 PM to 2 AM; Friday: 5 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: 5 PM to 2 AM",
+  "matched_name": "Swig",
+  "distance_m": 5.4
+ },
+ "n11032970208": {
+  "opening_hours": "Mo-Fr 09:30-22:00; Sa-Su 10:00-22:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 9:30 AM to 10 PM; Tuesday: 9:30 AM to 10 PM; Wednesday: 9:30 AM to 10 PM; Thursday: 9:30 AM to 10 PM; Friday: 9:30 AM to 10 PM; Saturday: 10 AM to 10 PM; Sunday: 10 AM to 10 PM",
+  "matched_name": "Sam's Tavern",
+  "distance_m": 5.4
+ },
+ "n6417228186": {
+  "opening_hours": "Mo-Su 11:00-17:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 5 PM; Tuesday: 11 AM to 5 PM; Wednesday: 11 AM to 5 PM; Thursday: 11 AM to 5 PM; Friday: 11 AM to 5 PM; Saturday: 11 AM to 5 PM; Sunday: 11 AM to 5 PM",
+  "matched_name": "The Wok Shop",
+  "distance_m": 5.4
+ },
+ "n3692823562": {
+  "opening_hours": "Mo 17:30-02:00; Tu-Su 17:00-02:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 5:30 PM to 2 AM; Tuesday: 5 PM to 2 AM; Wednesday: 5 PM to 2 AM; Thursday: 5 PM to 2 AM; Friday: 5 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: 5 PM to 2 AM",
+  "matched_name": "Kokio Republic",
+  "distance_m": 5.5
+ },
+ "n383507544": {
+  "opening_hours": "Mo-We 07:00-23:00; Th 07:00-24:00; Fr-Sa 00:00-24:00; Su 00:00-23:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 7 AM to 11 PM; Tuesday: 7 AM to 11 PM; Wednesday: 7 AM to 11 PM; Thursday: 7 AM to 12 AM; Friday: Open 24 hours; Saturday: Open 24 hours; Sunday: 12 AM to 11 PM",
+  "matched_name": "Pinecrest Diner",
+  "distance_m": 5.5
+ },
+ "n1293838091": {
+  "opening_hours": "Mo-Fr 08:00-15:00; Sa-Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 3 PM; Tuesday: 8 AM to 3 PM; Wednesday: 8 AM to 3 PM; Thursday: 8 AM to 3 PM; Friday: 8 AM to 3 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Working Girls' Cafe",
+  "distance_m": 5.5
+ },
+ "n2248286001": {
+  "opening_hours": "Mo-Fr 12:00-02:00; Sa-Su 16:00-02:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 12 PM to 2 AM; Tuesday: 12 PM to 2 AM; Wednesday: 12 PM to 2 AM; Thursday: 12 PM to 2 AM; Friday: 12 PM to 2 AM; Saturday: 4 PM to 2 AM; Sunday: 4 PM to 2 AM",
+  "matched_name": "Occidental Cigar Club",
+  "distance_m": 5.6
+ },
+ "n9194418333": {
+  "opening_hours": "Mo-Tu 10:00-03:00; We-Sa 10:00-05:00; Su 11:00-24:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 3 AM; Tuesday: 10 AM to 3 AM; Wednesday: 10 AM to 5 AM; Thursday: 10 AM to 5 AM; Friday: 10 AM to 5 AM; Saturday: 10 AM to 5 AM; Sunday: 11 AM to 12 AM",
+  "matched_name": "The Halal Guys",
+  "distance_m": 5.6
+ },
+ "n9397923182": {
+  "opening_hours": "Mo-We 17:00-21:00; Th-Sa 12:00-21:30; Su off",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 to 9 PM; Tuesday: 5 to 9 PM; Wednesday: 5 to 9 PM; Thursday: 12 to 9:30 PM; Friday: 12 to 9:30 PM; Saturday: 12 to 9:30 PM; Sunday: Closed",
+  "matched_name": "Aliment",
+  "distance_m": 5.6
+ },
+ "n4632000807": {
+  "opening_hours": "Mo-We 11:30-15:30,18:30-24:00; Th 11:30-15:30,18:30-01:00; Fr 11:30-15:30,18:30-02:00; Sa 14:00-02:00; Su 13:00-19:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11:30 AM to 3:30 PM, 6:30 PM to 12 AM; Tuesday: 11:30 AM to 3:30 PM, 6:30 PM to 12 AM; Wednesday: 11:30 AM to 3:30 PM, 6:30 PM to 12 AM; Thursday: 11:30 AM to 3:30 PM, 6:30 PM to 1 AM; Friday: 11:30 AM to 3:30 PM, 6:30 PM to 2 AM; Saturday: 2 PM to 2 AM; Sunday: 1 to 7 PM",
+  "matched_name": "SF Wraps",
+  "distance_m": 5.6
+ },
+ "n9427187532": {
+  "opening_hours": "Mo-Fr 07:30-16:00; Sa-Su 08:00-16:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7:30 AM to 4 PM; Tuesday: 7:30 AM to 4 PM; Wednesday: 7:30 AM to 4 PM; Thursday: 7:30 AM to 4 PM; Friday: 7:30 AM to 4 PM; Saturday: 8 AM to 4 PM; Sunday: 8 AM to 4 PM",
+  "matched_name": "Home Coffee Roasters",
+  "distance_m": 5.6
+ },
+ "n11725217803": {
+  "opening_hours": "We-Th,Su 19:00-21:30; Fr-Sa 19:00-23:30; Mo-Tu off",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: Closed; Wednesday: 7 to 9:30 PM; Thursday: 7 to 9:30 PM; Friday: 7 to 11:30 PM; Saturday: 7 to 11:30 PM; Sunday: 7 to 9:30 PM",
+  "matched_name": "Shelton Theater",
+  "distance_m": 5.7
+ },
+ "n1699076112": {
+  "opening_hours": "Mo-Th,Su 07:00-01:00; Fr-Sa 07:00-02:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 1 AM; Tuesday: 7 AM to 1 AM; Wednesday: 7 AM to 1 AM; Thursday: 7 AM to 1 AM; Friday: 7 AM to 2 AM; Saturday: 7 AM to 2 AM; Sunday: 7 AM to 1 AM",
+  "matched_name": "O'Farrell Liquors",
+  "distance_m": 5.7
+ },
+ "n381955914": {
+  "opening_hours": "Mo-Su 07:00-24:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 12 AM; Tuesday: 7 AM to 12 AM; Wednesday: 7 AM to 12 AM; Thursday: 7 AM to 12 AM; Friday: 7 AM to 12 AM; Saturday: 7 AM to 12 AM; Sunday: 7 AM to 12 AM",
+  "matched_name": "Walgreens",
+  "distance_m": 5.7
+ },
+ "n351963628": {
+  "opening_hours": "Mo,We-Sa 06:00-16:00; Tu,Su 06:00-14:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6 AM to 4 PM; Tuesday: 6 AM to 2 PM; Wednesday: 6 AM to 4 PM; Thursday: 6 AM to 4 PM; Friday: 6 AM to 4 PM; Saturday: 6 AM to 4 PM; Sunday: 6 AM to 2 PM",
+  "matched_name": "Angel Cafe & Deli",
+  "distance_m": 5.8
+ },
+ "n6188160959": {
+  "opening_hours": "Mo,Su 10:00-14:00; Th-Sa 10:00-15:00; Tu-We off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 2 PM; Tuesday: Closed; Wednesday: Closed; Thursday: 10 AM to 3 PM; Friday: 10 AM to 3 PM; Saturday: 10 AM to 3 PM; Sunday: 10 AM to 2 PM",
+  "matched_name": "Farm : Table",
+  "distance_m": 1.4
+ },
+ "n3394945428": {
+  "opening_hours": "Mo-Th 11:00-22:00; Fr-Sa 11:00-23:00; Su 10:00-22:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 10 PM; Tuesday: 11 AM to 10 PM; Wednesday: 11 AM to 10 PM; Thursday: 11 AM to 10 PM; Friday: 11 AM to 11 PM; Saturday: 11 AM to 11 PM; Sunday: 10 AM to 10 PM",
+  "matched_name": "The Cheesecake Factory",
+  "distance_m": 5.9
+ },
+ "n12316462727": {
+  "opening_hours": "Mo-Sa 11:00-21:00; Su 11:00-20:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 9 PM; Tuesday: 11 AM to 9 PM; Wednesday: 11 AM to 9 PM; Thursday: 11 AM to 9 PM; Friday: 11 AM to 9 PM; Saturday: 11 AM to 9 PM; Sunday: 11 AM to 8 PM",
+  "matched_name": "Wetzel's Pretzels",
+  "distance_m": 6.0
+ },
+ "n9536222651": {
+  "opening_hours": "Mo-Th,Su 17:00-02:00; Fr-Sa 17:00-04:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 5 PM to 2 AM; Tuesday: 5 PM to 2 AM; Wednesday: 5 PM to 2 AM; Thursday: 5 PM to 2 AM; Friday: 5 PM to 4 AM; Saturday: 5 PM to 4 AM; Sunday: 5 PM to 2 AM",
+  "matched_name": "Cocobang",
+  "distance_m": 1.1
+ },
+ "n1282408828": {
+  "opening_hours": "Mo-Fr 08:00-21:00; Sa 11:00-16:00; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 8 AM to 9 PM; Tuesday: 8 AM to 9 PM; Wednesday: 8 AM to 9 PM; Thursday: 8 AM to 9 PM; Friday: 8 AM to 9 PM; Saturday: 11 AM to 4 PM; Sunday: Closed",
+  "matched_name": "Uno Dos Tacos",
+  "distance_m": 6.1
+ },
+ "n1293838092": {
+  "opening_hours": "off",
+  "confidence": 0.84,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Temporarily closed",
+  "matched_name": "Village Tea House",
+  "distance_m": 6.2
+ },
+ "n3393447848": {
+  "opening_hours": "Mo-Tu 08:30-19:00; We,Su 08:30-20:00; Th-Sa 08:30-21:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 8:30 AM to 7 PM; Tuesday: 8:30 AM to 7 PM; Wednesday: 8:30 AM to 8 PM; Thursday: 8:30 AM to 9 PM; Friday: 8:30 AM to 9 PM; Saturday: 8:30 AM to 9 PM; Sunday: 8:30 AM to 8 PM",
+  "matched_name": "Union Square Wines & Spirits",
+  "distance_m": 2.9
+ },
+ "n3397982293": {
+  "opening_hours": "Mo-Su 05:00-19:30",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 5 AM to 7:30 PM; Tuesday: 5 AM to 7:30 PM; Wednesday: 5 AM to 7:30 PM; Thursday: 5 AM to 7:30 PM; Friday: 5 AM to 7:30 PM; Saturday: 5 AM to 7:30 PM; Sunday: 5 AM to 7:30 PM",
+  "matched_name": "Peet's Coffee",
+  "distance_m": 6.2
+ },
+ "n841414821": {
+  "opening_hours": "Mo-We 08:00-18:00; Th-Sa 08:00-20:00; Su 08:00-15:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 6 PM; Tuesday: 8 AM to 6 PM; Wednesday: 8 AM to 6 PM; Thursday: 8 AM to 8 PM; Friday: 8 AM to 8 PM; Saturday: 8 AM to 8 PM; Sunday: 8 AM to 3 PM",
+  "matched_name": "Café de la Presse",
+  "distance_m": 6.2
+ },
+ "n13261610392": {
+  "opening_hours": "Tu-Sa 10:00-19:00; Mo,Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: Closed; Tuesday: 10 AM to 7 PM; Wednesday: 10 AM to 7 PM; Thursday: 10 AM to 7 PM; Friday: 10 AM to 7 PM; Saturday: 10 AM to 7 PM; Sunday: Closed",
+  "matched_name": "New Fortune Restaurant",
+  "distance_m": 6.2
+ },
+ "n12054096702": {
+  "opening_hours": "Mo-Su 10:00-20:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 10 AM to 8 PM; Tuesday: 10 AM to 8 PM; Wednesday: 10 AM to 8 PM; Thursday: 10 AM to 8 PM; Friday: 10 AM to 8 PM; Saturday: 10 AM to 8 PM; Sunday: 10 AM to 8 PM",
+  "matched_name": "JinShan Cafe",
+  "distance_m": 6.4
+ },
+ "n9194418332": {
+  "opening_hours": "Tu-Th,Su 11:30-22:30; Fr-Sa 11:30-23:00; Mo off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: Closed; Tuesday: 11:30 AM to 10:30 PM; Wednesday: 11:30 AM to 10:30 PM; Thursday: 11:30 AM to 10:30 PM; Friday: 11:30 AM to 11 PM; Saturday: 11:30 AM to 11 PM; Sunday: 11:30 AM to 10:30 PM",
+  "matched_name": "Oma Sushi",
+  "distance_m": 6.5
+ },
+ "n10103504376": {
+  "opening_hours": "Mo-Fr 10:00-19:00; Sa 10:00-18:00; Su 11:00-18:00",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 10 AM to 7 PM; Tuesday: 10 AM to 7 PM; Wednesday: 10 AM to 7 PM; Thursday: 10 AM to 7 PM; Friday: 10 AM to 7 PM; Saturday: 10 AM to 6 PM; Sunday: 11 AM to 6 PM",
+  "matched_name": "Saatva",
+  "distance_m": 6.6
+ },
+ "n6704512686": {
+  "opening_hours": "Mo-Fr 10:00-14:00; Sa-Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:06:26+00:00",
+  "raw": "Monday: 10 AM to 2 PM; Tuesday: 10 AM to 2 PM; Wednesday: 10 AM to 2 PM; Thursday: 10 AM to 2 PM; Friday: 10 AM to 2 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Ladle & Leaf",
+  "distance_m": 6.6
+ },
+ "n12726274826": {
+  "opening_hours": "Mo 08:00-16:00; Tu-Fr 08:00-17:00; Sa-Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 4 PM; Tuesday: 8 AM to 5 PM; Wednesday: 8 AM to 5 PM; Thursday: 8 AM to 5 PM; Friday: 8 AM to 5 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Flower Cart",
+  "distance_m": 6.6
+ },
+ "n621851561": {
+  "opening_hours": "Mo-Th,Su 12:00-22:00; Fr-Sa 12:00-23:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 12 to 10 PM; Tuesday: 12 to 10 PM; Wednesday: 12 to 10 PM; Thursday: 12 to 10 PM; Friday: 12 to 11 PM; Saturday: 12 to 11 PM; Sunday: 12 to 10 PM",
+  "matched_name": "Matador",
+  "distance_m": 6.6
+ },
+ "n3061387376": {
+  "opening_hours": "Mo 16:30-24:00; Tu-We 16:30-01:00; Th-Fr 16:30-02:00; Sa 18:00-02:00; Su off",
+  "confidence": 0.94,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4:30 PM to 12 AM; Tuesday: 4:30 PM to 1 AM; Wednesday: 4:30 PM to 1 AM; Thursday: 4:30 PM to 2 AM; Friday: 4:30 PM to 2 AM; Saturday: 6 PM to 2 AM; Sunday: Closed",
+  "matched_name": "Local Edition",
+  "distance_m": 6.7
+ },
+ "n4637773271": {
+  "opening_hours": "Mo-Th 12:00-24:00; Fr 12:00-03:00; Sa 14:00-03:00; Su 14:00-24:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 12 PM to 12 AM; Tuesday: 12 PM to 12 AM; Wednesday: 12 PM to 12 AM; Thursday: 12 PM to 12 AM; Friday: 12 PM to 3 AM; Saturday: 2 PM to 3 AM; Sunday: 2 PM to 12 AM",
+  "matched_name": "Chico's Pizza",
+  "distance_m": 6.7
+ },
+ "n4637571920": {
+  "opening_hours": "Mo-We 08:00-23:00; Th 08:00-24:00; Fr-Sa 08:00-01:00; Su 09:00-23:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 8 AM to 11 PM; Tuesday: 8 AM to 11 PM; Wednesday: 8 AM to 11 PM; Thursday: 8 AM to 12 AM; Friday: 8 AM to 1 AM; Saturday: 8 AM to 1 AM; Sunday: 9 AM to 11 PM",
+  "matched_name": "Geary Wine & Spirits",
+  "distance_m": 6.8
+ },
+ "n5752120935": {
+  "opening_hours": "Mo-Sa 11:00-22:00; Su 11:00-21:30",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 10 PM; Tuesday: 11 AM to 10 PM; Wednesday: 11 AM to 10 PM; Thursday: 11 AM to 10 PM; Friday: 11 AM to 10 PM; Saturday: 11 AM to 10 PM; Sunday: 11 AM to 9:30 PM",
+  "matched_name": "IPPUDO San Francisco",
+  "distance_m": 6.9
+ },
+ "n3642082213": {
+  "opening_hours": "Mo-We 16:00-24:00; Th-Fr 16:00-02:00; Sa 17:00-02:00; Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 PM to 12 AM; Tuesday: 4 PM to 12 AM; Wednesday: 4 PM to 12 AM; Thursday: 4 PM to 2 AM; Friday: 4 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: Closed",
+  "matched_name": "Novela",
+  "distance_m": 6.9
+ },
+ "n9061212711": {
+  "opening_hours": "Mo-Sa 10:00-20:30; Su 10:30-20:30",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 10 AM to 8:30 PM; Tuesday: 10 AM to 8:30 PM; Wednesday: 10 AM to 8:30 PM; Thursday: 10 AM to 8:30 PM; Friday: 10 AM to 8:30 PM; Saturday: 10 AM to 8:30 PM; Sunday: 10:30 AM to 8:30 PM",
+  "matched_name": "Bimi poke",
+  "distance_m": 6.9
+ },
+ "n10023428673": {
+  "opening_hours": "Mo-Fr 07:30-17:00; Sa 00:30-22:00; Su 12:00-22:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7:30 AM to 5 PM; Tuesday: 7:30 AM to 5 PM; Wednesday: 7:30 AM to 5 PM; Thursday: 7:30 AM to 5 PM; Friday: 7:30 AM to 5 PM; Saturday: 12:30 AM to 10 PM; Sunday: 12 to 10 PM",
+  "matched_name": "Cafecito",
+  "distance_m": 7.0
+ },
+ "n9349946416": {
+  "opening_hours": "Mo-Th,Su 17:00-22:45; Fr-Sa 17:00-23:45",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 to 10:45 PM; Tuesday: 5 to 10:45 PM; Wednesday: 5 to 10:45 PM; Thursday: 5 to 10:45 PM; Friday: 5 to 11:45 PM; Saturday: 5 to 11:45 PM; Sunday: 5 to 10:45 PM",
+  "matched_name": "Sushi Toni",
+  "distance_m": 2.6
+ },
+ "n3408713872": {
+  "opening_hours": "Mo-Fr 07:00-15:00; Sa-Su 08:00-15:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 3 PM; Tuesday: 7 AM to 3 PM; Wednesday: 7 AM to 3 PM; Thursday: 7 AM to 3 PM; Friday: 7 AM to 3 PM; Saturday: 8 AM to 3 PM; Sunday: 8 AM to 3 PM",
+  "matched_name": "Posh Bagel",
+  "distance_m": 7.0
+ },
+ "n6532267412": {
+  "opening_hours": "Mo,We-Su 11:30-14:30,16:00-21:00; Tu off",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11:30 AM to 2:30 PM, 4 to 9 PM; Tuesday: Closed; Wednesday: 11:30 AM to 2:30 PM, 4 to 9 PM; Thursday: 11:30 AM to 2:30 PM, 4 to 9 PM; Friday: 11:30 AM to 2:30 PM, 4 to 9 PM; Saturday: 11:30 AM to 2:30 PM, 4 to 9 PM; Sunday: 11:30 AM to 2:30 PM, 4 to 9 PM",
+  "matched_name": "Far East Cafe",
+  "distance_m": 7.0
+ },
+ "n725096449": {
+  "opening_hours": "Mo-Su 16:00-22:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 to 10 PM; Tuesday: 4 to 10 PM; Wednesday: 4 to 10 PM; Thursday: 4 to 10 PM; Friday: 4 to 10 PM; Saturday: 4 to 10 PM; Sunday: 4 to 10 PM",
+  "matched_name": "The Mortimer",
+  "distance_m": 7.1
+ },
+ "n11774203415": {
+  "opening_hours": "Mo 07:00-20:00; Tu-We 09:00-20:00; Th-Sa 08:00-20:00; Su 09:00-18:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 7 AM to 8 PM; Tuesday: 9 AM to 8 PM; Wednesday: 9 AM to 8 PM; Thursday: 8 AM to 8 PM; Friday: 8 AM to 8 PM; Saturday: 8 AM to 8 PM; Sunday: 9 AM to 6 PM",
+  "matched_name": "Your New Barber",
+  "distance_m": 7.1
+ },
+ "n4301580389": {
+  "opening_hours": "Mo-Su 07:00-15:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 3 PM; Tuesday: 7 AM to 3 PM; Wednesday: 7 AM to 3 PM; Thursday: 7 AM to 3 PM; Friday: 7 AM to 3 PM; Saturday: 7 AM to 3 PM; Sunday: 7 AM to 3 PM",
+  "matched_name": "Sears Fine Food",
+  "distance_m": 7.2
+ },
+ "n3931497663": {
+  "opening_hours": "Tu-Th 16:00-23:00; Fr-Sa 16:00-24:00; Mo,Su off",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: 4 to 11 PM; Wednesday: 4 to 11 PM; Thursday: 4 to 11 PM; Friday: 4 PM to 12 AM; Saturday: 4 PM to 12 AM; Sunday: Closed",
+  "matched_name": "Key Klub",
+  "distance_m": 7.2
+ },
+ "n808930732": {
+  "opening_hours": "Mo-Th,Su 11:00-23:00; Fr-Sa 11:00-01:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 11 PM; Tuesday: 11 AM to 11 PM; Wednesday: 11 AM to 11 PM; Thursday: 11 AM to 11 PM; Friday: 11 AM to 1 AM; Saturday: 11 AM to 1 AM; Sunday: 11 AM to 11 PM",
+  "matched_name": "Union Square Pizza & Kitchen",
+  "distance_m": 7.2
+ },
+ "n1854985759": {
+  "opening_hours": "Mo-Fr 10:00-22:00; Sa-Su 11:00-22:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 10 AM to 10 PM; Tuesday: 10 AM to 10 PM; Wednesday: 10 AM to 10 PM; Thursday: 10 AM to 10 PM; Friday: 10 AM to 10 PM; Saturday: 11 AM to 10 PM; Sunday: 11 AM to 10 PM",
+  "matched_name": "Little Delhi",
+  "distance_m": 7.4
+ },
+ "n9194418323": {
+  "opening_hours": "Mo-Th,Su 08:00-22:00; Fr-Sa 08:00-23:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 8 AM to 10 PM; Tuesday: 8 AM to 10 PM; Wednesday: 8 AM to 10 PM; Thursday: 8 AM to 10 PM; Friday: 8 AM to 11 PM; Saturday: 8 AM to 11 PM; Sunday: 8 AM to 10 PM",
+  "matched_name": "Sutter Pub & Restaurant",
+  "distance_m": 7.4
+ },
+ "n1395111833": {
+  "opening_hours": "Mo-We,Su 11:00-23:00; Th-Sa 11:00-24:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 11 PM; Tuesday: 11 AM to 11 PM; Wednesday: 11 AM to 11 PM; Thursday: 11 AM to 12 AM; Friday: 11 AM to 12 AM; Saturday: 11 AM to 12 AM; Sunday: 11 AM to 11 PM",
+  "matched_name": "The Harlequin",
+  "distance_m": 7.4
+ },
+ "n9965255764": {
+  "opening_hours": "Mo-Su 07:00-14:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 7 AM to 2 PM; Tuesday: 7 AM to 2 PM; Wednesday: 7 AM to 2 PM; Thursday: 7 AM to 2 PM; Friday: 7 AM to 2 PM; Saturday: 7 AM to 2 PM; Sunday: 7 AM to 2 PM",
+  "matched_name": "Heist Restaurant",
+  "distance_m": 7.4
+ },
+ "n9546618838": {
+  "opening_hours": "Mo-Fr 07:00-17:00; Sa 08:30-17:00; Su 08:30-16:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 7 AM to 5 PM; Tuesday: 7 AM to 5 PM; Wednesday: 7 AM to 5 PM; Thursday: 7 AM to 5 PM; Friday: 7 AM to 5 PM; Saturday: 8:30 AM to 5 PM; Sunday: 8:30 AM to 4 PM",
+  "matched_name": "KP49 Sandwiches",
+  "distance_m": 7.4
+ },
+ "n9181840531": {
+  "opening_hours": "Mo-Su 11:00-02:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 2 AM; Tuesday: 11 AM to 2 AM; Wednesday: 11 AM to 2 AM; Thursday: 11 AM to 2 AM; Friday: 11 AM to 2 AM; Saturday: 11 AM to 2 AM; Sunday: 11 AM to 2 AM",
+  "matched_name": "Bellissimo Pizza",
+  "distance_m": 7.4
+ },
+ "n9849528033": {
+  "opening_hours": "Tu,Th-Fr 08:30-17:00; We,Sa-Su 08:30-14:00; Mo off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: Closed; Tuesday: 8:30 AM to 5 PM; Wednesday: 8:30 AM to 2 PM; Thursday: 8:30 AM to 5 PM; Friday: 8:30 AM to 5 PM; Saturday: 8:30 AM to 2 PM; Sunday: 8:30 AM to 2 PM",
+  "matched_name": "THE BIRDCAGE SAN FRANCISCO",
+  "distance_m": 2.6
+ },
+ "n4626983989": {
+  "opening_hours": "Mo-Fr 06:00-24:00; Sa 00:00-24:00; Su 04:00-24:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 6 AM to 12 AM; Tuesday: 6 AM to 12 AM; Wednesday: 6 AM to 12 AM; Thursday: 6 AM to 12 AM; Friday: 6 AM to 12 AM; Saturday: Open 24 hours; Sunday: 4 AM to 12 AM",
+  "matched_name": "McDonald's",
+  "distance_m": 7.5
+ },
+ "n9408415654": {
+  "opening_hours": "Mo-Su 11:00-02:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 2 AM; Tuesday: 11 AM to 2 AM; Wednesday: 11 AM to 2 AM; Thursday: 11 AM to 2 AM; Friday: 11 AM to 2 AM; Saturday: 11 AM to 2 AM; Sunday: 11 AM to 2 AM",
+  "matched_name": "Bite",
+  "distance_m": 7.5
+ },
+ "n725100818": {
+  "opening_hours": "Mo-Th,Su 07:00-10:30,11:30-21:00; Fr-Sa 07:00-10:30,11:30-22:00",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 7 to 10:30 AM, 11:30 AM to 9 PM; Tuesday: 7 to 10:30 AM, 11:30 AM to 9 PM; Wednesday: 7 to 10:30 AM, 11:30 AM to 9 PM; Thursday: 7 to 10:30 AM, 11:30 AM to 9 PM; Friday: 7 to 10:30 AM, 11:30 AM to 10 PM; Saturday: 7 to 10:30 AM, 11:30 AM to 10 PM; Sunday: 7 to 10:30 AM, 11:30 AM to 9 PM",
+  "matched_name": "Bota Tapas & Paella Bar",
+  "distance_m": 7.7
+ },
+ "n11067557407": {
+  "opening_hours": "Mo-Fr 10:30-14:00; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 10:30 AM to 2 PM; Tuesday: 10:30 AM to 2 PM; Wednesday: 10:30 AM to 2 PM; Thursday: 10:30 AM to 2 PM; Friday: 10:30 AM to 2 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Poke Bar",
+  "distance_m": 7.7
+ },
+ "n725096448": {
+  "opening_hours": "Tu-We 17:00-24:00; Th-Sa 17:00-02:00; Su 16:00-24:00; Mo off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: 5 PM to 12 AM; Wednesday: 5 PM to 12 AM; Thursday: 5 PM to 2 AM; Friday: 5 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: 4 PM to 12 AM",
+  "matched_name": "Bottle Club Pub",
+  "distance_m": 7.7
+ },
+ "n725100831": {
+  "opening_hours": "Tu-Th,Su 17:15-21:30; Fr-Sa 17:15-22:00; Mo off",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: 5:15 to 9:30 PM; Wednesday: 5:15 to 9:30 PM; Thursday: 5:15 to 9:30 PM; Friday: 5:15 to 10 PM; Saturday: 5:15 to 10 PM; Sunday: 5:15 to 9:30 PM",
+  "matched_name": "Biscuits And Blues",
+  "distance_m": 7.7
+ },
+ "n13799894601": {
+  "opening_hours": "Mo-Fr,Su 07:30-19:00; Sa 07:30-11:30",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 7:30 AM to 7 PM; Tuesday: 7:30 AM to 7 PM; Wednesday: 7:30 AM to 7 PM; Thursday: 7:30 AM to 7 PM; Friday: 7:30 AM to 7 PM; Saturday: 7:30 to 11:30 AM; Sunday: 7:30 AM to 7 PM",
+  "matched_name": "Nave Cafe",
+  "distance_m": 7.8
+ },
+ "n808884914": {
+  "opening_hours": "Mo-Su 05:00-23:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 5 AM to 11 PM; Tuesday: 5 AM to 11 PM; Wednesday: 5 AM to 11 PM; Thursday: 5 AM to 11 PM; Friday: 5 AM to 11 PM; Saturday: 5 AM to 11 PM; Sunday: 5 AM to 11 PM",
+  "matched_name": "Mellis Cafe",
+  "distance_m": 7.8
+ },
+ "n725100821": {
+  "opening_hours": "Mo-Su 08:00-15:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 3 PM; Tuesday: 8 AM to 3 PM; Wednesday: 8 AM to 3 PM; Thursday: 8 AM to 3 PM; Friday: 8 AM to 3 PM; Saturday: 8 AM to 3 PM; Sunday: 8 AM to 3 PM",
+  "matched_name": "David's Delicatessen & Diner",
+  "distance_m": 7.9
+ },
+ "n11253185335": {
+  "opening_hours": "Mo,Fr 09:00-16:00; Tu-Th 08:00-17:00; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 9 AM to 4 PM; Tuesday: 8 AM to 5 PM; Wednesday: 8 AM to 5 PM; Thursday: 8 AM to 5 PM; Friday: 9 AM to 4 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Holy Nata",
+  "distance_m": 8.0
+ },
+ "n11047391470": {
+  "opening_hours": "Mo-Fr 08:00-17:00; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 5 PM; Tuesday: 8 AM to 5 PM; Wednesday: 8 AM to 5 PM; Thursday: 8 AM to 5 PM; Friday: 8 AM to 5 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Bowl'd Acai",
+  "distance_m": 8.1
+ },
+ "n1486061262": {
+  "opening_hours": "Mo-Th,Su 07:00-21:00; Fr-Sa 07:00-22:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 7 AM to 9 PM; Tuesday: 7 AM to 9 PM; Wednesday: 7 AM to 9 PM; Thursday: 7 AM to 9 PM; Friday: 7 AM to 10 PM; Saturday: 7 AM to 10 PM; Sunday: 7 AM to 9 PM",
+  "matched_name": "Lori's Diner",
+  "distance_m": 8.2
+ },
+ "n725096451": {
+  "opening_hours": "Mo-Th 07:00-10:00,17:00-21:00; Fr 07:00-10:00,17:00-22:00; Sa 07:00-10:00,11:30-13:30,17:00-22:00; Su 07:00-10:00,11:30-13:30,17:00-21:00",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 7 to 10 AM, 5 to 9 PM; Tuesday: 7 to 10 AM, 5 to 9 PM; Wednesday: 7 to 10 AM, 5 to 9 PM; Thursday: 7 to 10 AM, 5 to 9 PM; Friday: 7 to 10 AM, 5 to 10 PM; Saturday: 7 to 10 AM, 11:30 AM to 1:30 PM, 5 to 10 PM; Sunday: 7 to 10 AM, 11:30 AM to 1:30 PM, 5 to 9 PM",
+  "matched_name": "Tratto",
+  "distance_m": 8.3
+ },
+ "w132125164": {
+  "opening_hours": "Mo-Fr 06:00-19:00; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 6 AM to 7 PM; Tuesday: 6 AM to 7 PM; Wednesday: 6 AM to 7 PM; Thursday: 6 AM to 7 PM; Friday: 6 AM to 7 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Crocker Galleria",
+  "distance_m": 8.4
+ },
+ "n1799521636": {
+  "opening_hours": "Mo-We 11:00-20:45; Th-Sa 11:00-21:30; Su 11:00-20:30",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 8:45 PM; Tuesday: 11 AM to 8:45 PM; Wednesday: 11 AM to 8:45 PM; Thursday: 11 AM to 9:30 PM; Friday: 11 AM to 9:30 PM; Saturday: 11 AM to 9:30 PM; Sunday: 11 AM to 8:30 PM",
+  "matched_name": "Tropisueno",
+  "distance_m": 8.4
+ },
+ "n13168483731": {
+  "opening_hours": "Mo-Th,Su 16:00-22:00; Fr-Sa 16:00-23:00",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 to 10 PM; Tuesday: 4 to 10 PM; Wednesday: 4 to 10 PM; Thursday: 4 to 10 PM; Friday: 4 to 11 PM; Saturday: 4 to 11 PM; Sunday: 4 to 10 PM",
+  "matched_name": "OneUp Restaurant & Lounge",
+  "distance_m": 8.4
+ },
+ "n9341088550": {
+  "opening_hours": "Mo,Fr 07:00-16:00; Tu-Th 07:00-17:00; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 4 PM; Tuesday: 7 AM to 5 PM; Wednesday: 7 AM to 5 PM; Thursday: 7 AM to 5 PM; Friday: 7 AM to 4 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Red Bay Coffee",
+  "distance_m": 8.5
+ },
+ "n2026996080": {
+  "opening_hours": "Mo-Su 10:30-22:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 10:30 AM to 10 PM; Tuesday: 10:30 AM to 10 PM; Wednesday: 10:30 AM to 10 PM; Thursday: 10:30 AM to 10 PM; Friday: 10:30 AM to 10 PM; Saturday: 10:30 AM to 10 PM; Sunday: 10:30 AM to 10 PM",
+  "matched_name": "Nick the Greek",
+  "distance_m": 8.5
+ },
+ "n6611213082": {
+  "opening_hours": "Mo-Fr 10:00-19:00; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 10 AM to 7 PM; Tuesday: 10 AM to 7 PM; Wednesday: 10 AM to 7 PM; Thursday: 10 AM to 7 PM; Friday: 10 AM to 7 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Mendocino Farms",
+  "distance_m": 8.5
+ },
+ "n9328656115": {
+  "opening_hours": "Mo-Su 17:00-02:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 PM to 2 AM; Tuesday: 5 PM to 2 AM; Wednesday: 5 PM to 2 AM; Thursday: 5 PM to 2 AM; Friday: 5 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: 5 PM to 2 AM",
+  "matched_name": "Persona",
+  "distance_m": 8.5
+ },
+ "n10039959914": {
+  "opening_hours": "Mo-Su 06:00-16:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 6 AM to 4 PM; Tuesday: 6 AM to 4 PM; Wednesday: 6 AM to 4 PM; Thursday: 6 AM to 4 PM; Friday: 6 AM to 4 PM; Saturday: 6 AM to 4 PM; Sunday: 6 AM to 4 PM",
+  "matched_name": "Hideaway Cafe",
+  "distance_m": 8.6
+ },
+ "n1823804082": {
+  "opening_hours": "Mo-Th 11:00-21:00; Fr 11:00-20:30; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 9 PM; Tuesday: 11 AM to 9 PM; Wednesday: 11 AM to 9 PM; Thursday: 11 AM to 9 PM; Friday: 11 AM to 8:30 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Per Diem - Financial District",
+  "distance_m": 8.6
+ },
+ "n9897737049": {
+  "opening_hours": "Mo-Su 06:30-17:30",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6:30 AM to 5:30 PM; Tuesday: 6:30 AM to 5:30 PM; Wednesday: 6:30 AM to 5:30 PM; Thursday: 6:30 AM to 5:30 PM; Friday: 6:30 AM to 5:30 PM; Saturday: 6:30 AM to 5:30 PM; Sunday: 6:30 AM to 5:30 PM",
+  "matched_name": "Blue Bottle Coffee",
+  "distance_m": 8.6
+ },
+ "n11717162358": {
+  "opening_hours": "Mo-We,Su 11:00-16:00; Th-Sa 11:00-17:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 4 PM; Tuesday: 11 AM to 4 PM; Wednesday: 11 AM to 4 PM; Thursday: 11 AM to 5 PM; Friday: 11 AM to 5 PM; Saturday: 11 AM to 5 PM; Sunday: 11 AM to 4 PM",
+  "matched_name": "The Rotunda",
+  "distance_m": 8.7
+ },
+ "w332229903": {
+  "opening_hours": "Mo-Su 11:00-22:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 10 PM; Tuesday: 11 AM to 10 PM; Wednesday: 11 AM to 10 PM; Thursday: 11 AM to 10 PM; Friday: 11 AM to 10 PM; Saturday: 11 AM to 10 PM; Sunday: 11 AM to 10 PM",
+  "matched_name": "Maru Sushi",
+  "distance_m": 8.7
+ },
+ "n818060724": {
+  "opening_hours": "Mo-Th,Su 10:00-01:00; Fr-Sa 10:00-02:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 10 AM to 1 AM; Tuesday: 10 AM to 1 AM; Wednesday: 10 AM to 1 AM; Thursday: 10 AM to 1 AM; Friday: 10 AM to 2 AM; Saturday: 10 AM to 2 AM; Sunday: 10 AM to 1 AM",
+  "matched_name": "El Tesoro Taqueria and Grill",
+  "distance_m": 0.3
+ },
+ "n9203665043": {
+  "opening_hours": "Mo-Th 16:30-02:00; Fr-Sa 17:30-03:00; Su 16:30-24:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4:30 PM to 2 AM; Tuesday: 4:30 PM to 2 AM; Wednesday: 4:30 PM to 2 AM; Thursday: 4:30 PM to 2 AM; Friday: 5:30 PM to 3 AM; Saturday: 5:30 PM to 3 AM; Sunday: 4:30 PM to 12 AM",
+  "matched_name": "The Public Izakaya",
+  "distance_m": 8.8
+ },
+ "n1486000122": {
+  "opening_hours": "Mo-Fr 07:00-15:00; Sa-Su 07:00-16:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 3 PM; Tuesday: 7 AM to 3 PM; Wednesday: 7 AM to 3 PM; Thursday: 7 AM to 3 PM; Friday: 7 AM to 3 PM; Saturday: 7 AM to 4 PM; Sunday: 7 AM to 4 PM",
+  "matched_name": "Roxanne Cafe",
+  "distance_m": 8.9
+ },
+ "n10095744878": {
+  "opening_hours": "Tu-We 18:00-23:00; Th-Sa 18:00-24:00; Mo,Su off",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: 6 to 11 PM; Wednesday: 6 to 11 PM; Thursday: 6 PM to 12 AM; Friday: 6 PM to 12 AM; Saturday: 6 PM to 12 AM; Sunday: Closed",
+  "matched_name": "Moongate Lounge",
+  "distance_m": 8.9
+ },
+ "n3397923104": {
+  "opening_hours": "Mo,We-Fr 10:00-20:00; Tu 09:00-20:00; Sa 10:00-19:00; Su 10:00-18:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 8 PM; Tuesday: 9 AM to 8 PM; Wednesday: 10 AM to 8 PM; Thursday: 10 AM to 8 PM; Friday: 10 AM to 8 PM; Saturday: 10 AM to 7 PM; Sunday: 10 AM to 6 PM",
+  "matched_name": "Oasis Grill",
+  "distance_m": 8.9
+ },
+ "n11085011205": {
+  "opening_hours": "Mo-Su 11:00-01:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 1 AM; Tuesday: 11 AM to 1 AM; Wednesday: 11 AM to 1 AM; Thursday: 11 AM to 1 AM; Friday: 11 AM to 1 AM; Saturday: 11 AM to 1 AM; Sunday: 11 AM to 1 AM",
+  "matched_name": "Trisara",
+  "distance_m": 9.0
+ },
+ "n4625129275": {
+  "opening_hours": "Mo-Fr 07:00-15:00; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 3 PM; Tuesday: 7 AM to 3 PM; Wednesday: 7 AM to 3 PM; Thursday: 7 AM to 3 PM; Friday: 7 AM to 3 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Foundation Cafe",
+  "distance_m": 9.0
+ },
+ "n383509298": {
+  "opening_hours": "Mo-Su 06:00-01:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 6 AM to 1 AM; Tuesday: 6 AM to 1 AM; Wednesday: 6 AM to 1 AM; Thursday: 6 AM to 1 AM; Friday: 6 AM to 1 AM; Saturday: 6 AM to 1 AM; Sunday: 6 AM to 1 AM",
+  "matched_name": "Jack in the Box",
+  "distance_m": 9.1
+ },
+ "n13785160902": {
+  "opening_hours": "Mo-Su 06:00-18:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6 AM to 6 PM; Tuesday: 6 AM to 6 PM; Wednesday: 6 AM to 6 PM; Thursday: 6 AM to 6 PM; Friday: 6 AM to 6 PM; Saturday: 6 AM to 6 PM; Sunday: 6 AM to 6 PM",
+  "matched_name": "Metropolitan Coffee",
+  "distance_m": 9.2
+ },
+ "n9976266125": {
+  "opening_hours": "24/7",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: Open 24 hours; Tuesday: Open 24 hours; Wednesday: Open 24 hours; Thursday: Open 24 hours; Friday: Open 24 hours; Saturday: Open 24 hours; Sunday: Open 24 hours",
+  "matched_name": "7-Eleven",
+  "distance_m": 9.2
+ },
+ "n11737694237": {
+  "opening_hours": "Mo-Tu,Th-Fr 10:00-20:00; Sa 09:00-20:00; Su 09:00-15:00; We off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 8 PM; Tuesday: 10 AM to 8 PM; Wednesday: Closed; Thursday: 10 AM to 8 PM; Friday: 10 AM to 8 PM; Saturday: 9 AM to 8 PM; Sunday: 9 AM to 3 PM",
+  "matched_name": "Tahona Mercado",
+  "distance_m": 9.3
+ },
+ "n3397875325": {
+  "opening_hours": "Mo-Th,Su 10:30-22:00; Fr-Sa 10:30-22:30",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 10:30 AM to 10 PM; Tuesday: 10:30 AM to 10 PM; Wednesday: 10:30 AM to 10 PM; Thursday: 10:30 AM to 10 PM; Friday: 10:30 AM to 10:30 PM; Saturday: 10:30 AM to 10:30 PM; Sunday: 10:30 AM to 10 PM",
+  "matched_name": "Super Duper Burgers",
+  "distance_m": 9.3
+ },
+ "n4631727986": {
+  "opening_hours": "Mo-Th,Su 12:00-20:00; Fr-Sa off",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 12 to 8 PM; Tuesday: 12 to 8 PM; Wednesday: 12 to 8 PM; Thursday: 12 to 8 PM; Friday: Closed; Saturday: Closed; Sunday: 12 to 8 PM",
+  "matched_name": "Sabra Grill Restaurant",
+  "distance_m": 9.3
+ },
+ "n725096410": {
+  "opening_hours": "Mo-Sa 11:00-15:00,17:00-22:00; Su off",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 3 PM, 5 to 10 PM; Tuesday: 11 AM to 3 PM, 5 to 10 PM; Wednesday: 11 AM to 3 PM, 5 to 10 PM; Thursday: 11 AM to 3 PM, 5 to 10 PM; Friday: 11 AM to 3 PM, 5 to 10 PM; Saturday: 11 AM to 3 PM, 5 to 10 PM; Sunday: Closed",
+  "matched_name": "Bento Taro",
+  "distance_m": 5.1
+ },
+ "n4616141811": {
+  "opening_hours": "Mo-Fr 11:30-20:00; Sa 17:00-20:00; Su off",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11:30 AM to 8 PM; Tuesday: 11:30 AM to 8 PM; Wednesday: 11:30 AM to 8 PM; Thursday: 11:30 AM to 8 PM; Friday: 11:30 AM to 8 PM; Saturday: 5 to 8 PM; Sunday: Closed",
+  "matched_name": "Palio",
+  "distance_m": 9.4
+ },
+ "n3186093217": {
+  "opening_hours": "off",
+  "confidence": 0.83,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Temporarily closed",
+  "matched_name": "Bamboo Asia",
+  "distance_m": 9.4
+ },
+ "n3393396123": {
+  "opening_hours": "Mo 16:00-22:00; Tu 02:00-24:00; We 00:00-02:00,16:00-02:00; Th-Fr 16:00-02:00; Sa-Su 11:00-02:00",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 to 10 PM; Tuesday: 2 AM to 12 AM; Wednesday: 12 to 2 AM, 4 PM to 2 AM; Thursday: 4 PM to 2 AM; Friday: 4 PM to 2 AM; Saturday: 11 AM to 2 AM; Sunday: 11 AM to 2 AM",
+  "matched_name": "Last Drop Tavern",
+  "distance_m": 9.4
+ },
+ "n9659740450": {
+  "opening_hours": "Mo-Th,Su 17:00-22:00; Fr-Sa 17:00-23:00",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 to 10 PM; Tuesday: 5 to 10 PM; Wednesday: 5 to 10 PM; Thursday: 5 to 10 PM; Friday: 5 to 11 PM; Saturday: 5 to 11 PM; Sunday: 5 to 10 PM",
+  "matched_name": "The European Bar & Lounge",
+  "distance_m": 1.1
+ },
+ "n9786711956": {
+  "opening_hours": "Mo-Fr 11:00-20:30; Sa 17:30-21:00; Su off",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 8:30 PM; Tuesday: 11 AM to 8:30 PM; Wednesday: 11 AM to 8:30 PM; Thursday: 11 AM to 8:30 PM; Friday: 11 AM to 8:30 PM; Saturday: 5:30 to 9 PM; Sunday: Closed",
+  "matched_name": "Sam's Grill & Seafood Restaurant",
+  "distance_m": 1.1
+ },
+ "n5085031722": {
+  "opening_hours": "Mo-Th,Su 11:30-21:30; Fr-Sa 11:30-22:30",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11:30 AM to 9:30 PM; Tuesday: 11:30 AM to 9:30 PM; Wednesday: 11:30 AM to 9:30 PM; Thursday: 11:30 AM to 9:30 PM; Friday: 11:30 AM to 10:30 PM; Saturday: 11:30 AM to 10:30 PM; Sunday: 11:30 AM to 9:30 PM",
+  "matched_name": "Delarosa Downtown",
+  "distance_m": 9.7
+ },
+ "n1629217172": {
+  "opening_hours": "Mo-Su 11:30-14:30,17:00-21:30",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11:30 AM to 2:30 PM, 5 to 9:30 PM; Tuesday: 11:30 AM to 2:30 PM, 5 to 9:30 PM; Wednesday: 11:30 AM to 2:30 PM, 5 to 9:30 PM; Thursday: 11:30 AM to 2:30 PM, 5 to 9:30 PM; Friday: 11:30 AM to 2:30 PM, 5 to 9:30 PM; Saturday: 11:30 AM to 2:30 PM, 5 to 9:30 PM; Sunday: 11:30 AM to 2:30 PM, 5 to 9:30 PM",
+  "matched_name": "Amber India Restaurant",
+  "distance_m": 9.7
+ },
+ "n808884850": {
+  "opening_hours": "Mo-Su 11:00-22:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:06:26+00:00",
+  "raw": "Monday: 11 AM to 10 PM; Tuesday: 11 AM to 10 PM; Wednesday: 11 AM to 10 PM; Thursday: 11 AM to 10 PM; Friday: 11 AM to 10 PM; Saturday: 11 AM to 10 PM; Sunday: 11 AM to 10 PM",
+  "matched_name": "Miyabiya Sushi & Grill",
+  "distance_m": 9.7
+ },
+ "n2689861324": {
+  "opening_hours": "Mo-Sa 07:00-19:30; Su 07:00-19:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 7:30 PM; Tuesday: 7 AM to 7:30 PM; Wednesday: 7 AM to 7:30 PM; Thursday: 7 AM to 7:30 PM; Friday: 7 AM to 7:30 PM; Saturday: 7 AM to 7:30 PM; Sunday: 7 AM to 7 PM",
+  "matched_name": "A Cup Of Joy",
+  "distance_m": 1.4
+ },
+ "w148740506": {
+  "opening_hours": "Tu-Th 08:30-15:00; Mo,Fr-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: Closed; Tuesday: 8:30 AM to 3 PM; Wednesday: 8:30 AM to 3 PM; Thursday: 8:30 AM to 3 PM; Friday: Closed; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Batter Bakery - Kiosk",
+  "distance_m": 9.9
+ },
+ "n3408837756": {
+  "opening_hours": "Mo-Th,Su 17:00-24:00; Fr-Sa 17:00-02:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 PM to 12 AM; Tuesday: 5 PM to 12 AM; Wednesday: 5 PM to 12 AM; Thursday: 5 PM to 12 AM; Friday: 5 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: 5 PM to 12 AM",
+  "matched_name": "Sool Bar and Lounge",
+  "distance_m": 9.9
+ },
+ "n4580505989": {
+  "opening_hours": "Mo-Th 17:00-21:00; Fr 17:00-22:00; Sa 11:00-15:00,17:00-22:00; Su 11:00-15:00,17:00-21:00",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 5 to 9 PM; Tuesday: 5 to 9 PM; Wednesday: 5 to 9 PM; Thursday: 5 to 9 PM; Friday: 5 to 10 PM; Saturday: 11 AM to 3 PM, 5 to 10 PM; Sunday: 11 AM to 3 PM, 5 to 9 PM",
+  "matched_name": "Nob Hill Cafe",
+  "distance_m": 9.9
+ },
+ "n9301912408": {
+  "opening_hours": "Mo-Th 09:30-21:00; Fr 09:30-21:30; Sa 11:00-21:30; Su 11:00-19:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 9:30 AM to 9 PM; Tuesday: 9:30 AM to 9 PM; Wednesday: 9:30 AM to 9 PM; Thursday: 9:30 AM to 9 PM; Friday: 9:30 AM to 9:30 PM; Saturday: 11 AM to 9:30 PM; Sunday: 11 AM to 7 PM",
+  "matched_name": "Deans Fine Cigars",
+  "distance_m": 10.0
+ },
+ "n10757791346": {
+  "opening_hours": "Tu-We 16:00-24:00; Th-Fr 16:00-01:00; Sa 15:30-01:00; Mo,Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: 4 PM to 12 AM; Wednesday: 4 PM to 12 AM; Thursday: 4 PM to 1 AM; Friday: 4 PM to 1 AM; Saturday: 3:30 PM to 1 AM; Sunday: Closed",
+  "matched_name": "RM 212",
+  "distance_m": 2.4
+ },
+ "n3397910051": {
+  "opening_hours": "Mo-Su 10:00-21:30",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 10 AM to 9:30 PM; Tuesday: 10 AM to 9:30 PM; Wednesday: 10 AM to 9:30 PM; Thursday: 10 AM to 9:30 PM; Friday: 10 AM to 9:30 PM; Saturday: 10 AM to 9:30 PM; Sunday: 10 AM to 9:30 PM",
+  "matched_name": "Super Duper Burgers",
+  "distance_m": 10.1
+ },
+ "n10200932825": {
+  "opening_hours": "Mo-Fr 10:00-14:00; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 10 AM to 2 PM; Tuesday: 10 AM to 2 PM; Wednesday: 10 AM to 2 PM; Thursday: 10 AM to 2 PM; Friday: 10 AM to 2 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Ladle & Leaf",
+  "distance_m": 10.1
+ },
+ "n621851566": {
+  "opening_hours": "Mo-Th,Su 10:00-23:00; Fr-Sa 10:00-24:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 11 PM; Tuesday: 10 AM to 11 PM; Wednesday: 10 AM to 11 PM; Thursday: 10 AM to 11 PM; Friday: 10 AM to 12 AM; Saturday: 10 AM to 12 AM; Sunday: 10 AM to 11 PM",
+  "matched_name": "MMC Wines & Spirits - Sake, Fruits, Beer, Pharmacy, Bakery, Wine, Alcohol, Spirits",
+  "distance_m": 5.2
+ },
+ "n5104555022": {
+  "opening_hours": "Mo-Fr 04:30-18:30; Sa-Su 06:30-17:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 4:30 AM to 6:30 PM; Tuesday: 4:30 AM to 6:30 PM; Wednesday: 4:30 AM to 6:30 PM; Thursday: 4:30 AM to 6:30 PM; Friday: 4:30 AM to 6:30 PM; Saturday: 6:30 AM to 5 PM; Sunday: 6:30 AM to 5 PM",
+  "matched_name": "Starbucks Coffee Company",
+  "distance_m": 1.9
+ },
+ "n725096408": {
+  "opening_hours": "Mo-Tu,Th-Fr,Su 11:15-14:45,16:00-22:45; We 11:10-14:45,16:00-22:45; Sa 11:15-15:00,16:00-22:45",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11:15 AM to 2:45 PM, 4 to 10:45 PM; Tuesday: 11:15 AM to 2:45 PM, 4 to 10:45 PM; Wednesday: 11:10 AM to 2:45 PM, 4 to 10:45 PM; Thursday: 11:15 AM to 2:45 PM, 4 to 10:45 PM; Friday: 11:15 AM to 2:45 PM, 4 to 10:45 PM; Saturday: 11:15 AM to 3 PM, 4 to 10:45 PM; Sunday: 11:15 AM to 2:45 PM, 4 to 10:45 PM",
+  "matched_name": "The ThongLor SF - Thai Restaurant",
+  "distance_m": 1.9
+ },
+ "n3393420459": {
+  "opening_hours": "Mo-Th,Su 04:30-21:00; Fr-Sa 04:30-22:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 4:30 AM to 9 PM; Tuesday: 4:30 AM to 9 PM; Wednesday: 4:30 AM to 9 PM; Thursday: 4:30 AM to 9 PM; Friday: 4:30 AM to 10 PM; Saturday: 4:30 AM to 10 PM; Sunday: 4:30 AM to 9 PM",
+  "matched_name": "Starbucks Coffee Company",
+  "distance_m": 2.1
+ },
+ "n1629213218": {
+  "opening_hours": "Mo-Sa 10:30-18:30; Su 11:00-18:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10:30 AM to 6:30 PM; Tuesday: 10:30 AM to 6:30 PM; Wednesday: 10:30 AM to 6:30 PM; Thursday: 10:30 AM to 6:30 PM; Friday: 10:30 AM to 6:30 PM; Saturday: 10:30 AM to 6:30 PM; Sunday: 11 AM to 6 PM",
+  "matched_name": "K Minamoto San Francisco Store",
+  "distance_m": 2.1
+ },
+ "n4129600387": {
+  "opening_hours": "Mo-Fr 06:30-17:30; Sa-Su 08:00-14:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6:30 AM to 5:30 PM; Tuesday: 6:30 AM to 5:30 PM; Wednesday: 6:30 AM to 5:30 PM; Thursday: 6:30 AM to 5:30 PM; Friday: 6:30 AM to 5:30 PM; Saturday: 8 AM to 2 PM; Sunday: 8 AM to 2 PM",
+  "matched_name": "Blue Bottle Coffee",
+  "distance_m": 2.1
+ },
+ "n3393428417": {
+  "opening_hours": "Mo-Th 11:00-23:00; Fr-Sa 11:00-24:00; Su 11:00-22:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 11 PM; Tuesday: 11 AM to 11 PM; Wednesday: 11 AM to 11 PM; Thursday: 11 AM to 11 PM; Friday: 11 AM to 12 AM; Saturday: 11 AM to 12 AM; Sunday: 11 AM to 10 PM",
+  "matched_name": "Fanoos Grills",
+  "distance_m": 2.1
+ },
+ "n3393400211": {
+  "opening_hours": "Mo-Th,Su 17:00-22:00; Fr-Sa 17:00-23:00",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 5 to 10 PM; Tuesday: 5 to 10 PM; Wednesday: 5 to 10 PM; Thursday: 5 to 10 PM; Friday: 5 to 11 PM; Saturday: 5 to 11 PM; Sunday: 5 to 10 PM",
+  "matched_name": "Uncle Vito's Pizza",
+  "distance_m": 3.8
+ },
+ "n4271092100": {
+  "opening_hours": "Mo,Fr 11:00-15:00; Tu-Th 11:00-19:00; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 3 PM; Tuesday: 11 AM to 7 PM; Wednesday: 11 AM to 7 PM; Thursday: 11 AM to 7 PM; Friday: 11 AM to 3 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Bun Mee",
+  "distance_m": 10.5
+ },
+ "n10617038681": {
+  "opening_hours": "Mo-Fr 11:00-14:30; Sa-Su off",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 2:30 PM; Tuesday: 11 AM to 2:30 PM; Wednesday: 11 AM to 2:30 PM; Thursday: 11 AM to 2:30 PM; Friday: 11 AM to 2:30 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Freshroll",
+  "distance_m": 10.5
+ },
+ "n1609669940": {
+  "opening_hours": "Mo-Su 12:00-23:00",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 12 to 11 PM; Tuesday: 12 to 11 PM; Wednesday: 12 to 11 PM; Thursday: 12 to 11 PM; Friday: 12 to 11 PM; Saturday: 12 to 11 PM; Sunday: 12 to 11 PM",
+  "matched_name": "Chutney Restaurant",
+  "distance_m": 10.6
+ },
+ "n4704557447": {
+  "opening_hours": "Mo-Su 09:00-21:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 9 AM to 9 PM; Tuesday: 9 AM to 9 PM; Wednesday: 9 AM to 9 PM; Thursday: 9 AM to 9 PM; Friday: 9 AM to 9 PM; Saturday: 9 AM to 9 PM; Sunday: 9 AM to 9 PM",
+  "matched_name": "Trader Joe's",
+  "distance_m": 10.7
+ },
+ "n4628492033": {
+  "opening_hours": "Mo,Su 12:00-17:00; Tu-Sa 11:00-18:00",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 12 to 5 PM; Tuesday: 11 AM to 6 PM; Wednesday: 11 AM to 6 PM; Thursday: 11 AM to 6 PM; Friday: 11 AM to 6 PM; Saturday: 11 AM to 6 PM; Sunday: 12 to 5 PM",
+  "matched_name": "Teuscher Chocolate",
+  "distance_m": 2.4
+ },
+ "n9339973638": {
+  "opening_hours": "Mo-Su 06:00-15:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6 AM to 3 PM; Tuesday: 6 AM to 3 PM; Wednesday: 6 AM to 3 PM; Thursday: 6 AM to 3 PM; Friday: 6 AM to 3 PM; Saturday: 6 AM to 3 PM; Sunday: 6 AM to 3 PM",
+  "matched_name": "Bluestone Lane Theatre District Coffee Shop",
+  "distance_m": 2.4
+ },
+ "n6576249560": {
+  "opening_hours": "Mo-Sa 07:00-19:00; Su 08:00-15:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 7 PM; Tuesday: 7 AM to 7 PM; Wednesday: 7 AM to 7 PM; Thursday: 7 AM to 7 PM; Friday: 7 AM to 7 PM; Saturday: 7 AM to 7 PM; Sunday: 8 AM to 3 PM",
+  "matched_name": "Good Luck Cafe and Deli",
+  "distance_m": 2.5
+ },
+ "n4118372489": {
+  "opening_hours": "Mo-Su 07:00-22:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 10 PM; Tuesday: 7 AM to 10 PM; Wednesday: 7 AM to 10 PM; Thursday: 7 AM to 10 PM; Friday: 7 AM to 10 PM; Saturday: 7 AM to 10 PM; Sunday: 7 AM to 10 PM",
+  "matched_name": "The Grove Restaurant & Bar",
+  "distance_m": 2.6
+ },
+ "n9996417479": {
+  "opening_hours": "Mo-We,Su 11:00-23:00; Th 11:00-24:00; Fr 11:00-02:00; Sa 11:00-02:30",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 11 PM; Tuesday: 11 AM to 11 PM; Wednesday: 11 AM to 11 PM; Thursday: 11 AM to 12 AM; Friday: 11 AM to 2 AM; Saturday: 11 AM to 2:30 AM; Sunday: 11 AM to 11 PM",
+  "matched_name": "Joyride Pizza, Market St",
+  "distance_m": 2.6
+ },
+ "n384359194": {
+  "opening_hours": "Mo-Su 08:00-02:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 8 AM to 2 AM; Tuesday: 8 AM to 2 AM; Wednesday: 8 AM to 2 AM; Thursday: 8 AM to 2 AM; Friday: 8 AM to 2 AM; Saturday: 8 AM to 2 AM; Sunday: 8 AM to 2 AM",
+  "matched_name": "Star Market & Deli",
+  "distance_m": 2.6
+ },
+ "n4533347390": {
+  "opening_hours": "Mo-Su 17:00-24:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 PM to 12 AM; Tuesday: 5 PM to 12 AM; Wednesday: 5 PM to 12 AM; Thursday: 5 PM to 12 AM; Friday: 5 PM to 12 AM; Saturday: 5 PM to 12 AM; Sunday: 5 PM to 12 AM",
+  "matched_name": "Pacific Cocktail Haven",
+  "distance_m": 11.0
+ },
+ "n1393930507": {
+  "opening_hours": "Mo-Su 08:00-21:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 8 AM to 9 PM; Tuesday: 8 AM to 9 PM; Wednesday: 8 AM to 9 PM; Thursday: 8 AM to 9 PM; Friday: 8 AM to 9 PM; Saturday: 8 AM to 9 PM; Sunday: 8 AM to 9 PM",
+  "matched_name": "Deep Purpl Acai",
+  "distance_m": 2.7
+ },
+ "n529777817": {
+  "opening_hours": "Mo-We,Su 18:00-24:00; Th-Sa 18:00-02:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 6 PM to 12 AM; Tuesday: 6 PM to 12 AM; Wednesday: 6 PM to 12 AM; Thursday: 6 PM to 2 AM; Friday: 6 PM to 2 AM; Saturday: 6 PM to 2 AM; Sunday: 6 PM to 12 AM",
+  "matched_name": "Bourbon & Branch",
+  "distance_m": 11.0
+ },
+ "n4343745958": {
+  "opening_hours": "Mo-Th,Su 10:00-21:00; Fr-Sa 09:30-21:30",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 9 PM; Tuesday: 10 AM to 9 PM; Wednesday: 10 AM to 9 PM; Thursday: 10 AM to 9 PM; Friday: 9:30 AM to 9:30 PM; Saturday: 9:30 AM to 9:30 PM; Sunday: 10 AM to 9 PM",
+  "matched_name": "Ghirardelli Ice Cream & Chocolate Shop",
+  "distance_m": 2.7
+ },
+ "n808930741": {
+  "opening_hours": "Mo-Su 04:30-20:00",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 4:30 AM to 8 PM; Tuesday: 4:30 AM to 8 PM; Wednesday: 4:30 AM to 8 PM; Thursday: 4:30 AM to 8 PM; Friday: 4:30 AM to 8 PM; Saturday: 4:30 AM to 8 PM; Sunday: 4:30 AM to 8 PM",
+  "matched_name": "Starbucks Coffee Company",
+  "distance_m": 2.8
+ },
+ "w71209436": {
+  "opening_hours": "Mo-Th,Su 18:00-01:00; Fr-Sa 18:00-01:30",
+  "confidence": 0.93,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 6 PM to 1 AM; Tuesday: 6 PM to 1 AM; Wednesday: 6 PM to 1 AM; Thursday: 6 PM to 1 AM; Friday: 6 PM to 1:30 AM; Saturday: 6 PM to 1:30 AM; Sunday: 6 PM to 1 AM",
+  "matched_name": "Pasha SF",
+  "distance_m": 11.1
+ },
+ "n6488820632": {
+  "opening_hours": "Mo-Su 06:30-18:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6:30 AM to 6 PM; Tuesday: 6:30 AM to 6 PM; Wednesday: 6:30 AM to 6 PM; Thursday: 6:30 AM to 6 PM; Friday: 6:30 AM to 6 PM; Saturday: 6:30 AM to 6 PM; Sunday: 6:30 AM to 6 PM",
+  "matched_name": "Cafe Encore: Coffee, Breakfast, and Lunch Delights",
+  "distance_m": 3.1
+ },
+ "w1136875252": {
+  "opening_hours": "24/7",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: Open 24 hours; Tuesday: Open 24 hours; Wednesday: Open 24 hours; Thursday: Open 24 hours; Friday: Open 24 hours; Saturday: Open 24 hours; Sunday: Open 24 hours",
+  "matched_name": "Burger King",
+  "distance_m": 11.4
+ },
+ "n1844653896": {
+  "opening_hours": "We 17:00-24:00; Th 17:00-00:30; Fr-Sa 17:00-02:00; Mo-Tu,Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: Closed; Wednesday: 5 PM to 12 AM; Thursday: 5 PM to 12:30 AM; Friday: 5 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: Closed",
+  "matched_name": "The Zombie Village",
+  "distance_m": 11.4
+ },
+ "n904139678": {
+  "opening_hours": "Mo-We,Su 07:00-23:00; Th 07:00-24:00; Fr-Sa 07:00-03:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 7 AM to 11 PM; Tuesday: 7 AM to 11 PM; Wednesday: 7 AM to 11 PM; Thursday: 7 AM to 12 AM; Friday: 7 AM to 3 AM; Saturday: 7 AM to 3 AM; Sunday: 7 AM to 11 PM",
+  "matched_name": "Mel's Drive-In",
+  "distance_m": 11.5
+ },
+ "n3396513641": {
+  "opening_hours": "24/7",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: Open 24 hours; Tuesday: Open 24 hours; Wednesday: Open 24 hours; Thursday: Open 24 hours; Friday: Open 24 hours; Saturday: Open 24 hours; Sunday: Open 24 hours",
+  "matched_name": "Carl's Jr.",
+  "distance_m": 11.6
+ },
+ "n4625131490": {
+  "opening_hours": "Mo-Fr 11:00-14:30; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 2:30 PM; Tuesday: 11 AM to 2:30 PM; Wednesday: 11 AM to 2:30 PM; Thursday: 11 AM to 2:30 PM; Friday: 11 AM to 2:30 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Tenmatsu",
+  "distance_m": 3.4
+ },
+ "n4518466190": {
+  "opening_hours": "Mo-We,Fr-Su 08:00-15:00; Th off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 8 AM to 3 PM; Tuesday: 8 AM to 3 PM; Wednesday: 8 AM to 3 PM; Thursday: Closed; Friday: 8 AM to 3 PM; Saturday: 8 AM to 3 PM; Sunday: 8 AM to 3 PM",
+  "matched_name": "Phở Tân Hòa | Vietnamese & Chinese Cuisine",
+  "distance_m": 3.4
+ },
+ "n13573915819": {
+  "opening_hours": "Mo-Su 07:00-11:00,11:30-15:00,16:00-22:00",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 7 to 11 AM, 11:30 AM to 3 PM, 4 to 10 PM; Tuesday: 7 to 11 AM, 11:30 AM to 3 PM, 4 to 10 PM; Wednesday: 7 to 11 AM, 11:30 AM to 3 PM, 4 to 10 PM; Thursday: 7 to 11 AM, 11:30 AM to 3 PM, 4 to 10 PM; Friday: 7 to 11 AM, 11:30 AM to 3 PM, 4 to 10 PM; Saturday: 7 to 11 AM, 11:30 AM to 3 PM, 4 to 10 PM; Sunday: 7 to 11 AM, 11:30 AM to 3 PM, 4 to 10 PM",
+  "matched_name": "PLS on Post",
+  "distance_m": 11.8
+ },
+ "n2613888359": {
+  "opening_hours": "Mo-Fr 10:45-22:00; Sa-Su 10:45-20:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 10:45 AM to 10 PM; Tuesday: 10:45 AM to 10 PM; Wednesday: 10:45 AM to 10 PM; Thursday: 10:45 AM to 10 PM; Friday: 10:45 AM to 10 PM; Saturday: 10:45 AM to 8 PM; Sunday: 10:45 AM to 8 PM",
+  "matched_name": "Chipotle Mexican Grill",
+  "distance_m": 3.7
+ },
+ "n2336730548": {
+  "opening_hours": "Mo-Fr 11:00-20:00; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 8 PM; Tuesday: 11 AM to 8 PM; Wednesday: 11 AM to 8 PM; Thursday: 11 AM to 8 PM; Friday: 11 AM to 8 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Leleka Ukrainian Comfort Food (San Francisco)",
+  "distance_m": 3.7
+ },
+ "n5686605778": {
+  "opening_hours": "Mo-Sa 10:00-23:00; Su 10:00-21:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 10 AM to 11 PM; Tuesday: 10 AM to 11 PM; Wednesday: 10 AM to 11 PM; Thursday: 10 AM to 11 PM; Friday: 10 AM to 11 PM; Saturday: 10 AM to 11 PM; Sunday: 10 AM to 9 PM",
+  "matched_name": "Chuy's Fiestas Taqueria lI",
+  "distance_m": 8.9
+ },
+ "n6770768271": {
+  "opening_hours": "Mo-Su 11:00-22:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 10 PM; Tuesday: 11 AM to 10 PM; Wednesday: 11 AM to 10 PM; Thursday: 11 AM to 10 PM; Friday: 11 AM to 10 PM; Saturday: 11 AM to 10 PM; Sunday: 11 AM to 10 PM",
+  "matched_name": "Oren's Hummus",
+  "distance_m": 12.0
+ },
+ "n9995635821": {
+  "opening_hours": "Mo-Su 08:00-02:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 2 AM; Tuesday: 8 AM to 2 AM; Wednesday: 8 AM to 2 AM; Thursday: 8 AM to 2 AM; Friday: 8 AM to 2 AM; Saturday: 8 AM to 2 AM; Sunday: 8 AM to 2 AM",
+  "matched_name": "Econo Market",
+  "distance_m": 12.0
+ },
+ "n4625169865": {
+  "opening_hours": "Mo-Su 08:30-20:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 8:30 AM to 8 PM; Tuesday: 8:30 AM to 8 PM; Wednesday: 8:30 AM to 8 PM; Thursday: 8:30 AM to 8 PM; Friday: 8:30 AM to 8 PM; Saturday: 8:30 AM to 8 PM; Sunday: 8:30 AM to 8 PM",
+  "matched_name": "V J Grocery",
+  "distance_m": 8.4
+ },
+ "n11253185336": {
+  "opening_hours": "Mo,Fr 08:00-14:00; Tu-Th 08:00-16:00; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 2 PM; Tuesday: 8 AM to 4 PM; Wednesday: 8 AM to 4 PM; Thursday: 8 AM to 4 PM; Friday: 8 AM to 2 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Cento Coffee",
+  "distance_m": 3.9
+ },
+ "n4343748160": {
+  "opening_hours": "Mo-Su 11:00-20:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 8 PM; Tuesday: 11 AM to 8 PM; Wednesday: 11 AM to 8 PM; Thursday: 11 AM to 8 PM; Friday: 11 AM to 8 PM; Saturday: 11 AM to 8 PM; Sunday: 11 AM to 8 PM",
+  "matched_name": "Onigilly Japanese Rice Balls - San Francisco (Kearny)",
+  "distance_m": 4.1
+ },
+ "n9553542990": {
+  "opening_hours": "off",
+  "confidence": 0.83,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Temporarily closed",
+  "matched_name": "Cafe 22",
+  "distance_m": 12.3
+ },
+ "n10254811575": {
+  "opening_hours": "Mo-Fr 11:30-16:00; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11:30 AM to 4 PM; Tuesday: 11:30 AM to 4 PM; Wednesday: 11:30 AM to 4 PM; Thursday: 11:30 AM to 4 PM; Friday: 11:30 AM to 4 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "iKU Sushi & Bento",
+  "distance_m": 4.3
+ },
+ "n2253031247": {
+  "opening_hours": "Mo-Su 15:00-02:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 3 PM to 2 AM; Tuesday: 3 PM to 2 AM; Wednesday: 3 PM to 2 AM; Thursday: 3 PM to 2 AM; Friday: 3 PM to 2 AM; Saturday: 3 PM to 2 AM; Sunday: 3 PM to 2 AM",
+  "matched_name": "Cinnabar",
+  "distance_m": 12.5
+ },
+ "n13131878136": {
+  "opening_hours": "Mo-Fr 04:00-19:00; Sa 06:00-16:00; Su 06:00-15:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 4 AM to 7 PM; Tuesday: 4 AM to 7 PM; Wednesday: 4 AM to 7 PM; Thursday: 4 AM to 7 PM; Friday: 4 AM to 7 PM; Saturday: 6 AM to 4 PM; Sunday: 6 AM to 3 PM",
+  "matched_name": "Passport Health Downtown San Francisco Travel Clinic",
+  "distance_m": 12.5
+ },
+ "n6250051862": {
+  "opening_hours": "Mo-Th 07:00-15:00; Fr 07:00-12:00; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 7 AM to 3 PM; Tuesday: 7 AM to 3 PM; Wednesday: 7 AM to 3 PM; Thursday: 7 AM to 3 PM; Friday: 7 AM to 12 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Coffee Bar-Kearny",
+  "distance_m": 4.4
+ },
+ "n818060781": {
+  "opening_hours": "Th,Su 17:00-24:00; Fr-Sa 17:00-02:00; Mo-We off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: Closed; Wednesday: Closed; Thursday: 5 PM to 12 AM; Friday: 5 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: 5 PM to 12 AM",
+  "matched_name": "Marrakech Moroccan Restaurant & Mediterranean Grill",
+  "distance_m": 4.4
+ },
+ "n11704706860": {
+  "opening_hours": "Mo-Sa 11:00-22:00; Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 10 PM; Tuesday: 11 AM to 10 PM; Wednesday: 11 AM to 10 PM; Thursday: 11 AM to 10 PM; Friday: 11 AM to 10 PM; Saturday: 11 AM to 10 PM; Sunday: Closed",
+  "matched_name": "The Old Siam Thai Restaurant",
+  "distance_m": 4.4
+ },
+ "n4564653193": {
+  "opening_hours": "Tu-Su 09:30-19:30; Mo off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: Closed; Tuesday: 9:30 AM to 7:30 PM; Wednesday: 9:30 AM to 7:30 PM; Thursday: 9:30 AM to 7:30 PM; Friday: 9:30 AM to 7:30 PM; Saturday: 9:30 AM to 7:30 PM; Sunday: 9:30 AM to 7:30 PM",
+  "matched_name": "Cafe New Honolulu",
+  "distance_m": 4.5
+ },
+ "n1617288110": {
+  "opening_hours": "Mo-Fr 12:00-01:00; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 12 PM to 1 AM; Tuesday: 12 PM to 1 AM; Wednesday: 12 PM to 1 AM; Thursday: 12 PM to 1 AM; Friday: 12 PM to 1 AM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Sutter Station Tavern",
+  "distance_m": 12.6
+ },
+ "n6326626789": {
+  "opening_hours": "Mo-Su 11:00-23:30",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 11:30 PM; Tuesday: 11 AM to 11:30 PM; Wednesday: 11 AM to 11:30 PM; Thursday: 11 AM to 11:30 PM; Friday: 11 AM to 11:30 PM; Saturday: 11 AM to 11:30 PM; Sunday: 11 AM to 11:30 PM",
+  "matched_name": "Red Chilli Halal",
+  "distance_m": 4.6
+ },
+ "n10000698133": {
+  "opening_hours": "Mo-Th 07:00-15:00; Fr 07:00-12:00; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 3 PM; Tuesday: 7 AM to 3 PM; Wednesday: 7 AM to 3 PM; Thursday: 7 AM to 3 PM; Friday: 7 AM to 12 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Coffee Bar Montgomery",
+  "distance_m": 4.6
+ },
+ "n768936339": {
+  "opening_hours": "Mo-Su 06:30-21:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 6:30 AM to 9 PM; Tuesday: 6:30 AM to 9 PM; Wednesday: 6:30 AM to 9 PM; Thursday: 6:30 AM to 9 PM; Friday: 6:30 AM to 9 PM; Saturday: 6:30 AM to 9 PM; Sunday: 6:30 AM to 9 PM",
+  "matched_name": "Restaurant Anzu",
+  "distance_m": 12.7
+ },
+ "n1640211020": {
+  "opening_hours": "Mo-Fr 12:00-15:00; Sa-Su off",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 12 to 3 PM; Tuesday: 12 to 3 PM; Wednesday: 12 to 3 PM; Thursday: 12 to 3 PM; Friday: 12 to 3 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "34 Trinity Arts & News",
+  "distance_m": 12.8
+ },
+ "n9657629729": {
+  "opening_hours": "Mo,Sa-Su 10:00-17:00; Tu-Fr 08:30-17:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 10 AM to 5 PM; Tuesday: 8:30 AM to 5 PM; Wednesday: 8:30 AM to 5 PM; Thursday: 8:30 AM to 5 PM; Friday: 8:30 AM to 5 PM; Saturday: 10 AM to 5 PM; Sunday: 10 AM to 5 PM",
+  "matched_name": "Junbi Matcha & Tea - San Francisco",
+  "distance_m": 4.7
+ },
+ "n4259746694": {
+  "opening_hours": "We-Su 19:00-24:00; Mo-Tu off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: Closed; Wednesday: 7 PM to 12 AM; Thursday: 7 PM to 12 AM; Friday: 7 PM to 12 AM; Saturday: 7 PM to 12 AM; Sunday: 7 PM to 12 AM",
+  "matched_name": "Stookey’s Blue Room",
+  "distance_m": 4.7
+ },
+ "n317081652": {
+  "opening_hours": "Mo-Su 11:45-21:30",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11:45 AM to 9:30 PM; Tuesday: 11:45 AM to 9:30 PM; Wednesday: 11:45 AM to 9:30 PM; Thursday: 11:45 AM to 9:30 PM; Friday: 11:45 AM to 9:30 PM; Saturday: 11:45 AM to 9:30 PM; Sunday: 11:45 AM to 9:30 PM",
+  "matched_name": "John's Grill",
+  "distance_m": 4.7
+ },
+ "n1486057725": {
+  "opening_hours": "24/7",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: Open 24 hours; Tuesday: Open 24 hours; Wednesday: Open 24 hours; Thursday: Open 24 hours; Friday: Open 24 hours; Saturday: Open 24 hours; Sunday: Open 24 hours",
+  "matched_name": "7-Eleven",
+  "distance_m": 12.8
+ },
+ "n10617038682": {
+  "opening_hours": "Mo-Th 11:00-15:00; Fr 10:00-14:00; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 3 PM; Tuesday: 11 AM to 3 PM; Wednesday: 11 AM to 3 PM; Thursday: 11 AM to 3 PM; Friday: 10 AM to 2 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Hi City",
+  "distance_m": 12.8
+ },
+ "n9426889459": {
+  "opening_hours": "Mo-Th,Su 10:00-21:30; Fr-Sa 10:00-22:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 10 AM to 9:30 PM; Tuesday: 10 AM to 9:30 PM; Wednesday: 10 AM to 9:30 PM; Thursday: 10 AM to 9:30 PM; Friday: 10 AM to 10 PM; Saturday: 10 AM to 10 PM; Sunday: 10 AM to 9:30 PM",
+  "matched_name": "Round the Clock",
+  "distance_m": 4.9
+ },
+ "n1626468365": {
+  "opening_hours": "Tu-Th 09:00-14:30,16:30-22:00; Fr 09:00-14:30,16:30-24:00; Sa 11:00-24:00; Su 11:00-15:30; Mo off",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: 9 AM to 2:30 PM, 4:30 to 10 PM; Wednesday: 9 AM to 2:30 PM, 4:30 to 10 PM; Thursday: 9 AM to 2:30 PM, 4:30 to 10 PM; Friday: 9 AM to 2:30 PM, 4:30 PM to 12 AM; Saturday: 11 AM to 12 AM; Sunday: 11 AM to 3:30 PM",
+  "matched_name": "620 Jones",
+  "distance_m": 13.0
+ },
+ "n3455075369": {
+  "opening_hours": "Mo-Th,Su 11:00-21:00; Fr-Sa 11:00-22:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 9 PM; Tuesday: 11 AM to 9 PM; Wednesday: 11 AM to 9 PM; Thursday: 11 AM to 9 PM; Friday: 11 AM to 10 PM; Saturday: 11 AM to 10 PM; Sunday: 11 AM to 9 PM",
+  "matched_name": "California Pizza Kitchen",
+  "distance_m": 13.1
+ },
+ "n4637773272": {
+  "opening_hours": "Mo-Su 08:00-23:30",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 8 AM to 11:30 PM; Tuesday: 8 AM to 11:30 PM; Wednesday: 8 AM to 11:30 PM; Thursday: 8 AM to 11:30 PM; Friday: 8 AM to 11:30 PM; Saturday: 8 AM to 11:30 PM; Sunday: 8 AM to 11:30 PM",
+  "matched_name": "Daldas Community Market",
+  "distance_m": 5.2
+ },
+ "n621851563": {
+  "opening_hours": "Mo-Su 11:30-22:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11:30 AM to 10 PM; Tuesday: 11:30 AM to 10 PM; Wednesday: 11:30 AM to 10 PM; Thursday: 11:30 AM to 10 PM; Friday: 11:30 AM to 10 PM; Saturday: 11:30 AM to 10 PM; Sunday: 11:30 AM to 10 PM",
+  "matched_name": "Cesario's",
+  "distance_m": 13.3
+ },
+ "n4637572296": {
+  "opening_hours": "Mo-Fr 10:00-20:00; Sa 11:00-20:00; Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:14:01+00:00",
+  "raw": "Monday: 10 AM to 8 PM; Tuesday: 10 AM to 8 PM; Wednesday: 10 AM to 8 PM; Thursday: 10 AM to 8 PM; Friday: 10 AM to 8 PM; Saturday: 11 AM to 8 PM; Sunday: Closed",
+  "matched_name": "Lin's Kitchen",
+  "distance_m": 13.3
+ },
+ "n808884842": {
+  "opening_hours": "Mo-Su 17:00-23:00",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 to 11 PM; Tuesday: 5 to 11 PM; Wednesday: 5 to 11 PM; Thursday: 5 to 11 PM; Friday: 5 to 11 PM; Saturday: 5 to 11 PM; Sunday: 5 to 11 PM",
+  "matched_name": "New Delhi Restaurant & Bar",
+  "distance_m": 5.4
+ },
+ "n4343745976": {
+  "opening_hours": "Mo-Su 17:00-23:45",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 to 11:45 PM; Tuesday: 5 to 11:45 PM; Wednesday: 5 to 11:45 PM; Thursday: 5 to 11:45 PM; Friday: 5 to 11:45 PM; Saturday: 5 to 11:45 PM; Sunday: 5 to 11:45 PM",
+  "matched_name": "Pied Piper",
+  "distance_m": 13.5
+ },
+ "n621818319": {
+  "opening_hours": "Mo-Th,Su 10:00-22:00; Fr-Sa 10:00-24:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 10 AM to 10 PM; Tuesday: 10 AM to 10 PM; Wednesday: 10 AM to 10 PM; Thursday: 10 AM to 10 PM; Friday: 10 AM to 12 AM; Saturday: 10 AM to 12 AM; Sunday: 10 AM to 10 PM",
+  "matched_name": "Mason Liquor",
+  "distance_m": 5.5
+ },
+ "n9426889458": {
+  "opening_hours": "Tu-Th,Su 12:00-22:00; Fr-Sa 12:00-23:00; Mo off",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: 12 to 10 PM; Wednesday: 12 to 10 PM; Thursday: 12 to 10 PM; Friday: 12 to 11 PM; Saturday: 12 to 11 PM; Sunday: 12 to 10 PM",
+  "matched_name": "Gusto Pinsa Romana",
+  "distance_m": 5.7
+ },
+ "n1613829041": {
+  "opening_hours": "Mo,We-Fr 11:00-15:00,17:00-22:00; Tu 11:00-15:00,17:00-22:30; Sa-Su 17:00-22:00",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:06:26+00:00",
+  "raw": "Monday: 11 AM to 3 PM, 5 to 10 PM; Tuesday: 11 AM to 3 PM, 5 to 10:30 PM; Wednesday: 11 AM to 3 PM, 5 to 10 PM; Thursday: 11 AM to 3 PM, 5 to 10 PM; Friday: 11 AM to 3 PM, 5 to 10 PM; Saturday: 5 to 10 PM; Sunday: 5 to 10 PM",
+  "matched_name": "Mehfil Indian Cuisine",
+  "distance_m": 5.8
+ },
+ "n9203665039": {
+  "opening_hours": "Mo,We-Su 08:00-14:00,17:00-21:00; Tu 08:00-14:00",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 2 PM, 5 to 9 PM; Tuesday: 8 AM to 2 PM; Wednesday: 8 AM to 2 PM, 5 to 9 PM; Thursday: 8 AM to 2 PM, 5 to 9 PM; Friday: 8 AM to 2 PM, 5 to 9 PM; Saturday: 8 AM to 2 PM, 5 to 9 PM; Sunday: 8 AM to 2 PM, 5 to 9 PM",
+  "matched_name": "Lapisara Eatery",
+  "distance_m": 5.9
+ },
+ "n11051910913": {
+  "opening_hours": "Mo-Fr 07:00-20:00; Sa 09:00-17:00; Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 7 AM to 8 PM; Tuesday: 7 AM to 8 PM; Wednesday: 7 AM to 8 PM; Thursday: 7 AM to 8 PM; Friday: 7 AM to 8 PM; Saturday: 9 AM to 5 PM; Sunday: Closed",
+  "matched_name": "Walgreens",
+  "distance_m": 14.0
+ },
+ "n8758527004": {
+  "opening_hours": "Mo-Th,Su 17:00-21:00; Fr-Sa 17:00-22:00",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:14:01+00:00",
+  "raw": "Monday: 5 to 9 PM; Tuesday: 5 to 9 PM; Wednesday: 5 to 9 PM; Thursday: 5 to 9 PM; Friday: 5 to 10 PM; Saturday: 5 to 10 PM; Sunday: 5 to 9 PM",
+  "matched_name": "Mastro's Steakhouse",
+  "distance_m": 14.0
+ },
+ "n9593474639": {
+  "opening_hours": "Mo-We,Su 18:00-24:00; Th-Sa 18:00-02:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 6 PM to 12 AM; Tuesday: 6 PM to 12 AM; Wednesday: 6 PM to 12 AM; Thursday: 6 PM to 2 AM; Friday: 6 PM to 2 AM; Saturday: 6 PM to 2 AM; Sunday: 6 PM to 12 AM",
+  "matched_name": "The Library",
+  "distance_m": 14.0
+ },
+ "n1295101210": {
+  "opening_hours": "Mo-Th 11:00-21:00; Fr 11:00-22:00; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 9 PM; Tuesday: 11 AM to 9 PM; Wednesday: 11 AM to 9 PM; Thursday: 11 AM to 9 PM; Friday: 11 AM to 10 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Buena Vida Cantina on Belden",
+  "distance_m": 6.3
+ },
+ "n1293838073": {
+  "opening_hours": "Mo-Su 11:00-19:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 7 PM; Tuesday: 11 AM to 7 PM; Wednesday: 11 AM to 7 PM; Thursday: 11 AM to 7 PM; Friday: 11 AM to 7 PM; Saturday: 11 AM to 7 PM; Sunday: 11 AM to 7 PM",
+  "matched_name": "Luke's Lobster SoMa",
+  "distance_m": 6.4
+ },
+ "n9502079156": {
+  "opening_hours": "off",
+  "confidence": 0.82,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Temporarily closed",
+  "matched_name": "Kona's",
+  "distance_m": 6.7
+ },
+ "n621818383": {
+  "opening_hours": "Mo-Su 16:00-02:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 PM to 2 AM; Tuesday: 4 PM to 2 AM; Wednesday: 4 PM to 2 AM; Thursday: 4 PM to 2 AM; Friday: 4 PM to 2 AM; Saturday: 4 PM to 2 AM; Sunday: 4 PM to 2 AM",
+  "matched_name": "Lost Cat Bar & Bites",
+  "distance_m": 6.9
+ },
+ "n3190942919": {
+  "opening_hours": "Mo-Th,Su 11:00-23:00; Fr-Sa 11:00-02:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 11 PM; Tuesday: 11 AM to 11 PM; Wednesday: 11 AM to 11 PM; Thursday: 11 AM to 11 PM; Friday: 11 AM to 2 AM; Saturday: 11 AM to 2 AM; Sunday: 11 AM to 11 PM",
+  "matched_name": "Pearl's Deluxe Phatburgers",
+  "distance_m": 8.1
+ },
+ "n1844915443": {
+  "opening_hours": "Tu-We 17:00-21:00; Th-Sa 17:00-22:00; Mo,Su off",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: 5 to 9 PM; Wednesday: 5 to 9 PM; Thursday: 5 to 10 PM; Friday: 5 to 10 PM; Saturday: 5 to 10 PM; Sunday: Closed",
+  "matched_name": "Press Club",
+  "distance_m": 14.9
+ },
+ "n9842796001": {
+  "opening_hours": "Mo,Su 08:00-18:00; Tu-Sa 08:00-20:00",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 6 PM; Tuesday: 8 AM to 8 PM; Wednesday: 8 AM to 8 PM; Thursday: 8 AM to 8 PM; Friday: 8 AM to 8 PM; Saturday: 8 AM to 8 PM; Sunday: 8 AM to 6 PM",
+  "matched_name": "ONE65 Patisserie & Boutique",
+  "distance_m": 14.9
+ },
+ "n4143685674": {
+  "opening_hours": "Mo 17:30-23:00; Tu-We 16:30-24:00; Th-Sa 16:30-02:00; Su off",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5:30 to 11 PM; Tuesday: 4:30 PM to 12 AM; Wednesday: 4:30 PM to 12 AM; Thursday: 4:30 PM to 2 AM; Friday: 4:30 PM to 2 AM; Saturday: 4:30 PM to 2 AM; Sunday: Closed",
+  "matched_name": "Pagan Idol",
+  "distance_m": 14.9
+ },
+ "n12054096701": {
+  "opening_hours": "Mo-Su 10:30-19:30",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:11:41+00:00",
+  "raw": "Monday: 10:30 AM to 7:30 PM; Tuesday: 10:30 AM to 7:30 PM; Wednesday: 10:30 AM to 7:30 PM; Thursday: 10:30 AM to 7:30 PM; Friday: 10:30 AM to 7:30 PM; Saturday: 10:30 AM to 7:30 PM; Sunday: 10:30 AM to 7:30 PM",
+  "matched_name": "Camera Zone & Art Gallery",
+  "distance_m": 7.2
+ },
+ "n6611213081": {
+  "opening_hours": "Mo-Fr 07:00-14:00; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 2 PM; Tuesday: 7 AM to 2 PM; Wednesday: 7 AM to 2 PM; Thursday: 7 AM to 2 PM; Friday: 7 AM to 2 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Local Roots by Opa Cafe",
+  "distance_m": 7.5
+ },
+ "n4129601492": {
+  "opening_hours": "Mo-Fr 12:00-22:00; Sa-Su off",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 12 to 10 PM; Tuesday: 12 to 10 PM; Wednesday: 12 to 10 PM; Thursday: 12 to 10 PM; Friday: 12 to 10 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "The Treasury",
+  "distance_m": 15.4
+ },
+ "n11067557408": {
+  "opening_hours": "Mo-Th 07:00-15:00; Fr 07:00-14:30; Sa-Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 7 AM to 3 PM; Tuesday: 7 AM to 3 PM; Wednesday: 7 AM to 3 PM; Thursday: 7 AM to 3 PM; Friday: 7 AM to 2:30 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Proper Food",
+  "distance_m": 15.4
+ },
+ "n6960980686": {
+  "opening_hours": "Mo-Tu,Th-Su 11:30-21:30; We off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11:30 AM to 9:30 PM; Tuesday: 11:30 AM to 9:30 PM; Wednesday: Closed; Thursday: 11:30 AM to 9:30 PM; Friday: 11:30 AM to 9:30 PM; Saturday: 11:30 AM to 9:30 PM; Sunday: 11:30 AM to 9:30 PM",
+  "matched_name": "Floating Sushi Boat",
+  "distance_m": 8.0
+ },
+ "n806243208": {
+  "opening_hours": "Mo-Fr 09:30-17:00; Sa 09:30-13:30; Su off",
+  "confidence": 0.92,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T18:28:06+00:00",
+  "raw": "Monday: 9:30 AM to 5 PM; Tuesday: 9:30 AM to 5 PM; Wednesday: 9:30 AM to 5 PM; Thursday: 9:30 AM to 5 PM; Friday: 9:30 AM to 5 PM; Saturday: 9:30 AM to 1:30 PM; Sunday: Closed",
+  "matched_name": "Clay Medical Pharmacy",
+  "distance_m": 15.8
+ },
+ "n10000755451": {
+  "opening_hours": "off",
+  "confidence": 0.82,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Temporarily closed",
+  "matched_name": "The Oak Room Restaurant",
+  "distance_m": 15.9
+ },
+ "n3393358381": {
+  "opening_hours": "Mo-Su 11:00-19:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 7 PM; Tuesday: 11 AM to 7 PM; Wednesday: 11 AM to 7 PM; Thursday: 11 AM to 7 PM; Friday: 11 AM to 7 PM; Saturday: 11 AM to 7 PM; Sunday: 11 AM to 7 PM",
+  "matched_name": "Boba Guys Union Square",
+  "distance_m": 8.2
+ },
+ "n4628492031": {
+  "opening_hours": "Mo-Su 16:30-22:00",
+  "confidence": 0.87,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4:30 to 10 PM; Tuesday: 4:30 to 10 PM; Wednesday: 4:30 to 10 PM; Thursday: 4:30 to 10 PM; Friday: 4:30 to 10 PM; Saturday: 4:30 to 10 PM; Sunday: 4:30 to 10 PM",
+  "matched_name": "Obscenity Bar",
+  "distance_m": 8.2
+ },
+ "n4194116711": {
+  "opening_hours": "Mo-Su 11:00-19:30",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 11 AM to 7:30 PM; Tuesday: 11 AM to 7:30 PM; Wednesday: 11 AM to 7:30 PM; Thursday: 11 AM to 7:30 PM; Friday: 11 AM to 7:30 PM; Saturday: 11 AM to 7:30 PM; Sunday: 11 AM to 7:30 PM",
+  "matched_name": "Dabao Singapore",
+  "distance_m": 16.2
+ },
+ "n9203665041": {
+  "opening_hours": "Mo-Th,Su 17:00-24:00; Fr-Sa 17:00-01:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 5 PM to 12 AM; Tuesday: 5 PM to 12 AM; Wednesday: 5 PM to 12 AM; Thursday: 5 PM to 12 AM; Friday: 5 PM to 1 AM; Saturday: 5 PM to 1 AM; Sunday: 5 PM to 12 AM",
+  "matched_name": "iThai Bangkok Street Food",
+  "distance_m": 8.6
+ },
+ "n298086258": {
+  "opening_hours": "Th,Su 16:00-24:00; Fr-Sa 16:00-02:00; Mo-We off",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: Closed; Wednesday: Closed; Thursday: 4 PM to 12 AM; Friday: 4 PM to 2 AM; Saturday: 4 PM to 2 AM; Sunday: 4 PM to 12 AM",
+  "matched_name": "Starlite",
+  "distance_m": 8.7
+ },
+ "n1940798155": {
+  "opening_hours": "Fr-Sa 22:00-02:00; Mo-Th,Su off",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: Closed; Wednesday: Closed; Thursday: Closed; Friday: 10 PM to 2 AM; Saturday: 10 PM to 2 AM; Sunday: Closed",
+  "matched_name": "Love+Propaganda",
+  "distance_m": 14.1
+ },
+ "n3393342116": {
+  "opening_hours": "Mo-Th,Su 09:00-22:00; Fr-Sa 09:00-24:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 9 AM to 10 PM; Tuesday: 9 AM to 10 PM; Wednesday: 9 AM to 10 PM; Thursday: 9 AM to 10 PM; Friday: 9 AM to 12 AM; Saturday: 9 AM to 12 AM; Sunday: 9 AM to 10 PM",
+  "matched_name": "Mr.Charlie's TMS",
+  "distance_m": 14.1
+ },
+ "n3397836578": {
+  "opening_hours": "Mo-Su 10:45-22:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 10:45 AM to 10 PM; Tuesday: 10:45 AM to 10 PM; Wednesday: 10:45 AM to 10 PM; Thursday: 10:45 AM to 10 PM; Friday: 10:45 AM to 10 PM; Saturday: 10:45 AM to 10 PM; Sunday: 10:45 AM to 10 PM",
+  "matched_name": "Chipotle Mexican Grill",
+  "distance_m": 8.9
+ },
+ "n2429468220": {
+  "opening_hours": "Mo-Fr 07:00-18:00; Sa-Su 09:00-17:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 6 PM; Tuesday: 7 AM to 6 PM; Wednesday: 7 AM to 6 PM; Thursday: 7 AM to 6 PM; Friday: 7 AM to 6 PM; Saturday: 9 AM to 5 PM; Sunday: 9 AM to 5 PM",
+  "matched_name": "Capital One Café",
+  "distance_m": 9.2
+ },
+ "n4259744392": {
+  "opening_hours": "Mo-Fr 08:00-16:00; Sa-Su off",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 4 PM; Tuesday: 8 AM to 4 PM; Wednesday: 8 AM to 4 PM; Thursday: 8 AM to 4 PM; Friday: 8 AM to 4 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Sutter Street Cafe",
+  "distance_m": 16.9
+ },
+ "n3397792145": {
+  "opening_hours": "Mo-Th 09:00-22:00; Fr-Sa 09:00-24:00; Su 10:00-22:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 9 AM to 10 PM; Tuesday: 9 AM to 10 PM; Wednesday: 9 AM to 10 PM; Thursday: 9 AM to 10 PM; Friday: 9 AM to 12 AM; Saturday: 9 AM to 12 AM; Sunday: 10 AM to 10 PM",
+  "matched_name": "SF Deli & Wine",
+  "distance_m": 16.9
+ },
+ "n808930789": {
+  "opening_hours": "Mo-Th,Su 11:00-24:00; Fr-Sa 11:00-00:30",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 12 AM; Tuesday: 11 AM to 12 AM; Wednesday: 11 AM to 12 AM; Thursday: 11 AM to 12 AM; Friday: 11 AM to 12:30 AM; Saturday: 11 AM to 12:30 AM; Sunday: 11 AM to 12 AM",
+  "matched_name": "King of Thai Noodle House",
+  "distance_m": 9.3
+ },
+ "n5608474721": {
+  "opening_hours": "Mo-Fr 17:00-22:00; Sa 16:00-22:00; Su 17:00-21:00",
+  "confidence": 0.86,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 to 10 PM; Tuesday: 5 to 10 PM; Wednesday: 5 to 10 PM; Thursday: 5 to 10 PM; Friday: 5 to 10 PM; Saturday: 4 to 10 PM; Sunday: 5 to 9 PM",
+  "matched_name": "Morton's The Steakhouse",
+  "distance_m": 17.0
+ },
+ "n818060761": {
+  "opening_hours": "Mo-Su 11:00-23:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 11 PM; Tuesday: 11 AM to 11 PM; Wednesday: 11 AM to 11 PM; Thursday: 11 AM to 11 PM; Friday: 11 AM to 11 PM; Saturday: 11 AM to 11 PM; Sunday: 11 AM to 11 PM",
+  "matched_name": "Pakwan Restaurant - Tenderloin",
+  "distance_m": 9.5
+ },
+ "n10000755449": {
+  "opening_hours": "Mo-Su 06:00-21:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 6 AM to 9 PM; Tuesday: 6 AM to 9 PM; Wednesday: 6 AM to 9 PM; Thursday: 6 AM to 9 PM; Friday: 6 AM to 9 PM; Saturday: 6 AM to 9 PM; Sunday: 6 AM to 9 PM",
+  "matched_name": "Café Rito",
+  "distance_m": 17.1
+ },
+ "n11328214993": {
+  "opening_hours": "Mo-Tu 17:00-24:00; We-Fr 17:00-02:00; Sa 18:00-02:00; Su off",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 PM to 12 AM; Tuesday: 5 PM to 12 AM; Wednesday: 5 PM to 2 AM; Thursday: 5 PM to 2 AM; Friday: 5 PM to 2 AM; Saturday: 6 PM to 2 AM; Sunday: Closed",
+  "matched_name": "Dawn Club",
+  "distance_m": 17.2
+ },
+ "n2957504173": {
+  "opening_hours": "Mo 07:00-11:00; Fr-Su 07:00-11:00,12:00-23:00; Tu-Th off",
+  "confidence": 0.86,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 to 11 AM; Tuesday: Closed; Wednesday: Closed; Thursday: Closed; Friday: 7 to 11 AM, 12 to 11 PM; Saturday: 7 to 11 AM, 12 to 11 PM; Sunday: 7 to 11 AM, 12 to 11 PM",
+  "matched_name": "Laurel Court Restaurant & Bar",
+  "distance_m": 9.8
+ },
+ "n621793543": {
+  "opening_hours": "Mo-Su 09:00-02:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 9 AM to 2 AM; Tuesday: 9 AM to 2 AM; Wednesday: 9 AM to 2 AM; Thursday: 9 AM to 2 AM; Friday: 9 AM to 2 AM; Saturday: 9 AM to 2 AM; Sunday: 9 AM to 2 AM",
+  "matched_name": "King Liquor & Deli",
+  "distance_m": 9.9
+ },
+ "n4632000740": {
+  "opening_hours": "Mo-We 17:00-22:00; Th 17:00-01:00; Fr-Sa 17:00-02:00; Su off",
+  "confidence": 0.86,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 to 10 PM; Tuesday: 5 to 10 PM; Wednesday: 5 to 10 PM; Thursday: 5 PM to 1 AM; Friday: 5 PM to 2 AM; Saturday: 5 PM to 2 AM; Sunday: Closed",
+  "matched_name": "Mr. Mahjong’s",
+  "distance_m": 14.4
+ },
+ "n9426889457": {
+  "opening_hours": "Mo-Sa 07:00-14:00; Su off",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 2 PM; Tuesday: 7 AM to 2 PM; Wednesday: 7 AM to 2 PM; Thursday: 7 AM to 2 PM; Friday: 7 AM to 2 PM; Saturday: 7 AM to 2 PM; Sunday: Closed",
+  "matched_name": "The Morning Fix",
+  "distance_m": 10.2
+ },
+ "n371025500": {
+  "opening_hours": "Mo-Su 16:00-02:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 PM to 2 AM; Tuesday: 4 PM to 2 AM; Wednesday: 4 PM to 2 AM; Thursday: 4 PM to 2 AM; Friday: 4 PM to 2 AM; Saturday: 4 PM to 2 AM; Sunday: 4 PM to 2 AM",
+  "matched_name": "Tunnel Top Lounge and Bar",
+  "distance_m": 10.3
+ },
+ "n12952494800": {
+  "opening_hours": "Mo-Fr 11:00-14:30; Sa-Su off",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 11 AM to 2:30 PM; Tuesday: 11 AM to 2:30 PM; Wednesday: 11 AM to 2:30 PM; Thursday: 11 AM to 2:30 PM; Friday: 11 AM to 2:30 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Julie's Kitchen",
+  "distance_m": 18.1
+ },
+ "n11159983112": {
+  "opening_hours": "Mo-Su 08:00-19:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 8 AM to 7 PM; Tuesday: 8 AM to 7 PM; Wednesday: 8 AM to 7 PM; Thursday: 8 AM to 7 PM; Friday: 8 AM to 7 PM; Saturday: 8 AM to 7 PM; Sunday: 8 AM to 7 PM",
+  "matched_name": "Starbucks Coffee Company",
+  "distance_m": 10.7
+ },
+ "n9842796000": {
+  "opening_hours": "Mo,Su 08:00-18:00; Tu-Sa 08:00-20:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 6 PM; Tuesday: 8 AM to 8 PM; Wednesday: 8 AM to 8 PM; Thursday: 8 AM to 8 PM; Friday: 8 AM to 8 PM; Saturday: 8 AM to 8 PM; Sunday: 8 AM to 6 PM",
+  "matched_name": "ONE65 San Francisco",
+  "distance_m": 10.8
+ },
+ "n621818396": {
+  "opening_hours": "Mo-Tu,Fr-Sa 12:00-13:00,14:00-23:00; We-Th,Su 14:00-23:00",
+  "confidence": 0.86,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 12 to 1 PM, 2 to 11 PM; Tuesday: 12 to 1 PM, 2 to 11 PM; Wednesday: 2 to 11 PM; Thursday: 2 to 11 PM; Friday: 12 to 1 PM, 2 to 11 PM; Saturday: 12 to 1 PM, 2 to 11 PM; Sunday: 2 to 11 PM",
+  "matched_name": "Zingari Ristorante + Jazz Bar",
+  "distance_m": 11.0
+ },
+ "n12259504142": {
+  "opening_hours": "Tu-We 11:30-19:30; Th-Fr 11:00-22:00; Sa-Su 11:00-19:00; Mo off",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: Closed; Tuesday: 11:30 AM to 7:30 PM; Wednesday: 11:30 AM to 7:30 PM; Thursday: 11 AM to 10 PM; Friday: 11 AM to 10 PM; Saturday: 11 AM to 7 PM; Sunday: 11 AM to 7 PM",
+  "matched_name": "Unbound Books and Coffee 格外书店",
+  "distance_m": 2.9
+ },
+ "n1320562890": {
+  "opening_hours": "Mo-Fr 11:00-20:00; Sa 12:00-17:00; Su off",
+  "confidence": 0.86,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 8 PM; Tuesday: 11 AM to 8 PM; Wednesday: 11 AM to 8 PM; Thursday: 11 AM to 8 PM; Friday: 11 AM to 8 PM; Saturday: 12 to 5 PM; Sunday: Closed",
+  "matched_name": "Flatiron Wines & Spirits",
+  "distance_m": 18.6
+ },
+ "n4637572306": {
+  "opening_hours": "Mo-Fr 11:30-23:00; Sa-Su 12:00-23:00",
+  "confidence": 0.86,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11:30 AM to 11 PM; Tuesday: 11:30 AM to 11 PM; Wednesday: 11:30 AM to 11 PM; Thursday: 11:30 AM to 11 PM; Friday: 11:30 AM to 11 PM; Saturday: 12 to 11 PM; Sunday: 12 to 11 PM",
+  "matched_name": "Halal Wings Plus",
+  "distance_m": 11.3
+ },
+ "n13168486490": {
+  "opening_hours": "Tu-Sa 17:00-21:30; Su 11:30-14:00; Mo off",
+  "confidence": 0.86,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: Closed; Tuesday: 5 to 9:30 PM; Wednesday: 5 to 9:30 PM; Thursday: 5 to 9:30 PM; Friday: 5 to 9:30 PM; Saturday: 5 to 9:30 PM; Sunday: 11:30 AM to 2 PM",
+  "matched_name": "Bombay Brasserie",
+  "distance_m": 19.4
+ },
+ "w128478751": {
+  "opening_hours": "Mo-Th 06:00-16:30; Fr 04:30-16:30; Sa 07:30-16:30; Su 08:00-16:30",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 6 AM to 4:30 PM; Tuesday: 6 AM to 4:30 PM; Wednesday: 6 AM to 4:30 PM; Thursday: 6 AM to 4:30 PM; Friday: 4:30 AM to 4:30 PM; Saturday: 7:30 AM to 4:30 PM; Sunday: 8 AM to 4:30 PM",
+  "matched_name": "Cable Car CoffeeSF",
+  "distance_m": 15.4
+ },
+ "n9528990699": {
+  "opening_hours": "Mo-Th 11:30-22:00; Fr 11:30-22:30; Sa 11:00-22:30; Su 11:00-21:00",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11:30 AM to 10 PM; Tuesday: 11:30 AM to 10 PM; Wednesday: 11:30 AM to 10 PM; Thursday: 11:30 AM to 10 PM; Friday: 11:30 AM to 10:30 PM; Saturday: 11 AM to 10:30 PM; Sunday: 11 AM to 9 PM",
+  "matched_name": "Fogo de Chão Brazilian Steakhouse",
+  "distance_m": 12.3
+ },
+ "n2336394868": {
+  "opening_hours": "Mo-Su 11:00-16:30",
+  "confidence": 0.91,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 11 AM to 4:30 PM; Tuesday: 11 AM to 4:30 PM; Wednesday: 11 AM to 4:30 PM; Thursday: 11 AM to 4:30 PM; Friday: 11 AM to 4:30 PM; Saturday: 11 AM to 4:30 PM; Sunday: 11 AM to 4:30 PM",
+  "matched_name": "Oink & Oscar Sandwich Shop",
+  "distance_m": 12.4
+ },
+ "n1406188020": {
+  "opening_hours": "Mo-Th 18:00-23:30; Fr-Sa 18:00-00:30; Su 18:00-22:30",
+  "confidence": 0.86,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 6 to 11:30 PM; Tuesday: 6 to 11:30 PM; Wednesday: 6 to 11:30 PM; Thursday: 6 to 11:30 PM; Friday: 6 PM to 12:30 AM; Saturday: 6 PM to 12:30 AM; Sunday: 6 to 10:30 PM",
+  "matched_name": "Ryoko's Japanese Restaurant & Bar",
+  "distance_m": 12.9
+ },
+ "n1417639584": {
+  "opening_hours": "Mo-Th,Su 16:00-23:00; Fr-Sa 15:00-00:30",
+  "confidence": 0.86,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 to 11 PM; Tuesday: 4 to 11 PM; Wednesday: 4 to 11 PM; Thursday: 4 to 11 PM; Friday: 3 PM to 12:30 AM; Saturday: 3 PM to 12:30 AM; Sunday: 4 to 11 PM",
+  "matched_name": "Top of the Mark",
+  "distance_m": 20.4
+ },
+ "n3442537168": {
+  "opening_hours": "Mo-Su 07:00-11:00,16:00-23:00",
+  "confidence": 0.86,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 7 to 11 AM, 4 to 11 PM; Tuesday: 7 to 11 AM, 4 to 11 PM; Wednesday: 7 to 11 AM, 4 to 11 PM; Thursday: 7 to 11 AM, 4 to 11 PM; Friday: 7 to 11 AM, 4 to 11 PM; Saturday: 7 to 11 AM, 4 to 11 PM; Sunday: 7 to 11 AM, 4 to 11 PM",
+  "matched_name": "Dirty Habit",
+  "distance_m": 20.6
+ },
+ "n9518786539": {
+  "opening_hours": "Mo-Sa 07:00-21:00; Su 09:00-21:00",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 7 AM to 9 PM; Tuesday: 7 AM to 9 PM; Wednesday: 7 AM to 9 PM; Thursday: 7 AM to 9 PM; Friday: 7 AM to 9 PM; Saturday: 7 AM to 9 PM; Sunday: 9 AM to 9 PM",
+  "matched_name": "Tad's Steakhouse",
+  "distance_m": 8.9
+ },
+ "n2249504566": {
+  "opening_hours": "Mo-Th,Su 11:30-24:00; Fr-Sa 11:30-02:00",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11:30 AM to 12 AM; Tuesday: 11:30 AM to 12 AM; Wednesday: 11:30 AM to 12 AM; Thursday: 11:30 AM to 12 AM; Friday: 11:30 AM to 2 AM; Saturday: 11:30 AM to 2 AM; Sunday: 11:30 AM to 12 AM",
+  "matched_name": "The Irish Bank",
+  "distance_m": 21.1
+ },
+ "n11047391469": {
+  "opening_hours": "Mo-Fr 07:00-18:00; Sa-Su off",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 7 AM to 6 PM; Tuesday: 7 AM to 6 PM; Wednesday: 7 AM to 6 PM; Thursday: 7 AM to 6 PM; Friday: 7 AM to 6 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "La Fromagerie Cheese Shop",
+  "distance_m": 14.1
+ },
+ "n9456812858": {
+  "opening_hours": "Mo-Su 11:00-19:00",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 11 AM to 7 PM; Tuesday: 11 AM to 7 PM; Wednesday: 11 AM to 7 PM; Thursday: 11 AM to 7 PM; Friday: 11 AM to 7 PM; Saturday: 11 AM to 7 PM; Sunday: 11 AM to 7 PM",
+  "matched_name": "Rolling Dumpling",
+  "distance_m": 22.0
+ },
+ "n4616136998": {
+  "opening_hours": "Mo-Fr 10:00-15:00; Sa-Su off",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:09:53+00:00",
+  "raw": "Monday: 10 AM to 3 PM; Tuesday: 10 AM to 3 PM; Wednesday: 10 AM to 3 PM; Thursday: 10 AM to 3 PM; Friday: 10 AM to 3 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Tokyo Express Restaurant",
+  "distance_m": 15.5
+ },
+ "w147633860": {
+  "opening_hours": "Tu-Th 17:00-24:00; Fr-Sa 22:00-02:00; Mo,Su off",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: Closed; Tuesday: 5 PM to 12 AM; Wednesday: 5 PM to 12 AM; Thursday: 5 PM to 12 AM; Friday: 10 PM to 2 AM; Saturday: 10 PM to 2 AM; Sunday: Closed",
+  "matched_name": "Hawthorn SF Nightclub and Lounge",
+  "distance_m": 15.7
+ },
+ "n4498256594": {
+  "opening_hours": "Mo-We 15:00-22:00; Th-Fr 12:00-22:00; Sa 10:00-22:00; Su 10:00-20:30",
+  "confidence": 0.85,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 3 to 10 PM; Tuesday: 3 to 10 PM; Wednesday: 3 to 10 PM; Thursday: 12 to 10 PM; Friday: 12 to 10 PM; Saturday: 10 AM to 10 PM; Sunday: 10 AM to 8:30 PM",
+  "matched_name": "Bartlett Hall",
+  "distance_m": 22.7
+ },
+ "n4632081526": {
+  "opening_hours": "Mo-Fr 09:00-17:30; Sa-Su off",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 9 AM to 5:30 PM; Tuesday: 9 AM to 5:30 PM; Wednesday: 9 AM to 5:30 PM; Thursday: 9 AM to 5:30 PM; Friday: 9 AM to 5:30 PM; Saturday: Closed; Sunday: Closed",
+  "matched_name": "Patrick & Co",
+  "distance_m": 16.0
+ },
+ "n12251148869": {
+  "opening_hours": "Mo-Fr 11:00-14:00,17:00-21:00; Sa 11:30-15:00,17:00-21:00; Su off",
+  "confidence": 0.85,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:06:26+00:00",
+  "raw": "Monday: 11 AM to 2 PM, 5 to 9 PM; Tuesday: 11 AM to 2 PM, 5 to 9 PM; Wednesday: 11 AM to 2 PM, 5 to 9 PM; Thursday: 11 AM to 2 PM, 5 to 9 PM; Friday: 11 AM to 2 PM, 5 to 9 PM; Saturday: 11:30 AM to 3 PM, 5 to 9 PM; Sunday: Closed",
+  "matched_name": "Osha Thai Montgomery",
+  "distance_m": 16.1
+ },
+ "w32863633": {
+  "opening_hours": "Mo-Sa 10:00-20:00; Su 11:00-19:00",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 8 PM; Tuesday: 10 AM to 8 PM; Wednesday: 10 AM to 8 PM; Thursday: 10 AM to 8 PM; Friday: 10 AM to 8 PM; Saturday: 10 AM to 8 PM; Sunday: 11 AM to 7 PM",
+  "matched_name": "Macy's",
+  "distance_m": 23.2
+ },
+ "n9322450624": {
+  "opening_hours": "Mo-Su 16:00-24:00",
+  "confidence": 0.9,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 PM to 12 AM; Tuesday: 4 PM to 12 AM; Wednesday: 4 PM to 12 AM; Thursday: 4 PM to 12 AM; Friday: 4 PM to 12 AM; Saturday: 4 PM to 12 AM; Sunday: 4 PM to 12 AM",
+  "matched_name": "Cityscape",
+  "distance_m": 16.5
+ },
+ "n10648027954": {
+  "opening_hours": "Mo-Th,Su 11:30-14:00,17:30-21:00; Fr-Sa 11:30-14:00,17:30-22:00",
+  "confidence": 0.85,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:06:26+00:00",
+  "raw": "Monday: 11:30 AM to 2 PM, 5:30 to 9 PM; Tuesday: 11:30 AM to 2 PM, 5:30 to 9 PM; Wednesday: 11:30 AM to 2 PM, 5:30 to 9 PM; Thursday: 11:30 AM to 2 PM, 5:30 to 9 PM; Friday: 11:30 AM to 2 PM, 5:30 to 10 PM; Saturday: 11:30 AM to 2 PM, 5:30 to 10 PM; Sunday: 11:30 AM to 2 PM, 5:30 to 9 PM",
+  "matched_name": "Kin Khao",
+  "distance_m": 23.8
+ },
+ "n1612808193": {
+  "opening_hours": "Mo-Su 16:00-24:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 4 PM to 12 AM; Tuesday: 4 PM to 12 AM; Wednesday: 4 PM to 12 AM; Thursday: 4 PM to 12 AM; Friday: 4 PM to 12 AM; Saturday: 4 PM to 12 AM; Sunday: 4 PM to 12 AM",
+  "matched_name": "The View Lounge",
+  "distance_m": 24.8
+ },
+ "n2730487173": {
+  "opening_hours": "Mo-Su 08:00-20:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 8 AM to 8 PM; Tuesday: 8 AM to 8 PM; Wednesday: 8 AM to 8 PM; Thursday: 8 AM to 8 PM; Friday: 8 AM to 8 PM; Saturday: 8 AM to 8 PM; Sunday: 8 AM to 8 PM",
+  "matched_name": "Target",
+  "distance_m": 25.5
+ },
+ "n1486017176": {
+  "opening_hours": "Mo-Su 09:00-23:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:15:27+00:00",
+  "raw": "Monday: 9 AM to 11 PM; Tuesday: 9 AM to 11 PM; Wednesday: 9 AM to 11 PM; Thursday: 9 AM to 11 PM; Friday: 9 AM to 11 PM; Saturday: 9 AM to 11 PM; Sunday: 9 AM to 11 PM",
+  "matched_name": "Cottage Market & Corner Store",
+  "distance_m": 5.0
+ },
+ "n10560594652": {
+  "opening_hours": "Mo-Su 07:00-22:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 7 AM to 10 PM; Tuesday: 7 AM to 10 PM; Wednesday: 7 AM to 10 PM; Thursday: 7 AM to 10 PM; Friday: 7 AM to 10 PM; Saturday: 7 AM to 10 PM; Sunday: 7 AM to 10 PM",
+  "matched_name": "The Turn Cafe",
+  "distance_m": 21.8
+ },
+ "n9518764060": {
+  "opening_hours": "Mo-Sa 10:00-19:00; Su 11:00-18:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 7 PM; Tuesday: 10 AM to 7 PM; Wednesday: 10 AM to 7 PM; Thursday: 10 AM to 7 PM; Friday: 10 AM to 7 PM; Saturday: 10 AM to 7 PM; Sunday: 11 AM to 6 PM",
+  "matched_name": "Starbucks Coffee Company",
+  "distance_m": 22.0
+ },
+ "n808930679": {
+  "opening_hours": "off",
+  "confidence": 0.79,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Temporarily closed",
+  "matched_name": "Urban Tavern",
+  "distance_m": 28.8
+ },
+ "n10091235854": {
+  "opening_hours": "Mo-Th,Su 17:00-21:00; Fr-Sa 17:00-21:30",
+  "confidence": 0.84,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 5 to 9 PM; Tuesday: 5 to 9 PM; Wednesday: 5 to 9 PM; Thursday: 5 to 9 PM; Friday: 5 to 9:30 PM; Saturday: 5 to 9:30 PM; Sunday: 5 to 9 PM",
+  "matched_name": "Osso Steakhouse",
+  "distance_m": 28.9
+ },
+ "n808930783": {
+  "opening_hours": "Mo-Sa 10:00-19:00; Su 11:00-18:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 10 AM to 7 PM; Tuesday: 10 AM to 7 PM; Wednesday: 10 AM to 7 PM; Thursday: 10 AM to 7 PM; Friday: 10 AM to 7 PM; Saturday: 10 AM to 7 PM; Sunday: 11 AM to 6 PM",
+  "matched_name": "Boudin Bakery Cafe",
+  "distance_m": 22.6
+ },
+ "n808930715": {
+  "opening_hours": "Mo-Th,Su 10:00-01:30; Fr 10:00-03:30; Sa 10:00-02:00",
+  "confidence": 0.89,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:07:37+00:00",
+  "raw": "Monday: 10 AM to 1:30 AM; Tuesday: 10 AM to 1:30 AM; Wednesday: 10 AM to 1:30 AM; Thursday: 10 AM to 1:30 AM; Friday: 10 AM to 3:30 AM; Saturday: 10 AM to 2 AM; Sunday: 10 AM to 1:30 AM",
+  "matched_name": "HINODEYA Ramen Union Square",
+  "distance_m": 10.8
+ },
+ "n7502504167": {
+  "opening_hours": "Mo-Tu,Fr-Su 09:30-16:30; Th 11:00-18:00; We off",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:08:28+00:00",
+  "raw": "Monday: 9:30 AM to 4:30 PM; Tuesday: 9:30 AM to 4:30 PM; Wednesday: Closed; Thursday: 11 AM to 6 PM; Friday: 9:30 AM to 4:30 PM; Saturday: 9:30 AM to 4:30 PM; Sunday: 9:30 AM to 4:30 PM",
+  "matched_name": "SFMOMA Steps Coffee",
+  "distance_m": 23.8
+ },
+ "n4637571918": {
+  "opening_hours": "Mo-Su 09:00-01:30",
+  "confidence": 0.88,
+  "source": "apify:google_maps",
+  "fetched_at": "2026-10-24T19:17:44+00:00",
+  "raw": "Monday: 9 AM to 1:30 AM; Tuesday: 9 AM to 1:30 AM; Wednesday: 9 AM to 1:30 AM; Thursday: 9 AM to 1:30 AM; Friday: 9 AM to 1:30 AM; Saturday: 9 AM to 1:30 AM; Sunday: 9 AM to 1:30 AM",
+  "matched_name": "Bel-Clift Grocery",
+  "distance_m": 10.3
+ }
+}

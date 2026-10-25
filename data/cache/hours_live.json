@@ -1,0 +1,72 @@
+{
+ "n4118223692": {
+  "opening_hours": "Mo-Sa 10:30-20:00; Su off",
+  "source": "apify-live",
+  "url": "https://www.google.com/maps/search/?api=1&query=Oasis%20Grill&query_place_id=ChIJg96BaoeAhYARIrnzcR8L-tY",
+  "checked_at": "2026-10-24T19:02:24-0700",
+  "confidence": 0.95
+ },
+ "n3397864969": {
+  "opening_hours": "Mo-Su 11:00-20:00",
+  "source": "apify-live",
+  "url": "https://www.google.com/maps/search/?api=1&query=heytea%20(Metreon)&query_place_id=ChIJU7szzDaBhYARHRdAbMjZhE0",
+  "checked_at": "2026-10-24T19:02:24-0700",
+  "confidence": 0.95
+ },
+ "n10261584500": {
+  "opening_hours": "off",
+  "source": "apify-live",
+  "url": "https://www.google.com/maps/search/?api=1&query=Tenderheart&query_place_id=ChIJs0BroYWAhYARr_RkI2Ym6_Y",
+  "checked_at": "2026-10-24T19:02:24-0700",
+  "confidence": 0.85
+ },
+ "n5748040763": {
+  "opening_hours": "Mo-Su 07:00-14:00",
+  "source": "apify-live",
+  "url": "https://www.google.com/maps/search/?api=1&query=Villon&query_place_id=ChIJJSUh04SAhYAR_nSfQBve1U4",
+  "checked_at": "2026-10-24T19:02:24-0700",
+  "confidence": 0.95
+ },
+ "n3725249094": {
+  "opening_hours": "off",
+  "source": "apify-live",
+  "url": "https://www.google.com/maps/search/?api=1&query=Taqueria%20Castillo%20B2&query_place_id=ChIJQ04Sl4WAhYARjXUElDeRhD0",
+  "checked_at": "2026-10-24T19:02:24-0700",
+  "confidence": 0.85
+ },
+ "n12133091149": {
+  "opening_hours": "off",
+  "source": "apify-live",
+  "url": "https://www.google.com/maps/search/?api=1&query=Punsch%20Bar&query_place_id=ChIJ1fG8aQCBhYAR36-HNiPgMj8",
+  "checked_at": "2026-10-24T19:02:24-0700",
+  "confidence": 0.85
+ },
+ "n13027442601": {
+  "opening_hours": "Tu-Th 11:00-15:00,16:00-19:00; Fr-Sa 11:00-15:00,16:00-20:00; Su 11:00-15:00,16:00-18:30; Mo off",
+  "source": "apify-live",
+  "url": "https://www.google.com/maps/search/?api=1&query=Smish%20Smash&query_place_id=ChIJd6ytC4-BhYARbnmwuZ3jpdo",
+  "checked_at": "2026-10-24T19:03:15-0700",
+  "confidence": 0.9
+ },
+ "n12133091153": {
+  "opening_hours": "Mo-Th 11:00-19:00; Fr-Sa 11:00-20:00; Su 11:00-18:00",
+  "source": "apify-live",
+  "url": "https://www.google.com/maps/search/?api=1&query=Izzy%20%26%20Wooks&query_place_id=ChIJI1BDQgCBhYAR_388X2jJ4DE",
+  "checked_at": "2026-10-24T19:03:15-0700",
+  "confidence": 0.95
+ },
+ "n4108035334": {
+  "opening_hours": "Mo-Sa 09:00-21:40; Su off",
+  "source": "apify-live",
+  "url": "https://www.google.com/maps/search/?api=1&query=Taqueria%20Cancun&query_place_id=ChIJd_Hu_YSAhYARlxdgh3vVI4k",
+  "checked_at": "2026-10-24T19:03:15-0700",
+  "confidence": 0.95
+ },
+ "n11144316503": {
+  "opening_hours": "Mo-Su 05:00-24:00",
+  "source": "apify-live",
+  "url": "https://www.google.com/maps/search/?api=1&query=Bay%20Food%20Market&query_place_id=ChIJh5P69vaBhYARmoflgESo4K0",
+  "checked_at": "2026-10-24T19:03:15-0700",
+  "confidence": 0.95
+ }
+}

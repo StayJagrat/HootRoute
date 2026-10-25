@@ -1,0 +1,245 @@
+<meta charset="utf-8">
+<title>Streetwise Brand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one long brand sheet, sections as full-width bands with a small mono label. Committed night look; amber is the single brand colour, the rest are signals. */
+:root {
+  color-scheme: dark;
+  --night: #070b12; --panel: #0d1520; --raise: #121c2a; --line: #1f2d3f; --moon: #e8edf3; --fog: #8fa0b3;
+  --lamp: #ffb547; --ember: #ff6b5a; --glow: #3dd6c3; --signal: #9a8cff; --on-lamp: #1b1203; --dawn: #f2f5f7; --ink: #0b1620; --lamp-ink: #9a5a00;
+  --display: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif; --body: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--night); color: var(--moon); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 72rem; margin-inline: auto; padding-inline: 1rem; }
+section { padding-block: 3.2rem; border-top: 1px solid var(--line); }
+section:first-of-type { border-top: 0; }
+h1, h2, h3, p { margin: 0; }
+h2 { font-family: var(--display); font-weight: 800; font-size: clamp(1.7rem, 3.6vw, 2.4rem); letter-spacing: -0.015em; line-height: 1.1; text-wrap: balance; }
+h3 { font-family: var(--display); font-weight: 700; font-size: 1.1rem; }
+.label { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lamp); margin-bottom: 0.7rem; }
+.lede { color: var(--fog); max-width: 58ch; margin-top: 0.8rem; font-size: 1.05rem; }
+.mono { font-family: var(--mono); }
+.row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.grid { display: grid; gap: 1rem; margin-top: 1.6rem; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); } .g3 { grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); } .g4 { grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.6rem; min-width: 0; }
+.card.light { background: var(--dawn); color: var(--ink); border-color: #d3dce1; }
+.card small, .small { font-size: 0.8rem; color: var(--fog); } .card.light small { color: #4b5d6a; }
+
+/* hero */
+.hero { padding-block: 4.5rem 3.6rem; display: grid; gap: 2rem; justify-items: start; }
+.lockup { display: flex; align-items: center; gap: clamp(0.8rem, 2vw, 1.6rem); }
+.hero-lamp { position: relative; width: clamp(5.5rem, 13vw, 9rem); aspect-ratio: 1; flex: 0 0 auto; }
+.hero-lamp svg { width: 100%; height: 100%; animation: breathe 4.5s ease-in-out infinite; }
+.word { font-family: var(--display); font-weight: 800; font-size: clamp(3rem, 10vw, 6.6rem); letter-spacing: -0.035em; line-height: 1; }
+.word b { color: var(--lamp); font-weight: 800; }
+.tag { font-family: var(--display); font-weight: 500; font-size: clamp(1.3rem, 3vw, 2rem); color: var(--fog); }
+@keyframes breathe { 0%, 100% { transform: scale(0.95); filter: brightness(0.92); } 50% { transform: scale(1.04); filter: brightness(1.08); } }
+
+/* palette */
+.sw { border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); display: flex; flex-direction: column; }
+.sw i { display: block; height: 5.5rem; }
+.sw div { padding: 0.7rem 0.8rem; display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.82rem; }
+.sw b { font-family: var(--display); font-size: 1rem; } .sw span { color: var(--fog); font-size: 0.78rem; } .sw code { font-family: var(--mono); font-size: 0.76rem; color: var(--moon); }
+
+/* type */
+.spec { border-top: 1px solid var(--line); padding-block: 1rem; display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 0.4rem 1.5rem; align-items: baseline; }
+.spec:first-child { border-top: 0; }
+.spec .k { font-family: var(--mono); font-size: 0.72rem; color: var(--fog); letter-spacing: 0.06em; text-transform: uppercase; }
+@media (max-width: 560px) { .spec { grid-template-columns: 1fr; } }
+
+/* voice */
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th, td { text-align: left; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fog); font-weight: 500; }
+td.yes { color: var(--glow); } td.no { color: var(--ember); text-decoration: line-through; text-decoration-color: rgba(255,107,90,0.5); }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); margin-top: 1.6rem; }
+.scroll table { min-width: 34rem; }
+
+/* motion demos */
+.demo { height: 9.5rem; border-radius: 12px; background: #05080e; border: 1px solid var(--line); position: relative; overflow: hidden; display: grid; place-items: center; }
+.btn { appearance: none; font: inherit; font-weight: 600; background: var(--lamp); color: var(--on-lamp); border: 0; border-radius: 12px; padding: 0.55rem 1rem; min-height: 44px; cursor: pointer; }
+.btn.ghost { background: var(--raise); color: var(--moon); border: 1px solid var(--line); font-weight: 500; }
+.btn:focus-visible { outline: 2px solid var(--moon); outline-offset: 2px; }
+.glow-dot { width: 3.4rem; height: 3.4rem; border-radius: 50%; background: radial-gradient(circle, #fff3d6, var(--lamp) 38%, rgba(255,181,71,0.22) 66%, rgba(255,181,71,0)); animation: breathe 4.5s ease-in-out infinite; }
+.route-demo svg { width: 92%; height: auto; } .route-demo path { stroke-dasharray: 700; stroke-dashoffset: 700; }
+.route-demo.go path { animation: draw 1.6s var(--ease, cubic-bezier(.2,.7,.2,1)) forwards; } @keyframes draw { to { stroke-dashoffset: 0; } }
+.pops { display: flex; gap: 0.7rem; flex-wrap: wrap; justify-content: center; padding: 1rem; }
+.pops i { width: 14px; height: 14px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 12px 2px rgba(61,214,195,0.7); opacity: 0; transform: scale(0); }
+.pops.go i { animation: pop .5s cubic-bezier(.2,1.4,.4,1) forwards; } @keyframes pop { to { opacity: 1; transform: scale(1); } }
+.count { font-family: var(--display); font-weight: 800; font-size: 3.4rem; font-variant-numeric: tabular-nums; }
+
+/* ui kit */
+.ring { position: relative; width: 5rem; height: 5rem; flex: 0 0 auto; } .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); } .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.chip { display: inline-flex; font-family: var(--mono); font-size: 0.7rem; padding: 0.22rem 0.6rem; border-radius: 99px; border: 1px solid var(--line); color: var(--fog); width: fit-content; }
+.chip.lamp { color: var(--lamp); border-color: rgba(255,181,71,0.55); } .chip.ember { color: var(--ember); border-color: rgba(255,107,90,0.55); } .chip.glow { color: var(--glow); border-color: rgba(61,214,195,0.5); } .chip.signal { color: var(--signal); border-color: rgba(154,140,255,0.55); }
+.rcard { border: 1px solid var(--lamp); border-radius: 14px; padding: 0.8rem; background: var(--raise); box-shadow: 0 0 0 1px rgba(255,181,71,0.3), 0 0 28px -6px rgba(255,181,71,0.4); display: flex; gap: 0.9rem; align-items: center; }
+.trace { font-family: var(--mono); font-size: 0.74rem; background: #070d16; border: 1px solid var(--line); border-radius: 12px; padding: 0.7rem 0.8rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.trace .t { color: var(--fog); margin-right: 0.5rem; } .trace .a { color: var(--signal); margin-right: 0.4rem; }
+.strip { position: relative; height: 3rem; margin-top: 0.4rem; } .strip .l { position: absolute; left: 0; right: 0; top: 1.6rem; height: 4px; background: #1c2a3b; border-radius: 4px; } .strip .g { position: absolute; left: 12%; width: 38%; top: 1.6rem; height: 4px; background: var(--ember); border-radius: 4px; box-shadow: 0 0 12px 2px rgba(255,107,90,0.7); }
+.strip .d { position: absolute; top: 1.6rem; width: 11px; height: 11px; margin: -3.5px 0 0 -5.5px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 10px 1px rgba(61,214,195,0.75); }
+.banner { min-height: 17rem; gap: 1.2rem; border-radius: 16px; background: radial-gradient(60% 90% at 78% 40%, rgba(255,181,71,0.28), transparent 70%), #05080e; border: 1px solid var(--line); padding: 1.6rem; display: flex; flex-direction: column; justify-content: space-between; }
+.banner .big { font-family: var(--display); font-weight: 800; font-size: clamp(1.8rem, 4.4vw, 3rem); line-height: 1.02; letter-spacing: -0.03em; }
+.appicon { width: 7rem; height: 7rem; border-radius: 26%; background: #070b12; display: grid; place-items: center; border: 1px solid var(--line); overflow: hidden; } .appicon svg { width: 118%; }
+@media (prefers-reduced-motion: reduce) { .hero-lamp svg, .glow-dot { animation: none; } .route-demo path { stroke-dashoffset: 0; animation: none !important; } .pops i { opacity: 1; transform: none; animation: none !important; } }
+</style>
+
+<main class="wrap">
+<section class="hero" aria-label="Streetwise">
+  <div class="label">Brand sheet · Cal Hacks 13.0</div>
+  <div class="lockup">
+    <div class="hero-lamp"><svg viewBox="0 0 128 128" aria-hidden="true"><defs><radialGradient id="g1" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF3D6"/><stop offset=".34" stop-color="#FFB547"/><stop offset=".7" stop-color="#FFB547" stop-opacity=".22"/><stop offset="1" stop-color="#FFB547" stop-opacity="0"/></radialGradient></defs><circle cx="64" cy="64" r="62" fill="url(#g1)"/><circle cx="64" cy="64" r="30" fill="#FFB547"/><path d="M24 94 C 50 94 42 62 64 62 S 82 92 106 38" fill="none" stroke="#070B12" stroke-width="9" stroke-linecap="round"/><circle cx="24" cy="94" r="6" fill="#070B12"/><circle cx="106" cy="38" r="7" fill="#FFF3D6" stroke="#070B12" stroke-width="4"/></svg></div>
+    <div class="word">Street<b>wise</b></div>
+  </div>
+  <p class="tag">Walk like you know.</p>
+  <p class="lede">Maps pick the shortest path. Streetwise scores every block by what is open, lit and reachable at the minute you pass it, and shows its work.</p>
+</section>
+
+<section>
+  <div class="label">Essence</div>
+  <h2>Navigation for people who think</h2>
+  <p class="lede">It does not tell you a street is safe or dangerous. It shows what is on it when you get there, and why the route it picked is better.</p>
+  <div class="grid g4">
+    <div class="card"><h3>Show the work</h3><p class="small">Every score has a breakdown and a reason. No black box.</p></div>
+    <div class="card"><h3>Say what is missing</h3><p class="small">Where data is thin, the score says so and shows confidence.</p></div>
+    <div class="card"><h3>Streets, not neighborhoods</h3><p class="small">Conditions on a block. Never a label on a place or the people in it.</p></div>
+    <div class="card"><h3>Stay calm</h3><p class="small">Precise and quiet. No alarms, no drama, no fear.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="label">Logo</div>
+  <h2>A lamp with a route through it</h2>
+  <p class="lede">The amber disc is the lamp: what is alive on the street. The line is your walk, from where you start to the pin.</p>
+  <div class="grid g3">
+    <div class="card" style="align-items:center;gap:1rem"><svg viewBox="0 0 128 128" width="120" aria-label="Full colour mark on dark"><defs><radialGradient id="g2" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF3D6"/><stop offset=".34" stop-color="#FFB547"/><stop offset=".7" stop-color="#FFB547" stop-opacity=".22"/><stop offset="1" stop-color="#FFB547" stop-opacity="0"/></radialGradient></defs><circle cx="64" cy="64" r="62" fill="url(#g2)"/><circle cx="64" cy="64" r="30" fill="#FFB547"/><path d="M24 94 C 50 94 42 62 64 62 S 82 92 106 38" fill="none" stroke="#070B12" stroke-width="9" stroke-linecap="round"/><circle cx="24" cy="94" r="6" fill="#070B12"/><circle cx="106" cy="38" r="7" fill="#FFF3D6" stroke="#070B12" stroke-width="4"/></svg><small>mark.svg · full colour, on dark only</small></div>
+    <div class="card" style="align-items:center;gap:1rem"><svg viewBox="0 0 128 128" width="120" aria-label="One colour mark on dark"><circle cx="64" cy="64" r="30" fill="#E8EDF3"/><path d="M24 94 C 50 94 42 62 64 62 S 82 92 106 38" fill="none" stroke="#070B12" stroke-width="9" stroke-linecap="round"/><circle cx="24" cy="94" r="6" fill="#070B12"/><circle cx="106" cy="38" r="7" fill="#E8EDF3" stroke="#070B12" stroke-width="4"/></svg><small>mark-mono-dark.svg</small></div>
+    <div class="card light" style="align-items:center;gap:1rem"><svg viewBox="0 0 128 128" width="120" aria-label="One colour mark on light"><circle cx="64" cy="64" r="30" fill="#0B1620"/><path d="M24 94 C 50 94 42 62 64 62 S 82 92 106 38" fill="none" stroke="#F2F5F7" stroke-width="9" stroke-linecap="round"/><circle cx="24" cy="94" r="6" fill="#F2F5F7"/><circle cx="106" cy="38" r="7" fill="#0B1620" stroke="#F2F5F7" stroke-width="4"/></svg><small>mark-mono-light.svg · on light backgrounds</small></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3>Wordmark</h3><p class="small">Bricolage Grotesque ExtraBold, tracking −1.5%. "Street" in Moon, "wise" in Lamp. Clear space: the height of the lamp disc. Minimum: 24 px mark, 96 px lockup.</p></div>
+    <div class="card"><h3>Never</h3><p class="small">Recolour the lamp. Put the glow mark on a light background. Add a drop shadow. Stretch, rotate or outline the wordmark in another colour.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="label">Colour</div>
+  <h2>One brand colour, four signals</h2>
+  <p class="lede">The product is a night product, so the brand is dark first. Amber is the only brand colour. Each signal has exactly one meaning, and colour never carries meaning alone: pair it with a number or a word.</p>
+  <div class="grid g4">
+    <div class="sw"><i style="background:#FFB547"></i><div><b>Lamp</b><code>#FFB547</code><span>The brand. Recommended route, selected state, primary action. 11.2:1 on Night</span></div></div>
+    <div class="sw"><i style="background:#FF6B5A"></i><div><b>Ember</b><code>#FF6B5A</code><span>Empty stretch, the fastest route, attention. 7.0:1</span></div></div>
+    <div class="sw"><i style="background:#3DD6C3"></i><div><b>Glow</b><code>#3DD6C3</code><span>Open and lit. 10.9:1</span></div></div>
+    <div class="sw"><i style="background:#9A8CFF"></i><div><b>Signal</b><code>#9A8CFF</code><span>An agent is working. 7.1:1</span></div></div>
+    <div class="sw"><i style="background:#070B12"></i><div><b>Night</b><code>#070B12</code><span>Page background</span></div></div>
+    <div class="sw"><i style="background:#0D1520"></i><div><b>Panel</b><code>#0D1520</code><span>Cards and sheets</span></div></div>
+    <div class="sw"><i style="background:#121C2A"></i><div><b>Raise</b><code>#121C2A</code><span>Inputs, selected rows</span></div></div>
+    <div class="sw"><i style="background:#1F2D3F"></i><div><b>Line</b><code>#1F2D3F</code><span>Borders and dividers</span></div></div>
+    <div class="sw"><i style="background:#E8EDF3"></i><div><b>Moon</b><code>#E8EDF3</code><span>Primary text. 16.7:1</span></div></div>
+    <div class="sw"><i style="background:#8FA0B3"></i><div><b>Fog</b><code>#8FA0B3</code><span>Secondary text. 7.4:1</span></div></div>
+    <div class="sw"><i style="background:#F2F5F7"></i><div><b>Dawn</b><code>#F2F5F7</code><span>Light surfaces: guardian page, print</span></div></div>
+    <div class="sw"><i style="background:#9A5A00"></i><div><b>Lamp Ink</b><code>#9A5A00</code><span>Amber text on Dawn. 5.0:1. Plain Lamp on Dawn fails at 1.6:1</span></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="label">Type</div>
+  <h2>Three voices, one system</h2>
+  <div class="card" style="margin-top:1.6rem;padding-block:0.4rem">
+    <div class="spec"><span class="k">Display · Bricolage 800</span><span style="font-family:var(--display);font-weight:800;font-size:clamp(2rem,6vw,3.6rem);letter-spacing:-0.02em;line-height:1.05">Walk like you know.</span></div>
+    <div class="spec"><span class="k">Title · Bricolage 700</span><span style="font-family:var(--display);font-weight:700;font-size:1.6rem">What goes into this score</span></div>
+    <div class="spec"><span class="k">Body · Plex Sans 400</span><span>24 places are listed open within 50 m as you pass. The longest stretch with nothing open is 110 m.</span></div>
+    <div class="spec"><span class="k">Data · Plex Mono 500</span><span class="mono" style="letter-spacing:0.04em">FRI 10:50 PM · 1.6 KM · +1.1 MIN · 69.0 / 100</span></div>
+    <div class="spec"><span class="k">Score · tabular</span><span style="font-family:var(--display);font-weight:800;font-size:3.6rem;font-variant-numeric:tabular-nums;line-height:1">69</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="label">Voice</div>
+  <h2>Plain, specific, numbers first</h2>
+  <p class="lede">Name the reason, not the feeling. Say when data is missing. Never use "safe", "unsafe", "dangerous" or "sketchy", and never name a neighborhood as a problem.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Say</th><th>Never say</th></tr></thead>
+    <tbody>
+      <tr><td class="yes">Your usual route scores 49. I found one at 60, 1 minute longer.</td><td class="no">Avoid this dangerous area!</td></tr>
+      <tr><td class="yes">Longest stretch with nothing open: 110 m</td><td class="no">Sketchy block ahead</td></tr>
+      <tr><td class="yes">A lamp was reported out here 3 days ago</td><td class="no">Unsafe lighting</td></tr>
+      <tr><td class="yes">63 places nearby have no listed hours, so this may be understated</td><td class="no">100% accurate AI-powered score</td></tr>
+      <tr><td class="yes">Conditions, not a safety rating</td><td class="no">The safest route</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <div class="label">Motion</div>
+  <h2>Lamplight</h2>
+  <p class="lede">Motion is slow and warm, and it only ever shows something alive: a lamp, a route, an open place. Every animation has a still state that says the same thing.</p>
+  <div class="grid g4">
+    <div class="card"><div class="demo"><div class="glow-dot"></div></div><h3>Breathe</h3><p class="small">Glow scales 0.94 to 1.04 over 4.5 s. Brand mark and walk state.</p></div>
+    <div class="card"><div class="demo route-demo" id="routeDemo"><svg viewBox="0 0 300 100" aria-hidden="true"><path d="M12 80 C 70 80, 60 30, 130 40 S 200 90, 288 20" fill="none" stroke="#FFB547" stroke-width="5" stroke-linecap="round" style="filter:drop-shadow(0 0 8px #FFB547)"/></svg></div><div class="row"><button class="btn ghost" data-replay="routeDemo">Replay</button></div><h3>Draw</h3><p class="small">A route draws from A to B in about 1.5 s, then light flows along it.</p></div>
+    <div class="card"><div class="demo"><div class="count" id="countDemo">69</div></div><div class="row"><button class="btn ghost" id="countBtn">Replay</button></div><h3>Count</h3><p class="small">Scores count up with an ease-out in about 1 s.</p></div>
+    <div class="card"><div class="demo"><div class="pops" id="popDemo"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class="row"><button class="btn ghost" data-replay="popDemo">Replay</button></div><h3>Pop</h3><p class="small">Open places appear one after another, 55 ms apart.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="label">Interface</div>
+  <h2>The pieces</h2>
+  <div class="grid g3">
+    <div class="card"><div class="small mono">SCORE RING AND ROUTE CARD</div>
+      <div class="rcard"><div class="ring"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="none" stroke="#1d2a3b" stroke-width="4"/><circle cx="22" cy="22" r="19" fill="none" stroke="#FFB547" stroke-width="4" stroke-linecap="round" stroke-dasharray="82 120"/></svg><b>69</b></div><div><div class="chip lamp">STREETWISE ROUTE</div><div style="font-family:var(--display);font-weight:800;font-size:1.5rem;margin-top:0.3rem">19.5 <span class="small" style="font-weight:400">min</span></div><div class="small mono" style="color:var(--glow)">+1.1 min · +14.3 points</div></div></div></div>
+    <div class="card"><div class="small mono">CHIPS</div><div style="display:flex;flex-wrap:wrap;gap:0.5rem"><span class="chip lamp">Streetwise route</span><span class="chip ember">Empty stretch · 110 m</span><span class="chip glow">24 places open</span><span class="chip signal">Scout</span><span class="chip">Fri 10:50 PM</span></div><div class="small mono" style="margin-top:0.6rem">BUTTONS</div><div style="display:flex;gap:0.6rem;flex-wrap:wrap"><button class="btn">Walk with me</button><button class="btn ghost">Keep usual route</button></div></div>
+    <div class="card"><div class="small mono">PLACES ALONG THE ROUTE</div><div class="strip"><div class="l"></div><div class="g"></div><div class="d" style="left:4%"></div><div class="d" style="left:8%"></div><div class="d" style="left:56%"></div><div class="d" style="left:62%"></div><div class="d" style="left:66%"></div><div class="d" style="left:79%"></div><div class="d" style="left:90%"></div></div><div class="small mono" style="color:var(--ember)">LONGEST EMPTY STRETCH · 520 M</div></div>
+    <div class="card" style="grid-column: 1 / -1"><div class="small mono">AGENT TRACE</div><div class="trace"><div><span class="t">10:50PM</span><span class="a">Scout</span>Fastest route A to B: 18.4 min, score 54.7. Longest empty stretch 520 m.</div><div><span class="t">10:50PM</span><span class="a">Scout</span>Streetwise route: 19.5 min (+1.1), score 69.0. Longest empty stretch 110 m.</div><div><span class="t">10:57PM</span><span class="a">Watcher</span>Stopped near an open shop. Staying quiet.</div><div><span class="t">10:57PM</span><span class="a">Rescuer</span>Guardian link opened. Handoff packet drafted. No call to 911.</div></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="label">The crew</div>
+  <h2>Agents speak in first person, briefly, and say what they did</h2>
+  <div class="grid g3">
+    <div class="card"><span class="chip signal">Scout</span><p class="small">Plans and re-scores routes. "Streetwise route scores 69 against 55, 1.1 minutes longer."</p></div>
+    <div class="card"><span class="chip signal">Place agents</span><p class="small">Shops declare live hours. "Peet's Coffee will stay open until 1 AM."</p></div>
+    <div class="card"><span class="chip signal">Watcher</span><p class="small">Follows the walk. "Stopped near an open shop. Staying quiet."</p></div>
+    <div class="card"><span class="chip signal">Rescuer</span><p class="small">Runs the alert ladder. "Guardian link opened. No call to 911."</p></div>
+    <div class="card"><span class="chip signal">Reporter</span><p class="small">Files what the walk found. "Draft 311 report saved. Nothing submitted."</p></div>
+    <div class="card"><span class="chip signal">Night Auditor</span><p class="small">Finds stale data overnight. "491 places have no listed hours."</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="label">Applications</div>
+  <h2>Where it shows up</h2>
+  <div class="grid g2" style="align-items:start">
+    <div class="banner"><div class="small mono" style="color:var(--lamp)">STREETWISE · CAL HACKS 13.0</div><div class="big">The fastest route isn't the one with <span style="color:var(--lamp)">people on it.</span></div><div class="small">Walk like you know.</div></div>
+    <div class="card" style="flex-direction:row;gap:1.2rem;align-items:center;flex-wrap:wrap"><div class="appicon"><svg viewBox="0 0 128 128" aria-label="App icon"><defs><radialGradient id="g3" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF3D6"/><stop offset=".34" stop-color="#FFB547"/><stop offset=".7" stop-color="#FFB547" stop-opacity=".22"/><stop offset="1" stop-color="#FFB547" stop-opacity="0"/></radialGradient></defs><circle cx="64" cy="64" r="62" fill="url(#g3)"/><circle cx="64" cy="64" r="30" fill="#FFB547"/><path d="M24 94 C 50 94 42 62 64 62 S 82 92 106 38" fill="none" stroke="#070B12" stroke-width="9" stroke-linecap="round"/><circle cx="24" cy="94" r="6" fill="#070B12"/><circle cx="106" cy="38" r="7" fill="#FFF3D6" stroke="#070B12" stroke-width="4"/></svg></div><div style="flex:1;min-width:12rem"><h3>App icon and splash</h3><p class="small">The glow mark on Night. PNG icons at 180, 192 and 512 px are generated in the repo. Slides and the Devpost banner use Night, the lockup, and one number in Display.</p></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="label">For the team</div>
+  <h2>Where the brand lives in the repo</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Abhishek (Figma)</h3><p class="small">Create a variable collection named <span class="mono">color</span> using the names above (night, panel, raise, line, moon, fog, lamp, ember, glow, signal, dawn, ink, lamp-ink) and text styles for Display, Title, Body and Data. Import <span class="mono">apps/web/public/brand/*.svg</span> for the logo.</p></div>
+    <div class="card"><h3>Jagrat (code)</h3><p class="small">Tokens are in <span class="mono">apps/web/src/design/tokens.css</span> and <span class="mono">tokens.ts</span>. Use the variables, never raw hex. The full guide is <span class="mono">docs/BRAND.md</span>.</p></div>
+  </div>
+</section>
+</main>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('[data-replay]').forEach((b) => b.addEventListener('click', () => {
+    const el = document.getElementById(b.dataset.replay); el.classList.remove('go'); void el.offsetWidth; el.classList.add('go');
+    if (el.id === 'popDemo') el.querySelectorAll('i').forEach((d, i) => (d.style.animationDelay = i * 55 + 'ms'));
+  }));
+  const rd = document.getElementById('routeDemo'); rd.classList.add('go');
+  const pd = document.getElementById('popDemo'); pd.classList.add('go'); pd.querySelectorAll('i').forEach((d, i) => (d.style.animationDelay = i * 55 + 'ms'));
+  const cd = document.getElementById('countDemo');
+  const count = () => { if (reduce) { cd.textContent = '69'; return; } const t0 = performance.now(); const s = (n) => { const p = Math.min(1, (n - t0) / 1000), e = 1 - Math.pow(1 - p, 3); cd.textContent = Math.round(69 * e); if (p < 1) requestAnimationFrame(s); }; requestAnimationFrame(s); };
+  document.getElementById('countBtn').addEventListener('click', count);
+})();
+</script>

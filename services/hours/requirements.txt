@@ -1,0 +1,5 @@
+apify-client>=1.9
+anthropic>=0.40
+# the engine's world.py is imported to reuse its is_open() parser; it needs these two at import time
+numpy>=2.0
+networkx>=3.3

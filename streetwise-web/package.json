@@ -1,0 +1,42 @@
+{
+  "name": "hootroute-web",
+  "version": "0.1.0",
+  "description": "HootRoute PWA \u2014 walker, guardian, shopkeeper and control room screens",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "relay": "node relay/server.mjs",
+    "assets": "node scripts/gen-assets.mjs",
+    "typecheck": "tsc --noEmit",
+    "icons": "node scripts/gen-icons.mjs public/brand/hootroute-logo.png public/icons"
+  },
+  "dependencies": {
+    "@fontsource/barlow-condensed": "^5.3.0",
+    "@fontsource/bricolage-grotesque": "^5.3.0",
+    "@fontsource/dm-mono": "^5.3.0",
+    "@fontsource/instrument-sans": "^5.3.0",
+    "@protomaps/basemaps": "^5.7.2",
+    "maplibre-gl": "^4.7.1",
+    "pmtiles": "^4.5.0",
+    "qrcode": "^1.5.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.6"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@types/ws": "^8.18.2",
+    "@vitejs/plugin-react": "^4.7.0",
+    "sharp": "^0.35.5",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "vite-plugin-pwa": "^0.20.5",
+    "ws": "^8.22.0"
+  },
+  "private": true,
+  "type": "module"
+}

@@ -1,0 +1,12 @@
+# Caddy terminates HTTPS (automatic Let's Encrypt) and proxies everything, including the /ws rooms, to the gateway.
+# Replace the domain, point its DNS A record at the VPS, then: sudo cp deploy/Caddyfile /etc/caddy/Caddyfile && sudo systemctl reload caddy
+streetwise.example.com {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8000
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		Permissions-Policy "geolocation=(self), microphone=(self)"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+	}
+}

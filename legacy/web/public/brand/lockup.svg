@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 128" role="img" aria-label="Streetwise">
+  <!-- Wordmark is live text in Bricolage Grotesque 800. Outline it in Figma before exporting for print. -->
+  <defs><radialGradient id="g" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF3D6"/><stop offset=".34" stop-color="#FFB547"/><stop offset=".7" stop-color="#FFB547" stop-opacity=".22"/><stop offset="1" stop-color="#FFB547" stop-opacity="0"/></radialGradient></defs>
+  <g><circle cx="64" cy="64" r="62" fill="url(#g)"/><circle cx="64" cy="64" r="30" fill="#FFB547"/>
+  <path d="M24 94 C 50 94 42 62 64 62 S 82 92 106 38" fill="none" stroke="#070B12" stroke-width="9" stroke-linecap="round"/><circle cx="24" cy="94" r="6" fill="#070B12"/><circle cx="106" cy="38" r="7" fill="#FFF3D6" stroke="#070B12" stroke-width="4"/></g>
+  <text x="148" y="82" font-family="'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif" font-weight="800" font-size="64" letter-spacing="-1.5" fill="#E8EDF3">Street<tspan fill="#FFB547">wise</tspan></text>
+</svg>

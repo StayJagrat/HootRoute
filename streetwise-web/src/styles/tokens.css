@@ -1,0 +1,50 @@
+/* Mirrors the "Streetwise" variable collection in Figma (modes: Night / Day).
+   Every screen sets data-theme on its root; the map style reads the same values. */
+:root,
+[data-theme='night'] {
+  --bg: #10141c;
+  --surface: #1b2230;
+  --surface-2: #242c3b;
+  --border: #2b3444;
+  --text: #ece7dc;
+  --text-2: #8e97a8;
+  --route: #6b83ff;
+  --open: #4fd1a5;
+  --checkin: #ff8a3d;
+  --alert: #ef4438;
+  --sign: #1f5c46;
+  --on-accent: #0b0e14;
+  --shadow: 0 -8px 30px rgb(0 0 0 / 0.35);
+  --scrim: rgb(16 20 28 / 0.35);
+  color-scheme: dark;
+}
+
+[data-theme='day'] {
+  --bg: #f4f0e8;
+  --surface: #ffffff;
+  --surface-2: #ede7db;
+  --border: #e2dcd0;
+  --text: #151a22;
+  --text-2: #6a6f7b;
+  --route: #4a63e8;
+  --open: #1e9e74;
+  --checkin: #e36a1a;
+  --alert: #d92d20;
+  --sign: #1f5c46;
+  --on-accent: #ffffff;
+  --shadow: 0 -6px 24px rgb(0 0 0 / 0.14);
+  --scrim: rgb(244 240 232 / 0.35);
+  color-scheme: light;
+}
+
+:root {
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'Instrument Sans', system-ui, sans-serif;
+  --font-sign: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
+  --radius-sheet: 28px;
+  --radius-card: 18px;
+  --gutter: 20px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}

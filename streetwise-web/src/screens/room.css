@@ -1,0 +1,354 @@
+.room {
+  display: grid;
+  grid-template-columns: 232px 1fr 400px;
+  min-width: 1100px;
+}
+.room__side {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 22px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+.room__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+.room__nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: 15px;
+}
+.room__nav-item--on {
+  color: var(--text);
+  background: color-mix(in srgb, var(--route) 16%, transparent);
+}
+.room__badge {
+  background: var(--alert);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 8px;
+}
+.room__qr {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  align-items: stretch;
+}
+.room__qr img {
+  width: 100%;
+  border-radius: 10px;
+  image-rendering: pixelated;
+}
+.room__action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-weight: 600;
+  font-size: 13px;
+}
+.room__action:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.room__det {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 0;
+}
+.room__map {
+  position: relative;
+  overflow: hidden;
+}
+.room__map > div:first-child {
+  bottom: 124px !important;
+}
+.room__header {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+}
+.room__pills {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.room__pills .chip {
+  font-size: 11px;
+  color: var(--text);
+  padding: 5px 10px;
+}
+.room__cards {
+  position: absolute;
+  z-index: 3;
+  top: 78px;
+  right: 20px;
+  width: 320px;
+  bottom: 144px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+.why {
+  position: relative;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.45);
+  flex: none;
+}
+.why--hint {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.why__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-right: 18px;
+}
+.why__sect span:first-child {
+  display: block;
+  color: var(--text-2);
+  font-size: 11px;
+}
+.why__sect p {
+  margin: 3px 0;
+  font-size: 13px;
+  line-height: 18px;
+}
+.why__sect em {
+  font-style: normal;
+  font-size: 10px;
+}
+.why__say {
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.why__say p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+}
+.why__close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 20px;
+  color: var(--text-2);
+}
+.conf {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--text-2);
+}
+.conf i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.2px solid var(--text-2);
+}
+.conf i.on {
+  background: var(--text);
+  border-color: var(--text);
+}
+.debt {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: none;
+}
+.debt__head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.debt__row > div {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.debt__row i {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.debt__row b {
+  display: block;
+  height: 100%;
+  background: var(--checkin);
+  border-radius: 3px;
+  transition: width 600ms;
+}
+.debt__btn {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-weight: 600;
+  font-size: 13px;
+}
+.room__legend {
+  position: absolute;
+  z-index: 3;
+  left: 20px;
+  bottom: 144px;
+  padding: 10px 14px;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.room__feed {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.room__feed-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.room__feed-list {
+  overflow-y: auto;
+  flex: 1;
+}
+.room__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 60px 30px;
+  text-align: center;
+}
+
+.timeline {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 124px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 40px 210px 1fr;
+  grid-template-rows: 1fr auto;
+  gap: 0 14px;
+  padding: 20px 28px 10px 20px;
+  align-items: center;
+}
+.timeline__play {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: var(--text);
+  color: var(--bg);
+  display: grid;
+  place-items: center;
+}
+.timeline__track {
+  position: relative;
+  height: 60px;
+}
+.timeline__base,
+.timeline__done {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 27px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+.timeline__done {
+  background: var(--route);
+  transform-origin: left;
+}
+.timeline__stop {
+  position: absolute;
+  top: 0;
+  height: 60px;
+  transform: translateX(-50%);
+}
+.timeline__dot {
+  position: absolute;
+  top: 22px;
+  left: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid var(--surface);
+}
+.timeline__txt {
+  position: absolute;
+  top: 42px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 11px;
+  line-height: 13px;
+}
+.timeline__txt--up {
+  top: -10px;
+  flex-direction: column-reverse;
+}
+.timeline__txt em {
+  font-style: normal;
+  font-size: 10px;
+}
+.timeline__foot {
+  grid-column: 1 / -1;
+  font-size: 11px;
+}
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+}

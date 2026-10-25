@@ -1,0 +1,200 @@
+.walk__top {
+  position: absolute;
+  top: calc(12px + var(--safe-top));
+  left: 16px;
+  right: 16px;
+  z-index: 4;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  pointer-events: none;
+}
+.walk__top > * {
+  pointer-events: auto;
+}
+.walk__top .chip {
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+}
+.walk__top-right {
+  display: flex;
+  gap: 8px;
+}
+.walk__tape {
+  position: absolute;
+  z-index: 4;
+  left: 16px;
+  top: calc(96px + var(--safe-top));
+}
+.walk__toast {
+  position: absolute;
+  z-index: 6;
+  left: 16px;
+  right: 16px;
+  top: calc(140px + var(--safe-top));
+  background: var(--surface);
+  border: 1px solid var(--checkin);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+.walk__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: var(--scrim);
+  pointer-events: none;
+}
+.round-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.3);
+}
+
+.speaker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ticket {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: var(--surface-2);
+  border-radius: 14px;
+  padding: 12px 0;
+  text-align: center;
+}
+.ticket > div + div {
+  border-left: 1px solid var(--border);
+}
+.ticket__v {
+  font-size: 24px;
+  line-height: 26px;
+}
+.ticket__k {
+  font-size: 12px;
+  color: var(--text-2);
+}
+.legend {
+  display: flex;
+  gap: 18px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend__solid {
+  width: 22px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--route);
+}
+.legend__dots {
+  width: 22px;
+  height: 4px;
+  background: radial-gradient(circle, var(--text-2) 1.6px, transparent 2px) 0 50% / 7px 4px repeat-x;
+}
+.walk__eta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.guardian-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 20px;
+  background: var(--surface-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+.listening {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--route);
+}
+.wave {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 16px;
+}
+.wave i {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--route);
+  animation: wave 900ms ease-in-out infinite alternate;
+}
+@keyframes wave {
+  to {
+    transform: scaleY(0.35);
+  }
+}
+.countdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.countdown__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+}
+.countdown__track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.countdown__fill {
+  height: 100%;
+  background: var(--checkin);
+  border-radius: 4px;
+  transform-origin: left;
+  transition: transform 250ms linear;
+}
+.ack {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  font-weight: 600;
+}
+.ack--on {
+  color: var(--open);
+}
+.center {
+  text-align: center;
+  margin: 0;
+}
+
+.walk__end {
+  align-self: center;
+  color: var(--text-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 4px 8px;
+}
+
+/* rescue ladder */
+.ladder { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ladder__rung { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-2); }
+.ladder__rung small { color: var(--text-2); }
+.ladder__n { width: 22px; height: 22px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; border: 1.5px solid var(--border); }
+.ladder__rung--now { color: var(--text); font-weight: 600; }
+.ladder__rung--now .ladder__n { border-color: var(--alert); background: var(--alert); color: var(--on-accent); }
+.ladder__rung--done .ladder__n { border-color: var(--open); background: var(--open); color: var(--on-accent); }
+.call911 { text-decoration: none; text-align: center; }
